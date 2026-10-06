@@ -7,14 +7,14 @@ import { useCart } from "@/state/CartContext";
 const CATEGORY_ORDER = ["loaf", "cheesecake", "batch", "cookie"];
 const CATEGORY_LABEL = {
   loaf: "Loaves — freshly baked, made with love",
-  cheesecake: "Cheesecake & desserts",
-  batch: "Batches — brownies, buns & rolls",
-  cookie: "Cookies — by the piece",
+  cheesecake: "Cheesecake & Dessert Boxes",
+  batch: "Brownies, Bakes & Dessert Cups",
+  cookie: "Artisanal Cookies",
 };
 const CATEGORY_EYEBROW = {
   loaf: "01 / LOAVES",
-  cheesecake: "02 / CHEESECAKE & DESSERTS",
-  batch: "03 / BATCHES",
+  cheesecake: "02 / CHEESECAKE & DESSERT BOXES",
+  batch: "03 / BROWNIES, BAKES & CUPS",
   cookie: "04 / COOKIES",
 };
 
@@ -41,7 +41,15 @@ export default function Menu() {
     return g;
   }, [products]);
 
-  const visibleCategories = filter === "all" ? CATEGORY_ORDER : [filter];
+  const visibleCategories = filter === "all"
+    ? CATEGORY_ORDER
+    : filter === "healthy"
+      ? CATEGORY_ORDER.filter((category) => grouped[category].some((product) => product.healthy))
+      : [filter];
+  const visibleGroups = visibleCategories.map((category) => ({
+    category,
+    products: filter === "healthy" ? grouped[category].filter((product) => product.healthy) : grouped[category],
+  }));
 
   const add = (p) => {
     addItem({ id: p.id, name: p.name, price: p.price, image: p.image, custom_box: false });
@@ -51,10 +59,14 @@ export default function Menu() {
   return (
     <div className="menu-page">
       <header className="menu-header">
+        <div className="menu-order-note">
+          <strong>24 Hours Notice Required</strong>
+          <span>Freshly prepared &amp; baked to order with love.</span>
+        </div>
         <p className="eyebrow">THE FULL MENU</p>
         <h1>Freshly baked,<br /><em>made with love.</em></h1>
         <p className="menu-lead">
-          Browse the whole kitchen — loaves, cheesecakes, batches, cookies. Or, for a small mix,{" "}
+          Browse the whole kitchen — artisanal loaves, dessert boxes, bakes, cookies, and wholesome treats. Or, for a small mix,{" "}
           <Link to="/build" className="inline-link light" data-testid="menu-build-link">build a custom box <WandSparkles size={14} /></Link>.
         </p>
         <div className="menu-filters">
@@ -64,17 +76,20 @@ export default function Menu() {
               {CATEGORY_LABEL[c].split(" — ")[0]}
             </button>
           ))}
+          <button className={filter === "healthy" ? "chip active" : "chip"} onClick={() => setFilter("healthy")} data-testid="filter-healthy">
+            Healthy Range
+          </button>
         </div>
       </header>
 
-      {visibleCategories.map((cat) => (
+      {visibleGroups.map(({ category: cat, products: categoryProducts }) => (
         <section className="menu-cat" key={cat} id={`cat-${cat}`}>
           <div className="menu-cat-head">
             <p className="eyebrow">{CATEGORY_EYEBROW[cat]}</p>
             <h2>{CATEGORY_LABEL[cat]}</h2>
           </div>
           <div className="menu-grid">
-            {grouped[cat].map((p) => (
+            {categoryProducts.map((p) => (
               <article className="menu-card" id={`product-${p.id}`} key={p.id} data-testid={`menu-item-${p.id}`}>
                 <div className="menu-card-image">
                   <img src={p.image} alt={p.name} />

@@ -9,6 +9,9 @@
 /* Menu page */
 .menu-page{padding:60px 6% 110px;background:var(--paper);min-height:70vh}
 .menu-header{max-width:820px;margin-bottom:56px}
+.menu-order-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:32px;padding:13px 16px;border:1px solid var(--line);background:#fff;font-size:12px}
+.menu-order-note strong{color:var(--burnt)}
+.menu-order-note span{color:var(--muted)}
 .menu-header h1{font:500 clamp(40px,5vw,68px)/.98 'Playfair Display';margin:8px 0 24px;letter-spacing:-1.4px}
 .menu-header h1 em{color:var(--orange);font-weight:500}
 .menu-lead{color:var(--muted);font-size:15px;line-height:1.7;max-width:560px}

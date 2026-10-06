@@ -28,9 +28,9 @@ const moods = [
 const featuredCategories = [
   { id: "all", label: "All bakes" },
   { id: "loaf", label: "Loaves" },
-  { id: "cheesecake", label: "Desserts" },
-  { id: "batch", label: "Batches" },
-  { id: "cookie", label: "Cookies" },
+  { id: "cheesecake", label: "Dessert boxes" },
+  { id: "batch", label: "Bakes & cups" },
+  { id: "cookie", label: "Artisanal cookies" },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
 

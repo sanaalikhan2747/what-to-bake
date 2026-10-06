@@ -1,21 +1,27 @@
 """Regression coverage for Treats & Temptation public API — 19-item + orders iteration."""
 from pathlib import Path
+import os
 import re
 import pytest
 import requests
 
 
 def base_url():
+    configured_url = os.environ.get("TEST_API_URL")
+    if configured_url:
+        return configured_url.rstrip("/")
     env = Path(__file__).parents[2] / "frontend" / ".env"
-    value = next(line.split("=", 1)[1].strip() for line in env.read_text().splitlines() if line.startswith("REACT_APP_BACKEND_URL="))
-    return value.rstrip("/")
+    if env.exists():
+        value = next(line.split("=", 1)[1].strip() for line in env.read_text().splitlines() if line.startswith("REACT_APP_BACKEND_URL="))
+        return value.rstrip("/")
+    return "http://127.0.0.1:8001"
 
 
 BASE = base_url()
 
 CUSTOM_BOX_IDS = {
-    "brownies-batch", "cinnamon-rolls-batch", "papparoti-batch", "cadbury-eclair-batch",
-    "chocolate-chip-cookie", "chocolate-filled-cookie", "lotus-cookie", "double-chocolate-cookie",
+    "flourless-brownies-batch", "brownies-batch", "cinnamon-rolls-batch", "papparoti-batch",
+    "oat-flour-choco-chip-cookie", "chocolate-chip-cookie", "double-chocolate-cookie",
 }
 
 
@@ -26,19 +32,19 @@ def test_root():
 
 
 # ---------- Products ----------
-def test_products_19_items_across_4_categories():
+def test_products_28_items_across_4_categories():
     r = requests.get(f"{BASE}/api/products", timeout=20)
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == 19, f"Expected 19 items, got {len(data)}"
+    assert len(data) == 28, f"Expected 28 items, got {len(data)}"
     cats = {}
     for p in data:
         assert {"id", "name", "category", "price", "image", "moods", "occasions"} <= set(p.keys()), \
             f"Missing fields on {p.get('id')}"
         cats.setdefault(p["category"], []).append(p["id"])
-    assert len(cats.get("loaf", [])) == 6
-    assert len(cats.get("cheesecake", [])) == 5
-    assert len(cats.get("batch", [])) == 4
+    assert len(cats.get("loaf", [])) == 9
+    assert len(cats.get("cheesecake", [])) == 7
+    assert len(cats.get("batch", [])) == 8
     assert len(cats.get("cookie", [])) == 4
 
 
@@ -48,10 +54,10 @@ def test_custom_box_unit_only_on_expected_items():
     assert with_cbox == CUSTOM_BOX_IDS, f"Mismatch: {with_cbox ^ CUSTOM_BOX_IDS}"
     # Spot-check specific prices
     prices = {p["id"]: p.get("custom_box_unit") for p in products if "custom_box_unit" in p}
-    assert prices["brownies-batch"] == 275
-    assert prices["cinnamon-rolls-batch"] == 375
-    assert prices["papparoti-batch"] == 225
-    assert prices["cadbury-eclair-batch"] == 250
+    assert prices["brownies-batch"] == 300
+    assert prices["flourless-brownies-batch"] == 300
+    assert prices["cinnamon-rolls-batch"] == 400
+    assert prices["papparoti-batch"] == 300
 
 
 def test_packaging_three_options():
@@ -113,14 +119,14 @@ def test_order_happy_path():
     body = r.json()
     assert re.match(r"^TT\d{6}$", body["order_number"])
     prices = {i["product_id"]: i["unit_price"] for i in body["items"]}
-    assert prices["brownies-batch"] == 275
-    assert prices["chocolate-chip-cookie"] == 200
-    assert body["subtotal"] == 275 * 2 + 200 * 4  # 1350
+    assert prices["brownies-batch"] == 300
+    assert prices["chocolate-chip-cookie"] == 300
+    assert body["subtotal"] == 300 * 2 + 300 * 4
     assert body["packaging"]["ribbon"] == "pink"
     assert body["packaging"]["style"] == "kraft"
     assert "customer-assets-rejwkqb3.emergentagent" in body["packaging"]["image"]
     assert body["packaging_total"] == 150
-    assert body["total"] == 1500
+    assert body["total"] == 1950
     assert body["status"] == "pending_confirmation"
 
     # GET persistence
@@ -175,9 +181,9 @@ def test_get_festive_box_eid_hydrated():
     b = r.json()
     assert b["id"] == "eid-box"
     ids_qty = {it["product"]["id"]: it["qty"] for it in b["items"]}
-    assert ids_qty == {"coconut-loaf": 1, "lotus-cookie": 4, "papparoti-batch": 1}
-    # Total = 1200 + 4*300 + 800 = 3200
-    assert b["total"] == 3200
+    assert ids_qty == {"coconut-loaf": 1, "double-chocolate-cookie": 4, "papparoti-batch": 1}
+    # Total = 1200 + 4*350 + 1200 = 3800
+    assert b["total"] == 3800
 
 
 def test_get_festive_box_unknown_404():
@@ -190,7 +196,7 @@ def test_order_from_festive_editor_uses_full_prices():
     payload = {
         "items": [
             {"product_id": "coconut-loaf", "qty": 1, "custom_box": False},
-            {"product_id": "lotus-cookie", "qty": 4, "custom_box": False},
+            {"product_id": "double-chocolate-cookie", "qty": 4, "custom_box": False},
             {"product_id": "papparoti-batch", "qty": 1, "custom_box": False},
         ],
         "packaging_id": "clear-box",
@@ -201,10 +207,10 @@ def test_order_from_festive_editor_uses_full_prices():
     body = r.json()
     prices = {i["product_id"]: i["unit_price"] for i in body["items"]}
     assert prices["coconut-loaf"] == 1200
-    assert prices["lotus-cookie"] == 300
-    assert prices["papparoti-batch"] == 800
-    assert body["subtotal"] == 1200 + 4 * 300 + 800  # 3200
-    assert body["total"] == 3200 + 150
+    assert prices["double-chocolate-cookie"] == 350
+    assert prices["papparoti-batch"] == 1200
+    assert body["subtotal"] == 1200 + 4 * 350 + 1200
+    assert body["total"] == 3800 + 150
     assert body["packaging"]["style"] == "clear"
 
 
