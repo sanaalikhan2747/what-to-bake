@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
@@ -22,10 +22,17 @@ export default function Menu() {
   const [products, setProducts] = useState([]);
   const [filter, setFilter] = useState("all");
   const { addItem, setCartOpen } = useCart();
+  const location = useLocation();
 
   useEffect(() => {
     api.get("/products").then((r) => setProducts(r.data)).catch(() => setProducts([]));
   }, []);
+
+  useEffect(() => {
+    if (!location.hash || !products.length) return;
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (target) setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
+  }, [location.hash, products.length]);
 
   const grouped = useMemo(() => {
     const g = {};
@@ -68,7 +75,7 @@ export default function Menu() {
           </div>
           <div className="menu-grid">
             {grouped[cat].map((p) => (
-              <article className="menu-card" key={p.id} data-testid={`menu-item-${p.id}`}>
+              <article className="menu-card" id={`product-${p.id}`} key={p.id} data-testid={`menu-item-${p.id}`}>
                 <div className="menu-card-image">
                   <img src={p.image} alt={p.name} />
                   {p.healthy && <span className="pill-healthy">Healthy option</span>}

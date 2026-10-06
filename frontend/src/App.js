@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "@/App.css";
+import "@/SurfaceRefinement.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -11,6 +12,8 @@ import BuildBox from "@/pages/BuildBox";
 import FestiveBoxEditor from "@/pages/FestiveBoxEditor";
 import Checkout from "@/pages/Checkout";
 import OrderSuccess from "@/pages/OrderSuccess";
+import OrderOption from "@/pages/OrderOption";
+import OurStory from "@/pages/OurStory";
 
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -21,9 +24,15 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
+          <Route path="/our-story" element={<OurStory />} />
           <Route path="/build" element={<BuildBox />} />
           <Route path="/festive/:boxId" element={<FestiveBoxEditor />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order/local-pickup" element={<OrderOption orderType="local-pickup" />} />
+          <Route path="/order/same-day" element={<OrderOption orderType="same-day" />} />
+          <Route path="/order/corporate-catering" element={<OrderOption orderType="corporate-catering" />} />
+          <Route path="/order/corporate-gifting" element={<OrderOption orderType="corporate-gifting" />} />
+          <Route path="/order/celebrations" element={<OrderOption orderType="celebrations" />} />
           <Route path="/order/:orderNumber" element={<OrderSuccess />} />
         </Routes>
       </main>

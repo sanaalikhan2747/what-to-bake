@@ -1,0 +1,35 @@
+.match-section{display:block}
+.match-heading-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(370px,420px);align-items:center;gap:28px;max-width:1080px;margin:0 auto 28px}
+.match-heading-row .section-intro h2{font-size:clamp(48px,5vw,62px)}
+.match-heading-row .section-intro>p:last-child{max-width:430px;margin-top:20px}
+.match-heading-row .match-mascot-button{margin:0;width:100%}
+.match-form{width:100%;max-width:1080px;margin:0 auto}
+.match-form .question label{margin-bottom:14px;color:var(--ink);font:500 19px/1.2 'Playfair Display',serif}
+.match-form .choice-grid{gap:9px}
+.match-form .choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-height:59px;border-radius:3px;padding:10px 12px;background:#fff;color:var(--ink);text-align:left;transition:background .18s,border-color .18s,transform .18s}
+.match-form .choice:hover{transform:translateY(-1px);border-color:#d3a7a4}
+.match-form .choice.active{border-color:var(--burnt);background:#fbf0f1;color:var(--ink)}
+.match-form .choice-title{font-size:12px;font-weight:700;line-height:1.2}
+.match-form .choice small{color:var(--muted);font-size:10px;font-weight:400;line-height:1.25}
+.occasion-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.mood-choice-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.match-form .mood-choice{min-height:68px}
+.mood-choice-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;line-height:1.2}
+.mood-choice-title i{width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:var(--mood-swatch)}
+.match-mascot-button{display:flex;align-items:center;gap:0;width:min(100%,420px);min-height:220px;margin:15px 0 0 -12px;padding:0;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.match-mascot-canvas-wrap{position:relative;display:block;width:250px;height:208px;flex:0 0 250px}
+.match-mascot-canvas{display:block;width:100%;height:100%;outline:none}
+.match-mascot-sparkle{position:absolute;color:#d9a642;opacity:.65;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.sparkle-one{top:8px;right:13px}
+.sparkle-two{top:29px;right:1px;color:#d97e87}
+.match-mascot-button:hover .match-mascot-sparkle,.match-mascot-button:focus-visible .match-mascot-sparkle{opacity:1;transform:scale(1.25) rotate(12deg)}
+.match-mascot-button:focus-visible{outline:2px solid var(--burnt);outline-offset:4px}
+.match-mascot-copy{display:flex;flex-direction:column;gap:5px}
+.match-mascot-copy>small{color:var(--burnt);font-size:9px;font-weight:800;letter-spacing:.12em}
+.match-mascot-copy>b{font:500 17px/1.2 'Playfair Display',serif}
+.match-mascot-copy>span{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:10px;font-weight:600}
+@media(max-width:800px){.match-mascot-button{margin-left:0;width:min(100%,460px)}.match-mascot-canvas-wrap{width:230px;height:192px;flex-basis:230px}}
+@media(max-width:760px){.match-heading-row{grid-template-columns:1fr;gap:8px;margin-bottom:20px}.match-heading-row .match-mascot-button{width:min(100%,460px)}.match-heading-row .section-intro h2{font-size:48px}.match-form{padding:30px 26px}}
+@media(max-width:760px){.mood-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:500px){.occasion-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mood-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.match-form .question label{font-size:17px}}
+@media(max-width:430px){.match-mascot-button{gap:0}.match-mascot-canvas-wrap{width:185px;height:155px;flex-basis:185px}.match-mascot-copy>b{font-size:15px}}

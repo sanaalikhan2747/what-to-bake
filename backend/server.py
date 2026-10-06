@@ -10,15 +10,23 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Literal
 import uuid
 import json
+import asyncio
+import re
 from datetime import datetime, timezone
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+except ImportError:
+    LlmChat = UserMessage = TextDelta = StreamDone = None
 
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    serverSelectionTimeoutMS=int(os.environ.get("MONGO_SERVER_SELECTION_TIMEOUT_MS", "5000")),
+)
 db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
@@ -128,12 +136,12 @@ PRODUCTS = [
     {"id": "lotus-cookie", "name": "Lotus Cookie", "category": "cookie", "price": 300,
      "unit": "piece", "custom_box_unit": 300,
      "moods": ["Something different"], "occasions": ["Gift", "Tea party"],
-     "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=900&q=85",
+        "image": "https://images.pexels.com/photos/29066518/pexels-photo-29066518/free-photo-of-delicious-brownie-tubs-with-lotus-biscoff.jpeg?auto=compress&w=1200",
      "story": "Caramelised, spiced and quietly obsessive — the biscoff lover's cookie."},
     {"id": "double-chocolate-cookie", "name": "Double Chocolate Cookie", "category": "cookie", "price": 300,
      "unit": "piece", "custom_box_unit": 300,
      "moods": ["Chocolate lover"], "occasions": ["Gift", "Birthday", "Just craving something"],
-     "image": "https://images.unsplash.com/photo-1568051243851-f9b136146e97?auto=format&fit=crop&w=900&q=85",
+        "image": "https://images.pexels.com/photos/33650331/pexels-photo-33650331/free-photo-of-stack-of-delicious-chocolate-cookies-on-a-plate.jpeg?auto=compress&w=1200",
      "story": "Chocolate cookie, chocolate chunks, no restraint."},
 ]
 
@@ -199,8 +207,9 @@ class MatchRequest(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=1000)
     session_id: Optional[str] = None
+    history: Optional[List[dict]] = Field(default=None, max_length=12)
 
 
 class SaveMatchRequest(BaseModel):
@@ -273,25 +282,298 @@ def _pick_product(req: MatchRequest):
     return max(PRODUCTS, key=lambda p: _score(p, req))
 
 
-async def ask_baker(prompt: str, session_id: str, system_extra: str = "", full_catalogue: bool = True):
-    key = os.environ["EMERGENT_LLM_KEY"]
+async def ask_baker(prompt: str, session_id: str, system_extra: str = "", full_catalogue: bool = True, history=None):
     catalogue = FULL_CATALOGUE_FOR_AI if full_catalogue else LOAF_CATALOGUE_FOR_AI
     system_message = (
         "You are the warm, concise home baker for Treats & Temptation by SK. "
         "Only ever mention items from this catalogue (never invent products, prices or ingredients): "
         + json.dumps(catalogue) + ". "
-        "Speak like a friend, not a menu. Keep replies under 90 words. All prices are in Rs."
+        "Speak like a friend, not a menu. Keep replies under 90 words. All prices are in Rs. "
+        "The catalogue does not contain verified ingredient or allergen lists. Never guess ingredients or claim a product is safe for an allergy; recommend confirming directly with the baker. "
+        "Do not claim access to private orders. Order tracking is handled separately by the secure order lookup. "
+        "Verified website details: WhatsApp +92 322 411 2832; payment is arranged by Sana by bank transfer after confirmation; online card payment is unavailable; pickup address and opening hours are not published, so Sana confirms pickup availability, location and time directly. "
+        "The website has a full menu, a build-your-own box with per-piece pricing and Rs. 150 pink-ribbon packaging, five festive gift boxes, a checkout form, and order pages. Never invent delivery zones, same-day availability, an email, a physical address, business hours, discounts, or stock status."
     )
     if system_extra:
         system_message += " " + system_extra
-    chat = LlmChat(api_key=key, session_id=session_id, system_message=system_message).with_model("openai", "gpt-4o-mini")
-    text = ""
-    async for event in chat.stream_message(UserMessage(text=prompt)):
-        if isinstance(event, TextDelta):
-            text += event.content
-        elif isinstance(event, StreamDone):
+    if LlmChat is not None and os.environ.get("EMERGENT_LLM_KEY"):
+        chat = LlmChat(api_key=os.environ["EMERGENT_LLM_KEY"], session_id=session_id, system_message=system_message).with_model("openai", "gpt-4o-mini")
+        text = ""
+        async for event in chat.stream_message(UserMessage(text=prompt)):
+            if isinstance(event, TextDelta):
+                text += event.content
+            elif isinstance(event, StreamDone):
+                break
+        return text.strip()
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("No AI provider key is configured")
+
+    def request_completion():
+        import requests
+        messages = [{"role": "system", "content": system_message}]
+        for turn in (history or [])[-10:]:
+            if not isinstance(turn, dict) or turn.get("role") not in ("user", "assistant"):
+                continue
+            text = str(turn.get("text", "")).strip()[:1000]
+            if text:
+                messages.append({"role": turn["role"], "content": text})
+        messages.append({"role": "user", "content": prompt})
+        response = requests.post(
+            os.environ.get("OPENAI_API_URL", "https://api.openai.com/v1/chat/completions"),
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+                "messages": messages,
+                "temperature": 0.5,
+                "max_tokens": 180,
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"].strip()
+
+    return await asyncio.to_thread(request_completion)
+
+
+def _spoken_number(tokens):
+    small = {
+        "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+        "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+        "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+        "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+        "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40,
+        "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
+    }
+    current = 0
+    total = 0
+    found = False
+    for token in tokens:
+        if token == "and":
+            continue
+        if token in small:
+            current += small[token]
+            found = True
+        elif token == "hundred":
+            current = max(current, 1) * 100
+            found = True
+        elif token in ("thousand", "k"):
+            total += max(current, 1) * 1000
+            current = 0
+            found = True
+        else:
             break
-    return text.strip()
+    return total + current if found else None
+
+
+def _catalogue_chat_reply(message: str, history=None):
+    normalize = lambda text: re.sub(r"[^a-z0-9]+", " ", str(text).lower()).strip()
+    lowered = normalize(message)
+    user_history = [
+        str(turn.get("text", "")) for turn in (history or [])
+        if isinstance(turn, dict) and turn.get("role") == "user" and turn.get("text")
+    ][-4:]
+    context = normalize(" ".join(user_history))
+    query = normalize(f"{message} {' '.join(user_history)}")
+
+    raw_context = re.sub(r"[^a-z0-9, ]", " ", " ".join([message, *user_history]).lower())
+    amount_pattern = r"((?:\d{1,3}(?:[, ]\d{3})+)|\d+)"
+    budget_pattern = rf"(?:under|below|within|budget(?:\s+(?:of|is|around))?|up to|upto|less than|spend(?:ing)?(?:\s+(?:up to|under|around))?|maximum(?:\s+budget)?|max(?:imum)?\s+spend)\s*(?:rs\.?\s*)?{amount_pattern}"
+    budget_match = re.search(budget_pattern, raw_context)
+    if not budget_match:
+        budget_match = re.search(rf"\brs\.?\s*{amount_pattern}\b", raw_context)
+    budget = int(re.sub(r"[, ]", "", budget_match.group(1))) if budget_match else None
+    if budget is None:
+        tokens = raw_context.split()
+        cues = {"under", "below", "within", "budget", "upto", "spend", "maximum", "max"}
+        fillers = {"rs", "rupees", "about", "around", "of", "is", "up", "to", "less", "than"}
+        number_tokens = set(("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety hundred thousand k and").split())
+        for index, token in enumerate(tokens):
+            if token not in cues:
+                continue
+            cursor = index + 1
+            while cursor < len(tokens) and tokens[cursor] in fillers:
+                cursor += 1
+            spoken_tokens = []
+            while cursor < len(tokens) and tokens[cursor] in number_tokens:
+                spoken_tokens.append(tokens[cursor])
+                cursor += 1
+            budget = _spoken_number(spoken_tokens)
+            if budget is not None:
+                break
+    budget_exclusive = bool(re.search(r"\b(?:under|below|less than)\b", raw_context))
+    within_budget = lambda amount: budget is None or (amount < budget if budget_exclusive else amount <= budget)
+    people_match = re.search(r"\b(?:for|serves?|people|guests?)\s+(\d{1,2})\b|\b(\d{1,2})\s*(?:people|guests?|persons)\b", lowered)
+    if not people_match:
+        people_match = re.search(r"\b(?:for|serves?|people|guests?)\s+(\d{1,2})\b|\b(\d{1,2})\s*(?:people|guests?|persons)\b", context)
+    people = int(next(group for group in people_match.groups() if group)) if people_match else None
+    if people is None:
+        people_words = set("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety".split())
+        tokens = raw_context.split()
+        for index, token in enumerate(tokens[:-1]):
+            if token not in ("for", "serves", "serving"):
+                continue
+            count = _spoken_number(tokens[index + 1:index + 3])
+            if count is not None and count <= 99 and any(person in tokens[index + 1:index + 5] for person in ("people", "guests", "persons")):
+                people = count
+                break
+
+    if any(word in lowered for word in ("allerg", "ingredient", "peanut", "tree nut", "nut free", "nut-free", "nuts", "gluten", "dairy", "milk", "lactose", "sesame", "soy", "eggless", "eggs", "vegan", "vegetarian", "halal", "contain", "contains")):
+        return "I don't have verified ingredient or allergen sheets, so I won't guess about allergy safety. Please confirm directly with Sana before ordering: https://wa.me/923224112832. I can still help compare bakes and prices."
+
+    if any(word in lowered for word in ("email", "email address", "street address", "physical address", "store address", "where are you located", "your address", "opening hours", "business hours", "what time do you open")):
+        if "email" in lowered:
+            detail = "There isn't a public email address listed."
+        elif any(word in lowered for word in ("hour", "open", "close", "time")):
+            detail = "Opening hours aren't published, so please message Sana to arrange a time."
+        else:
+            detail = "The pick-up address isn't published; Sana confirms the location for each order."
+        return f"{detail} WhatsApp Sana at +92 322 411 2832: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("card", "credit card", "debit card", "online payment", "pay online", "payment", "how do i pay", "bank transfer")):
+        return "After you place an order, Sana confirms it on WhatsApp and shares bank-transfer details. Online card payment isn't currently available."
+
+    if "cash" in lowered:
+        return "Cash payment options aren't published. Sana confirms how to pay when she confirms your order on WhatsApp: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("delivery fee", "delivery fees", "delivery charge", "shipping cost", "delivery cost", "how much for delivery", "how much is delivery", "how much does delivery cost")):
+        return "Delivery charges depend on your area and aren't listed as a fixed price here. Send Sana your location and order details for a quote: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("same day", "today", "delivery", "deliver", "pick up", "pickup", "pick-up", "collect", "shipping")):
+        return "Pick-up and delivery depend on the date and area. Send Sana your location and preferred time; she confirms availability and arrangements directly: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("gift box", "gift boxes", "gifting", "festive box", "festive boxes", "eid box", "anniversary box", "birthday box", "graduation box", "baby born box")):
+        boxes = [_hydrate_box(box) for box in FESTIVE_BOXES]
+        if budget is not None:
+            boxes = [box for box in boxes if within_budget(box["total"])]
+            if not boxes:
+                lowest = min(_hydrate_box(box)["total"] for box in FESTIVE_BOXES)
+                return f"There aren't ready-made gift boxes under Rs. {budget:,}; they start at Rs. {lowest:,}. You could build a smaller custom gift box instead."
+        options = "; ".join(
+            f"{box['name']} (Rs. {box['total']:,}; " + ", ".join(f"{line['qty']} × {line['product']['name']}" for line in box["items"]) + ")"
+            for box in boxes
+        )
+        lead = f"Ready-made gift boxes under Rs. {budget:,}: " if budget is not None else "Our ready-made gift boxes are "
+        return f"{lead}{options}. You can customize a box from Gifting or make a mix in Build a box."
+
+    if any(word in lowered for word in ("custom box", "build a box", "box builder", "pick and mix", "pick mix", "packaging", "ribbon")):
+        custom_items = [product for product in PRODUCTS if product.get("custom_box_unit") is not None]
+        prices = ", ".join(f"{product['name']} Rs. {product['custom_box_unit']:,} each" for product in custom_items)
+        packs = ", ".join(f"{item['name']} Rs. {item['price']:,}" for item in PACKAGING)
+        return f"The custom-box treats are {prices}. Packaging is {packs}, with pink ribbon included. Your total depends on your choices; add a personal note at checkout."
+
+    if any(word in lowered for word in ("catering", "corporate", "office event", "large order", "bulk order", "event order", "party order")):
+        return "For catering, corporate gifts, or larger event quantities, share your date, guest count and location with Sana so she can confirm suitable bakes and timing: https://wa.me/923224112832. The site doesn't list fixed catering packages."
+
+    if any(word in lowered for word in ("discount", "coupon", "promo code", "promotion", "sale")):
+        return "I don't have a published discount or coupon to offer right now. Sana can confirm any current offers directly: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("custom cake", "special design", "specific design", "custom design", "can you make")):
+        return "The online menu shows the bakes currently listed. For a special design or request, send Sana the details and date so she can confirm what's possible: https://wa.me/923224112832."
+
+    category_terms = {
+        "loaf": ("loaf", "loaves", "bread"),
+        "cheesecake": ("cheesecake", "cake", "dessert", "desserts", "pie"),
+        "batch": ("brownie", "brownies", "batch", "batches", "roll", "rolls", "bun", "buns", "eclair"),
+        "cookie": ("cookie", "cookies"),
+    }
+    category = next((key for key, terms in category_terms.items() if any(term in query for term in terms)), None)
+    occasion_map = {
+        "Birthday": ("birthday",), "Anniversary": ("anniversary",), "Tea party": ("tea",),
+        "Family gathering": ("family", "gathering"), "Graduation": ("graduation",), "Eid": ("eid",),
+        "Baby born": ("new baby", "baby", "new arrival"), "Gift": ("gift", "present"),
+    }
+    occasion = next((name for name, words in occasion_map.items() if any(word in query for word in words)), None)
+    recommendation = any(word in query for word in ("recommend", "suggest", "what should", "which one", "best for", "perfect for", "match me", "surprise"))
+    if recommendation and category in (None, "loaf"):
+        mood = "Coffee lover" if "coffee" in query else "Chocolate lover" if "chocolate" in query else "Warm & comforting"
+        req = MatchRequest(occasion=occasion or "Just craving something", mood=mood, people=people or 6, budget=budget or 100000)
+        candidates = [item for item in PRODUCTS if item["category"] == "loaf" and within_budget(item["price"])]
+        if occasion:
+            candidates = [item for item in candidates if occasion in item["occasions"]] or candidates
+        if not candidates:
+            return f"The loaves start at Rs. {min(item['price'] for item in PRODUCTS if item['category'] == 'loaf'):,}. I can look for cookies or smaller treats within Rs. {budget:,}."
+        best = max(candidates, key=lambda item: _score(item, req))
+        return f"For {occasion.lower() if occasion else 'a little treat'}, I’d suggest {best['name']} (Rs. {best['price']:,}, serves {best['serves']}). {best['story']}"
+
+    product_query = normalize(f"{message} {' '.join(user_history)}")
+    product = next((item for item in PRODUCTS if normalize(item["name"]) in product_query), None)
+    if product:
+        custom_price = product.get("custom_box_unit") if any(word in lowered for word in ("custom", "single", "piece", "each")) else None
+        price = custom_price if custom_price is not None else product["price"]
+        detail = f"{product['name']} is Rs. {price:,} per {product['unit']}"
+        if custom_price is not None and custom_price != product["price"]:
+            detail += " in a custom box"
+        detail += "."
+        if product.get("serves"):
+            detail += f" It serves {product['serves']}."
+        if product.get("note"):
+            detail += f" Note: {product['note']}."
+        if product.get("addons"):
+            detail += " Optional add-ons: " + ", ".join(f"{addon['name']} +Rs. {addon['price']}" for addon in product["addons"]) + "."
+        if product.get("variants"):
+            detail += " Options: " + ", ".join(product["variants"]) + "."
+        return detail
+
+    if budget is not None or any(word in lowered for word in ("menu", "price", "cost", "available", "what do you have", "products", "bakes", "options")):
+        categories = [category] if category else list(category_terms)
+        menu_lines = []
+        labels = {"loaf": "Loaves", "cheesecake": "Desserts", "batch": "Batches", "cookie": "Cookies"}
+        for current in categories:
+            items = [item for item in PRODUCTS if item["category"] == current and within_budget(item["price"])]
+            if people and current == "loaf":
+                items = [item for item in items if item.get("serves_min", 0) <= people + 2]
+            if items:
+                menu_lines.append(f"{labels[current]}: " + ", ".join(f"{item['name']} (Rs. {item['price']:,})" for item in items))
+        if not menu_lines:
+            return f"I couldn't find {labels[category].lower() if category else 'any bakes'} under Rs. {budget:,}. The lowest-priced item starts at Rs. {min(item['price'] for item in PRODUCTS):,}. Want me to find the closest options?"
+        intro = f"Here are options under Rs. {budget:,}" if budget is not None else "Here are the current menu options"
+        if people:
+            intro += f" for around {people} people"
+        return intro + ":\n" + "\n".join(menu_lines) + "\nOpen Menu to browse photos and full details."
+
+    if any(word in lowered for word in ("cancel", "cancellation", "change my order", "edit my order", "modify my order", "wrong address", "refund", "return")):
+        return "Order changes, cancellations and refunds need Sana's confirmation. Message her as soon as possible with your order code: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("order", "track", "status", "arrive")):
+        return "For an existing order, send its code (like TT123456) and the last four digits of the checkout phone to check the status privately. For a new order, add bakes to your bag and continue to checkout; Sana confirms it on WhatsApp."
+
+    if any(word in lowered for word in ("website", "how do i", "how can i", "where can i", "how to", "checkout", "place an order", "place order")):
+        return "Browse all bakes in Menu, mix treats in Build a box, or customize one of the ready-made gifts under Gifting. Add your choices to the bag and continue to checkout; Sana confirms orders and shares bank-transfer details on WhatsApp."
+
+    if any(word in lowered for word in ("hello", "hi", "hey", "good morning", "good afternoon", "good evening")) and len(lowered.split()) <= 5:
+        return "Hi! I’m Pippa. Tell me what you’re celebrating, your budget, or what you’re craving and I’ll find a few lovely options."
+
+    return "I can help with menu items and prices, budget-friendly picks, recommendations, gift boxes, custom-box costs, checkout, and order tracking. Ask away; for details that aren't published, I’ll check with Sana rather than guess."
+
+
+async def _order_tracking_reply(message: str):
+    order_match = re.search(r"\bTT\d{6}\b", message.upper())
+    if not order_match:
+        return None
+
+    suffix_match = re.search(r"(?:ending(?:\s+in)?|ends\s+in|last\s*(?:four|4)(?:\s+digits?)?|phone(?:\s+number)?\s*(?:is|:)?)[^\d]{0,16}(\d{4})\b", message.lower())
+    if not suffix_match:
+        return "For privacy, please send the last four digits of the phone number used at checkout along with your order code."
+
+    try:
+        order = await db.orders.find_one({"order_number": order_match.group(0)}, {"_id": 0})
+    except Exception:
+        logging.getLogger(__name__).warning("Order lookup unavailable")
+        return "I can't reach the order book right now. Please try again shortly or message Sana on WhatsApp."
+    if not order:
+        return "I couldn't find that order code. Please double-check it, or message Sana on WhatsApp and she'll help you."
+
+    phone = re.sub(r"\D", "", str(order.get("customer", {}).get("phone", "")))
+    if not phone or phone[-4:] != suffix_match.group(1):
+        return "I couldn't verify those details, so I can't show the order yet. Check the code and phone digits, or contact Sana directly."
+
+    status = str(order.get("status", "being prepared")).replace("_", " ")
+    items = ", ".join(f"{item.get('qty', 1)} × {item.get('name', 'bake')}" for item in order.get("items", []))
+    total = order.get("total")
+    total_text = f" The total is Rs. {total:,}." if isinstance(total, (int, float)) else ""
+    return f"Order {order_match.group(0)} is currently {status}. Items: {items or 'details unavailable'}.{total_text} For a change or delivery update, message Sana on WhatsApp."
 
 
 # ---------- Routes ----------
@@ -388,18 +670,32 @@ async def get_saved_match(match_id: str):
 @api_router.post("/chat")
 async def baker_chat(request: ChatRequest):
     session_id = request.session_id or "chat-" + uuid.uuid4().hex
-    try:
-        reply = await ask_baker(request.message, session_id, full_catalogue=True)
-        ok = True
-    except Exception as e:
-        logging.getLogger(__name__).warning("chat LLM error: %s", e)
-        reply = "The oven's a little warm right now — try me again in a moment."
-        ok = False
-    await db.baker_chats.insert_one({
-        "session_id": session_id, "message": request.message, "reply": reply, "ok": ok,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
-    return {"session_id": session_id, "reply": reply, "ok": ok}
+    order_context = " ".join(
+        str(turn.get("text", "")) for turn in (request.history or [])
+        if isinstance(turn, dict) and turn.get("role") == "user" and turn.get("text")
+    )
+    reply = await _order_tracking_reply(f"{order_context} {request.message}".strip())
+    if reply is not None:
+        mode = "order"
+    else:
+        try:
+            reply = await ask_baker(request.message, session_id, full_catalogue=True, history=request.history)
+            mode = "ai"
+        except Exception as e:
+            logging.getLogger(__name__).info("Using grounded baker helper: %s", e)
+            reply = _catalogue_chat_reply(request.message, history=request.history)
+            mode = "catalogue"
+    async def save_chat_log():
+        try:
+            await db.baker_chats.insert_one({
+            "session_id": session_id, "message": request.message, "reply": reply, "ok": True, "mode": mode,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+        except Exception:
+            logging.getLogger(__name__).warning("Chat log unavailable; returning the reply without saving it")
+
+    asyncio.create_task(save_chat_log())
+    return {"session_id": session_id, "reply": reply, "ok": True, "mode": mode}
 
 
 def _new_order_number():

@@ -65,6 +65,22 @@ export default function BuildBox() {
 
   return (
     <div className="build-page">
+      <section className="build-cta build-cta-builder" data-testid="build-box-callout">
+        <div>
+          <p className="eyebrow">OR MAKE IT YOURS</p>
+          <h2>Build a box, your way.</h2>
+          <p>Mix small treats — brownies, cookies, cinnamon rolls, éclairs. Pick a ribbon. Add a note.</p>
+        </div>
+        <button
+          type="button"
+          className="button primary"
+          onClick={() => document.getElementById("pick-your-mix")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          data-testid="build-box-start-building"
+        >
+          Start building <ArrowRight size={17} />
+        </button>
+      </section>
+
       <header className="build-header">
         <p className="eyebrow">CUSTOM BOX BUILDER</p>
         <h1>Pick, mix,<br /><em>send with love.</em></h1>
@@ -73,7 +89,7 @@ export default function BuildBox() {
 
       <div className="build-layout">
         <div className="build-picker">
-          <p className="eyebrow">01 / PICK YOUR MIX</p>
+          <p className="eyebrow" id="pick-your-mix">01 / PICK YOUR MIX</p>
           <div className="picker-grid">
             {products.map((p) => (
               <div className="picker-card" key={p.id} data-testid={`picker-${p.id}`}>

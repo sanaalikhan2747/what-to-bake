@@ -1,21 +1,44 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, Instagram, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
+import { ArrowRight, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
+import MagicBaker from "@/components/MagicBaker";
+import "./Home.css";
+import "./HomePolish.css";
 
 const occasions = [
-  "Birthday", "Anniversary", "Tea party", "Family gathering",
-  "Graduation", "Eid", "Baby born", "Gift", "Just craving something",
+  { value: "Birthday", label: "A birthday", detail: "Make their day" },
+  { value: "Anniversary", label: "An anniversary", detail: "Celebrate together" },
+  { value: "Tea party", label: "Tea with friends", detail: "Put the kettle on" },
+  { value: "Family gathering", label: "Family gathering", detail: "For the whole table" },
+  { value: "Graduation", label: "A new milestone", detail: "Mark the moment" },
+  { value: "Eid", label: "Eid", detail: "Something to share" },
+  { value: "Baby born", label: "A new arrival", detail: "Welcome, little one" },
+  { value: "Gift", label: "A thoughtful gift", detail: "Send a little joy" },
+  { value: "Just craving something", label: "Just because", detail: "No reason needed" },
 ];
-const moods = ["Chocolate lover", "Fresh & citrusy", "Warm & comforting", "Coffee lover", "Something different"];
-
+const moods = [
+  { value: "Chocolate lover", label: "Chocolate, always", detail: "Deep & indulgent", color: "#75514b" },
+  { value: "Fresh & citrusy", label: "Bright & citrusy", detail: "Light & lively", color: "#cf9d4c" },
+  { value: "Warm & comforting", label: "Warm & spiced", detail: "Soft & familiar", color: "#b97759" },
+  { value: "Coffee lover", label: "Coffee & a treat", detail: "Toasty & mellow", color: "#83705a" },
+  { value: "Something different", label: "A little unexpected", detail: "Find a new favourite", color: "#7b8a70" },
+];
+const featuredCategories = [
+  { id: "all", label: "All bakes" },
+  { id: "loaf", label: "Loaves" },
+  { id: "cheesecake", label: "Desserts" },
+  { id: "batch", label: "Batches" },
+  { id: "cookie", label: "Cookies" },
+];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loaves, setLoaves] = useState([]);
   const [boxes, setBoxes] = useState([]);
+  const [featuredCategory, setFeaturedCategory] = useState("all");
   const [occasion, setOccasion] = useState("Tea party");
   const [mood, setMood] = useState("Warm & comforting");
   const [people, setPeople] = useState(6);
@@ -64,11 +87,12 @@ export default function Home() {
   };
 
   const surprise = () => {
-    if (!loaves.length) return;
+    if (!loaves.length) return null;
     const picked = loaves[Math.floor(Math.random() * loaves.length)];
     setMatch({ product: picked, explanation: `${picked.name} — a little baker's instinct says this is the loaf you didn't know you were craving.` });
     setSavedNote("");
     setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 60);
+    return picked;
   };
 
   const saveMatch = async () => {
@@ -93,6 +117,19 @@ export default function Home() {
     addItem({ id: match.product.id, name: match.product.name, price: match.product.price, image: match.product.image, custom_box: false });
     setCartOpen(true);
   };
+
+  const addProductToCart = (product) => {
+    addItem({ id: product.id, name: product.name, price: product.price, image: product.image, custom_box: false });
+    setCartOpen(true);
+  };
+
+  const productGroups = (featuredCategory === "all"
+    ? featuredCategories.filter((category) => category.id !== "all")
+    : featuredCategories.filter((category) => category.id === featuredCategory)
+  ).map((category) => ({
+    ...category,
+    products: products.filter((product) => product.category === category.id),
+  })).filter((group) => group.products.length > 0);
 
   const addFestive = (box) => {
     box.items.forEach(({ product, qty }) => {
@@ -138,29 +175,92 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="featured-products" aria-labelledby="featured-products-title">
+        <div className="featured-products-heading">
+          <div>
+              <p className="eyebrow">FROM THE LITTLE BAKESHOP</p>
+              <h2 id="featured-products-title">Made for sharing.<br /><em>Or keeping close.</em></h2>
+              <p>Loaves, little treats and celebration bakes, made in small batches and ready to find their way to your table.</p>
+          </div>
+          <Link to="/menu" className="featured-menu-link">Explore the whole menu <ArrowRight size={16} /></Link>
+        </div>
+        <div className="featured-tabs" role="group" aria-label="Filter all bakes">
+          {featuredCategories.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              className={featuredCategory === category.id ? "featured-tab active" : "featured-tab"}
+              aria-pressed={featuredCategory === category.id}
+              onClick={() => setFeaturedCategory(category.id)}
+              data-testid={`featured-filter-${category.id}`}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
+        <div className="featured-groups">
+          {productGroups.map((group, groupIndex) => (
+            <section className="featured-category-group" key={group.id} aria-labelledby={`featured-category-${group.id}`}>
+              <div className="featured-category-heading">
+                <span>{String(groupIndex + 1).padStart(2, "0")}</span>
+                <h3 id={`featured-category-${group.id}`}>{group.label}</h3>
+                <i />
+                <small>{group.products.length} {group.products.length === 1 ? "bake" : "bakes"}</small>
+              </div>
+              <div className="featured-grid">
+                {group.products.map((product, index) => (
+                  <article className="featured-card" key={product.id} data-testid={`featured-product-${product.id}`}>
+                    <Link to={`/menu#product-${product.id}`} className="featured-card-image" aria-label={`Browse menu: ${product.name}`}>
+                      <img src={product.image} alt={product.name} loading="lazy" />
+                      <span className="featured-card-index">{String(index + 1).padStart(2, "0")}</span>
+                    </Link>
+                    <div className="featured-card-copy">
+                      <h4>{product.name}</h4>
+                      <p className="featured-card-story">{product.story}</p>
+                      <div className="featured-card-footer">
+                        <span>Rs. {product.price.toLocaleString()} <small>/ {product.unit}</small></span>
+                        <button type="button" className="featured-add" onClick={() => addProductToCart(product)} aria-label={`Add ${product.name} to bag`}>
+                          <ShoppingBag size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </section>
+
       <section className="match-section" id="match">
-        <div className="section-intro">
-          <p className="eyebrow">01 / THE LOAF MATCHMAKER</p>
-          <h2>Let's find your<br /><em>perfect match.</em></h2>
-          <p>A few little questions, then a loaf recommendation that feels like it was made for you.</p>
-          <button className="button text-button" style={{ marginTop: 22 }} onClick={surprise} data-testid="hero-surprise-button">
-            <WandSparkles size={17} /> Surprise me
-          </button>
+        <div className="match-heading-row">
+          <div className="section-intro">
+            <p className="eyebrow">01 / THE LOAF MATCHMAKER</p>
+            <h2>Let's Find Your<br /><em>Match.</em></h2>
+            <p>A few little questions, then a loaf recommendation that feels like it was made for you.</p>
+          </div>
+          <MagicBaker onActivate={surprise} />
         </div>
         <div className="match-form">
           <div className="question">
-            <label>Who are you buying for?</label>
-            <div className="choice-grid">
-              {occasions.map((x) => (
-                <button className={occasion === x ? "choice active" : "choice"} onClick={() => setOccasion(x)} data-testid={`occasion-${slug(x)}`} key={x}>{x}</button>
+            <label>What are we celebrating?</label>
+            <div className="choice-grid occasion-choice-grid">
+              {occasions.map((choice) => (
+                <button className={occasion === choice.value ? "choice active" : "choice"} onClick={() => setOccasion(choice.value)} data-testid={`occasion-${slug(choice.value)}`} key={choice.value}>
+                  <span className="choice-title">{choice.label}</span>
+                  <small>{choice.detail}</small>
+                </button>
               ))}
             </div>
           </div>
           <div className="question">
-            <label>What's your mood?</label>
-            <div className="choice-grid">
-              {moods.map((x) => (
-                <button className={mood === x ? "choice active" : "choice"} onClick={() => setMood(x)} data-testid={`mood-${slug(x)}`} key={x}>{x}</button>
+            <label>What sounds good today?</label>
+            <div className="choice-grid mood-choice-grid">
+              {moods.map((choice) => (
+                <button className={mood === choice.value ? "choice mood-choice active" : "choice mood-choice"} onClick={() => setMood(choice.value)} data-testid={`mood-${slug(choice.value)}`} key={choice.value}>
+                  <span className="mood-choice-title"><i style={{ "--mood-swatch": choice.color }} />{choice.label}</span>
+                  <small>{choice.detail}</small>
+                </button>
               ))}
             </div>
           </div>
@@ -265,38 +365,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="build-cta">
-        <div>
-          <p className="eyebrow">03 / OR MAKE IT YOURS</p>
-          <h2>Build a box, your way.</h2>
-          <p>Mix small treats — brownies, cookies, cinnamon rolls, éclairs. Pick a ribbon. Add a note.</p>
-        </div>
-        <Link to="/build" className="button primary" data-testid="cta-build-box">
-          Start building <ArrowRight size={17} />
-        </Link>
-      </section>
-
-      <section className="stories" id="stories">
-        <div>
-          <p className="eyebrow">04 / STORY BEHIND THE BAKE</p>
-          <h2>Good things<br /><em>take time.</em></h2>
-          <p className="story-lead">Every loaf has a mood, a memory, a reason to be shared. Here are a few of ours.</p>
-          <a className="inline-link" href="https://www.instagram.com/treatsandtemptationbysk/" target="_blank" rel="noreferrer" data-testid="instagram-link">
-            See more on Instagram <Instagram size={17} />
-          </a>
-        </div>
-        <div className="story-grid">
-          {loaves.slice(0, 3).map((p) => (
-            <article className="story-card" key={p.id}>
-              <img src={p.image} alt={p.name} />
-              <div>
-                <p className="eyebrow">THE {p.name.toUpperCase()}</p>
-                <p>{p.story}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
     </>
   );
 }
