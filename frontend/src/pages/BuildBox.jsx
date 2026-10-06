@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Gift, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowRight, Gift, Minus, Plus, ShoppingBag } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
 import { flyToBox } from "@/lib/flyToBox";
+import "./BuildBox.css";
 
 const RIBBONS = [
   { id: "clear-box", label: "Clear Plastic Box", price: 150, ribbon: "pink", style: "clear",
@@ -65,31 +66,18 @@ export default function BuildBox() {
 
   return (
     <div className="build-page">
-      <section className="build-cta build-cta-builder" data-testid="build-box-callout">
-        <div>
-          <p className="eyebrow">OR MAKE IT YOURS</p>
-          <h2>Build a box, your way.</h2>
-          <p>Mix small treats — brownies, cookies, cinnamon rolls, éclairs. Pick a ribbon. Add a note.</p>
-        </div>
-        <button
-          type="button"
-          className="button primary"
-          onClick={() => document.getElementById("pick-your-mix")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-          data-testid="build-box-start-building"
-        >
-          Start building <ArrowRight size={17} />
-        </button>
-      </section>
-
       <header className="build-header">
         <p className="eyebrow">CUSTOM BOX BUILDER</p>
         <h1>Pick, mix,<br /><em>send with love.</em></h1>
-        <p>Choose small treats from the kitchen, pick a ribbon, add a personal note — we'll wrap it just so.</p>
+        <p>Choose your treats, packaging, and a personal note. Your box total updates as you build it.</p>
       </header>
 
       <div className="build-layout">
         <div className="build-picker">
-          <p className="eyebrow" id="pick-your-mix">01 / PICK YOUR MIX</p>
+          <div className="build-step-heading" id="pick-your-mix">
+            <p className="eyebrow">01 / PICK YOUR MIX</p>
+            <span>{itemsCount} {itemsCount === 1 ? "treat" : "treats"} · Rs. {itemsTotal.toLocaleString()}</span>
+          </div>
           <div className="picker-grid">
             {products.map((p) => (
               <div className="picker-card" key={p.id} data-testid={`picker-${p.id}`}>
@@ -99,11 +87,11 @@ export default function BuildBox() {
                   <small>Rs. {p.custom_box_unit.toLocaleString()} each</small>
                 </div>
                 <div className="picker-qty">
-                  <button onClick={(e) => bump(p, -1, e.currentTarget.closest(".picker-card")?.querySelector("img"))} data-testid={`picker-minus-${p.id}`}>
+                  <button aria-label={`Remove one ${p.name}`} onClick={(e) => bump(p, -1, e.currentTarget.closest(".picker-card")?.querySelector("img"))} data-testid={`picker-minus-${p.id}`}>
                     <Minus size={13} />
                   </button>
                   <span data-testid={`picker-qty-${p.id}`}>{selection[p.id] || 0}</span>
-                  <button onClick={(e) => bump(p, 1, e.currentTarget.closest(".picker-card")?.querySelector("img"))} data-testid={`picker-plus-${p.id}`}>
+                  <button aria-label={`Add one ${p.name}`} onClick={(e) => bump(p, 1, e.currentTarget.closest(".picker-card")?.querySelector("img"))} data-testid={`picker-plus-${p.id}`}>
                     <Plus size={13} />
                   </button>
                 </div>
@@ -120,6 +108,7 @@ export default function BuildBox() {
                   key={r.id}
                   className={`pack-option ${pack === r.id ? "active" : ""}`}
                   onClick={() => setPack(r.id)}
+                  aria-pressed={pack === r.id}
                   data-testid={`pack-${r.id}`}
                 >
                   <img src={r.image} alt={r.label} className="pack-photo" />

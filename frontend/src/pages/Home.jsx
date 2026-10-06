@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
 import MagicBaker from "@/components/MagicBaker";
@@ -32,6 +32,28 @@ const featuredCategories = [
   { id: "batch", label: "Bakes & cups" },
   { id: "cookie", label: "Artisanal cookies" },
 ];
+const heroSlides = [
+  {
+    src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
+    alt: "Homemade artisanal bakes and loaves",
+  },
+  {
+    src: "https://res.cloudinary.com/dffsqfwok/image/upload/w_1800,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
+    alt: "Signature mango dessert trays and cups",
+  },
+  {
+    src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
+    alt: "Curated festive dessert boxes",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1621994214182-f467e6999dc9?auto=format&fit=crop&w=1800&q=90",
+    alt: "Chocolate chip banana bread",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=1800&q=90",
+    alt: "Freshly glazed cinnamon rolls",
+  },
+];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
 
 export default function Home() {
@@ -39,6 +61,7 @@ export default function Home() {
   const [loaves, setLoaves] = useState([]);
   const [boxes, setBoxes] = useState([]);
   const [featuredCategory, setFeaturedCategory] = useState("all");
+  const [heroSlide, setHeroSlide] = useState(0);
   const [occasion, setOccasion] = useState("Tea party");
   const [mood, setMood] = useState("Warm & comforting");
   const [people, setPeople] = useState(6);
@@ -74,6 +97,13 @@ export default function Home() {
       if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 80);
     }
   }, [location]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroSlide((current) => (current + 1) % heroSlides.length);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const runMatch = async () => {
     setLoading(true); setMatchError(""); setSavedNote("");
@@ -159,18 +189,43 @@ export default function Home() {
             <Sparkles size={16} /> Baked in small batches, chosen with care
           </div>
         </div>
-        <div className="hero-image">
+        <div className="hero-image hero-showcase" role="region" aria-label="Bakery photo carousel">
           <img
-            src="https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&w=1300&q=85"
-            alt="Homemade loaf, freshly baked"
+            key={heroSlides[heroSlide].src}
+            src={heroSlides[heroSlide].src}
+            alt={heroSlides[heroSlide].alt}
             data-testid="hero-dessert-image"
+            loading="eager"
           />
-          <div className="image-stamp logo-stamp">
-            <img
-              src="https://customer-assets-rejwkqb3.emergentagent.net/job_bake-moment/artifacts/qhx8c79m_Screenshot_20260310_144819_Instagram.webp"
-              alt="Made with love — Treats & Temptation by Sana Khan"
-              data-testid="hero-logo"
-            />
+          <div className="hero-carousel-controls">
+            <div className="hero-slide-dots" role="group" aria-label="Choose bakery photo">
+              {heroSlides.map((photo, index) => (
+                <button
+                  key={photo.src}
+                  type="button"
+                  className={heroSlide === index ? "hero-slide-dot active" : "hero-slide-dot"}
+                  aria-label={`Show photo ${index + 1}: ${photo.alt}`}
+                  aria-pressed={heroSlide === index}
+                  onClick={() => setHeroSlide(index)}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              className="hero-slide-arrow"
+              aria-label="Previous bakery photo"
+              onClick={() => setHeroSlide((heroSlide + heroSlides.length - 1) % heroSlides.length)}
+            >
+              <ChevronLeft size={19} />
+            </button>
+            <button
+              type="button"
+              className="hero-slide-arrow"
+              aria-label="Next bakery photo"
+              onClick={() => setHeroSlide((heroSlide + 1) % heroSlides.length)}
+            >
+              <ChevronRight size={19} />
+            </button>
           </div>
         </div>
       </section>
