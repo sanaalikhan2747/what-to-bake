@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, WandSparkles } from "lucide-react";
+import { Rotate3D, ShoppingBag, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
+import Product360Viewer from "@/components/Product360Viewer";
 
 const CATEGORY_ORDER = ["loaf", "cheesecake", "batch", "cookie"];
 const CATEGORY_LABEL = {
@@ -21,6 +22,7 @@ const CATEGORY_EYEBROW = {
 export default function Menu() {
   const [products, setProducts] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [viewingProduct, setViewingProduct] = useState(null);
   const { addItem, setCartOpen } = useCart();
   const location = useLocation();
 
@@ -94,6 +96,15 @@ export default function Menu() {
                 <div className="menu-card-image">
                   <img src={p.image} alt={p.name} />
                   {p.healthy && <span className="pill-healthy">Healthy option</span>}
+                  <button
+                    type="button"
+                    className="menu-view-360"
+                    onClick={() => setViewingProduct(p)}
+                    aria-label={`Open 360 degree preview of ${p.name}`}
+                    data-testid={`menu-360-${p.id}`}
+                  >
+                    <Rotate3D size={15} /> <span>360° view</span>
+                  </button>
                 </div>
                 <div className="menu-card-body">
                   <h3>{p.name}</h3>
@@ -122,6 +133,7 @@ export default function Menu() {
           </div>
         </section>
       ))}
+      {viewingProduct && <Product360Viewer product={viewingProduct} onClose={() => setViewingProduct(null)} />}
     </div>
   );
 }
