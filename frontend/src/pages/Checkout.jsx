@@ -20,7 +20,7 @@ const PACKAGING_FALLBACK = [
 ];
 
 export default function Checkout() {
-  const { items, packagingId, message, setPackaging, setMessage, clearCart } = useCart();
+  const { items, packagingId, message, clearCart } = useCart();
   const [packagings, setPackagings] = useState(PACKAGING_FALLBACK);
   const [form, setForm] = useState({
     name: "", phone: "", address: "", email: "", delivery_date: "", notes: "",
@@ -127,40 +127,10 @@ export default function Checkout() {
               <input value={form.email} onChange={(e) => update("email", e.target.value)} data-testid="checkout-email" />
             </div>
             <div className="field full">
-              <label>Anything else? (optional)</label>
-              <textarea rows={2} value={form.notes} onChange={(e) => update("notes", e.target.value)} data-testid="checkout-notes" placeholder="Allergies, special requests, gift notes…" />
+              <label>Delivery instructions (optional)</label>
+              <textarea rows={2} value={form.notes} onChange={(e) => update("notes", e.target.value)} data-testid="checkout-notes" placeholder="Allergies or delivery instructions…" />
             </div>
           </div>
-
-          <h2 className="section-h">Packaging</h2>
-          <p className="pack-hint">Every box is tied with a pink ribbon.</p>
-          <div className="pack-options">
-            {packagings.map((p) => (
-              <button
-                key={p.id}
-                className={`pack-option ${packagingId === p.id ? "active" : ""}`}
-                onClick={() => setPackaging(p.id)}
-                data-testid={`checkout-pack-${p.id}`}
-              >
-                {p.image ? <img src={p.image} alt={p.name} className="pack-photo" /> : <span className={`pack-swatch pack-swatch-${p.id}`} />}
-                <span>
-                  <b>{p.name}</b>
-                  <small>+ Rs. {p.price}</small>
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <h2 className="section-h">Personalized note</h2>
-          <textarea
-            className="checkout-message"
-            maxLength={140}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            data-testid="checkout-message"
-            placeholder="A little something to write on the box (optional)."
-          />
-          <small className="counter">{message.length}/140</small>
 
           {serverError && <p className="inline-error" data-testid="checkout-error">{serverError}</p>}
           <button className="button primary wide" onClick={place} disabled={submitting} data-testid="place-order-button">
@@ -184,7 +154,6 @@ export default function Checkout() {
           <div className="summary-line"><span>Subtotal</span><b data-testid="summary-subtotal">Rs. {subtotal.toLocaleString()}</b></div>
           {pack && <div className="summary-line"><span>{pack.name}</span><b data-testid="summary-pack">Rs. {pack.price}</b></div>}
           <div className="summary-line total"><span>Total</span><b data-testid="summary-total">Rs. {total.toLocaleString()}</b></div>
-          {message && <p className="summary-message" data-testid="summary-message">"{message}"</p>}
         </aside>
       </div>
     </div>

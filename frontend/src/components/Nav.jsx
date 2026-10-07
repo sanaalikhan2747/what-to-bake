@@ -20,7 +20,7 @@ function closeDropdown(event) {
   event.currentTarget.closest("details").open = false;
 }
 
-function NavDropdown({ id, label, heading, items, loading, className = "" }) {
+function NavDropdown({ id, label, heading, items, loading, className = "", pageHref, pageLinkLabel }) {
   return (
     <details
       className={`nav-dropdown ${className}`}
@@ -41,7 +41,14 @@ function NavDropdown({ id, label, heading, items, loading, className = "" }) {
         {label} <ChevronDown size={15} aria-hidden="true" />
       </summary>
       <div className={`nav-dropdown-menu ${id === "menu" ? "nav-dropdown-menu-catalogue" : ""}`}>
-        <p className="nav-dropdown-heading">{heading}</p>
+        {pageHref ? (
+          <div className="nav-dropdown-heading-row">
+            <p className="nav-dropdown-heading">{heading}</p>
+            <Link to={pageHref} className="nav-dropdown-all-link" onClick={closeDropdown}>
+              {pageLinkLabel || "View all"} <ArrowRight size={13} aria-hidden="true" />
+            </Link>
+          </div>
+        ) : <p className="nav-dropdown-heading">{heading}</p>}
         {loading ? (
           <p className="nav-dropdown-message">Loading…</p>
         ) : items.length ? items.map((item) => (
@@ -118,7 +125,7 @@ export default function Nav({ onOpenChat }) {
       </Link>
       <NavDropdown id="order" label="Order" heading="ORDER OPTIONS" items={orderOptions.map((option) => ({ ...option, key: option.href }))} />
       <div className="nav-sections">
-        <NavDropdown id="menu" label="Menu" heading="ALL BAKES" items={productItems} loading={catalogueLoading} />
+        <NavDropdown id="menu" label="Menu" heading="ALL BAKES" items={productItems} loading={catalogueLoading} pageHref="/menu" pageLinkLabel="View full menu" />
         <NavDropdown id="build" label="Build a box" heading="MAKE IT YOURS" items={[
           { label: "Build a custom box", href: "/build" },
           { label: "Browse the full menu", href: "/menu" },
