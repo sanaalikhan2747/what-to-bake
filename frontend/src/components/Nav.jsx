@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Heart, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/state/CartContext";
 import { api } from "@/state/api";
 import "./Nav.css";
@@ -135,9 +135,9 @@ export default function Nav({ onOpenChat }) {
       <button className="nav-mobile-toggle" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen} aria-controls="nav-links" onClick={() => setMobileOpen(!mobileOpen)}>
         {mobileOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
-      <Link to="/" className="brand" data-testid="brand-home">
-        <span className="brand-mark">SK</span>
-        <span>Treats &<br /><b>Temptation</b></span>
+      <Link to="/" className="brand" data-testid="brand-home" aria-label="SK Treats & Temptation home" title="Treats & Temptation home">
+        <span className="brand-mark" aria-hidden="true"><span>SK</span><Heart className="brand-heart" size={12} /></span>
+        <span className="brand-name"><span>Treats &</span><span>Temptation</span></span>
       </Link>
       <div id="nav-links" className="nav-links" onClick={(event) => {
         if (event.target.closest("a")) setMobileOpen(false);
