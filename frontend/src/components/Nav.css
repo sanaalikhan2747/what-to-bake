@@ -32,7 +32,7 @@
 @media(max-width:420px){.brand>span:nth-child(2){display:none}.nav-sections{justify-content:flex-start}.nav-dropdown-trigger{font-size:14px;padding-inline:4px}}
 @media(max-width:370px){.brand{gap:7px}.nav-home{width:28px}.nav{gap:4px}}
 
-.nav{--nav-ink:#183b32;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;height:106px;min-height:106px;padding:0 3%;gap:24px;flex-wrap:nowrap;background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid #e7ece8;box-shadow:none;color:var(--nav-ink)}
+.nav{--nav-ink:#183b32;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;height:106px;min-height:106px;padding:0 3%;gap:24px;flex-wrap:nowrap;background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid #e7ece8;box-shadow:none;color:var(--nav-ink)}
 .nav .brand{display:flex;align-items:center;flex:0 0 auto;gap:10px;margin:0;color:var(--nav-ink);text-decoration:none}
 .nav .brand-mark{display:grid;place-items:center;width:45px;height:45px;background:#f5e8e9;color:#884653;border:1px solid #ead4d8;border-radius:50%;font-size:20px}
 .nav .brand>span:nth-child(2){display:block;font-family:"Playfair Display",Georgia,serif;font-size:23px;line-height:1.08;font-weight:600;letter-spacing:0}

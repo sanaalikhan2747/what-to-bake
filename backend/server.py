@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException
+from speech import transcribe_request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -713,6 +714,9 @@ async def get_saved_match(match_id: str):
         "occasion": doc.get("occasion"), "mood": doc.get("mood"),
         "people": doc.get("people"), "budget": doc.get("budget"),
     }
+
+
+api_router.add_api_route("/speech/transcribe", transcribe_request, methods=["POST"])
 
 
 @api_router.post("/chat")

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Mic, MicOff, MessageCircle, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowUp, Mic, MicOff, MessageCircle, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import { api, waLink } from "@/state/api";
 import MagicBaker from "@/components/MagicBaker";
 import "./ChatDrawer.css";
@@ -17,10 +17,16 @@ export default function ChatDrawer({ open, onClose }) {
   const [voiceProblem, setVoiceProblem] = useState(false);
   const [mode, setMode] = useState("help");
   const [listening, setListening] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const [voiceReplies, setVoiceReplies] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const sessionId = useRef(window.crypto?.randomUUID?.() || `pip-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const recognitionRef = useRef(null);
+  const recordingRef = useRef(null);
+  const voiceStartingRef = useRef(false);
+  const voiceRequestRef = useRef(null);
+  const openRef = useRef(open);
+  openRef.current = open;
   const voiceSubmissionRef = useRef(false);
   const speechRef = useRef(null);
   const messagesEnd = useRef(null);
@@ -29,21 +35,36 @@ export default function ChatDrawer({ open, onClose }) {
     { role: "assistant", text: "Hi, I'm Pippa! I can help you find a bake, check menu prices, or look up an order. What can I help with?" },
   ]);
 
+  const stopRecording = (cancel = false) => {
+    const recording = recordingRef.current;
+    if (!recording) return;
+    recording.cancelled = cancel;
+    window.clearTimeout(recording.timer);
+    if (recording.recorder.state !== "inactive") recording.recorder.stop();
+    recording.stream.getTracks().forEach((track) => track.stop());
+  };
+
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [chat, loading]);
 
   useEffect(() => {
     if (!open) {
-      recognitionRef.current?.stop();
+      recognitionRef.current?.abort();
+      stopRecording(true);
+      voiceRequestRef.current?.abort();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       setListening(false);
+      setTranscribing(false);
       setSpeaking(false);
     }
   }, [open]);
 
   useEffect(() => () => {
-    recognitionRef.current?.stop();
+    openRef.current = false;
+    recognitionRef.current?.abort();
+    stopRecording(true);
+    voiceRequestRef.current?.abort();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   }, []);
 
@@ -79,7 +100,7 @@ export default function ChatDrawer({ open, onClose }) {
     });
   };
 
-  const startListening = async () => {
+  const startBrowserListening = async () => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Recognition) {
       setError("Voice input isn't supported by this browser. Type your question instead.");
@@ -121,7 +142,8 @@ export default function ChatDrawer({ open, onClose }) {
       if (transcript) {
         voiceSubmissionRef.current = true;
         recognition.stop();
-        send(transcript);
+        setMessage(transcript.slice(0, 1000));
+        inputRef.current?.focus();
       }
     };
     recognition.onerror = (event) => {
@@ -145,6 +167,86 @@ export default function ChatDrawer({ open, onClose }) {
     } catch {
       setListening(false);
       setError("The microphone is busy. Try again in a moment.");
+    }
+  };
+
+  const startListening = async () => {
+    if (voiceStartingRef.current || recordingRef.current || transcribing || loading) return;
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      return startBrowserListening();
+    }
+    voiceStartingRef.current = true;
+    setError("");
+    setVoiceProblem(false);
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      if (!openRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      const mimeType = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus"].find((type) => window.MediaRecorder.isTypeSupported(type));
+      const recorder = new window.MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      const recording = { recorder, stream, chunks: [], cancelled: false, timer: undefined };
+      recordingRef.current = recording;
+      recorder.ondataavailable = (event) => {
+        if (event.data.size) recording.chunks.push(event.data);
+      };
+      recorder.onerror = () => {
+        stopRecording(true);
+        setListening(false);
+        setVoiceProblem(true);
+        setError("The microphone recording failed. Please try again.");
+      };
+      recorder.onstop = async () => {
+        window.clearTimeout(recording.timer);
+        recording.stream.getTracks().forEach((track) => track.stop());
+        if (recordingRef.current === recording) recordingRef.current = null;
+        if (recording.cancelled || !openRef.current) return;
+        setListening(false);
+        setTranscribing(true);
+        const controller = new AbortController();
+        voiceRequestRef.current = controller;
+        try {
+          const audio = new Blob(recording.chunks, { type: recorder.mimeType || mimeType || "audio/webm" });
+          const response = await api.post("/speech/transcribe", audio, {
+            headers: { "Content-Type": audio.type },
+            signal: controller.signal,
+            timeout: 180000,
+          });
+          const transcript = response.data.text?.trim();
+          if (controller.signal.aborted || !openRef.current) return;
+          if (!transcript) throw new Error("No speech was detected. Please try again.");
+          setTranscribing(false);
+          setMessage(transcript.slice(0, 1000));
+          inputRef.current?.focus();
+        } catch (failure) {
+          if (!controller.signal.aborted && openRef.current) {
+            setVoiceProblem(true);
+            setError(failure.response?.data?.detail || "Pippa couldn't transcribe the recording. Check the kitchen server connection and try again.");
+          }
+        } finally {
+          if (voiceRequestRef.current === controller) {
+            voiceRequestRef.current = null;
+            setTranscribing(false);
+          }
+        }
+      };
+      recorder.start();
+      setListening(true);
+      recording.timer = window.setTimeout(() => stopRecording(), 15000);
+    } catch (failure) {
+      stream?.getTracks().forEach((track) => track.stop());
+      recordingRef.current = null;
+      setListening(false);
+      setVoiceProblem(true);
+      const permissionBlocked = failure.name === "NotAllowedError" || failure.name === "SecurityError";
+      setError(permissionBlocked
+        ? "Microphone access is blocked. Allow microphone access for this page, then try again."
+        : "No microphone is available. Connect a microphone and try again.");
+    } finally {
+      voiceStartingRef.current = false;
     }
   };
 
@@ -200,6 +302,7 @@ export default function ChatDrawer({ open, onClose }) {
         <div ref={messagesEnd} />
       </div>
       {error && <div className="chat-error" role="alert" data-testid="chat-error">{error}</div>}
+      {(listening || transcribing) && <div className="chat-voice-status" role="status" data-testid="chat-voice-status">{transcribing ? "Transcribing your question..." : "Listening... tap the microphone to finish."}</div>}
       {error && voiceProblem && (
         <div className="chat-voice-recovery">
           <button type="button" onClick={startListening}>Try microphone again</button>
@@ -216,7 +319,7 @@ export default function ChatDrawer({ open, onClose }) {
           placeholder="Ask Pippa anything…"
           data-testid="baker-chat-input"
         />
-        <button type="button" className={`chat-mic-button${listening ? " listening" : ""}`} onClick={listening ? () => recognitionRef.current?.stop() : startListening} disabled={loading} aria-label={listening ? "Stop listening" : "Ask Pippa by voice"} title={listening ? "Stop listening" : "Ask Pippa by voice"} data-testid="chat-voice-input">
+        <button type="button" className={`chat-mic-button${listening ? " listening" : ""}`} onClick={listening ? () => { stopRecording(); recognitionRef.current?.stop(); } : startListening} disabled={loading || transcribing} aria-label={listening ? "Stop listening" : "Ask Pippa by voice"} title={listening ? "Stop listening" : "Ask Pippa by voice"} data-testid="chat-voice-input">
           {listening ? <MicOff size={17} /> : <Mic size={17} />}
         </button>
         <button type="submit" disabled={!message.trim() || loading} aria-label="Send message" title="Send message" data-testid="send-baker-chat"><ArrowUp size={18} /></button>

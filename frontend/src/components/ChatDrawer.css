@@ -42,6 +42,7 @@
 .chat-footer .whatsapp-button{display:inline-flex;align-items:center;gap:6px;border:0;padding:6px 0;background:transparent;color:#52765b;font:600 10px 'DM Sans',sans-serif;cursor:pointer}
 .chat-footer .whatsapp-button:hover{text-decoration:underline}
 .chat-error{padding:8px 15px;background:#fff1eb;color:#a64a34;font-size:11px}
+.chat-voice-status{padding:8px 15px;background:#edf3ef;color:#365e49;font-size:12px;line-height:1.4}
 .chat-voice-recovery{display:flex;justify-content:flex-end;gap:8px;padding:0 12px 8px;background:#fff}
 .chat-voice-recovery button{border:1px solid #e4d7d0;border-radius:4px;padding:6px 9px;background:#fff;color:#64574f;font:600 10px 'DM Sans',sans-serif;cursor:pointer}
 .chat-voice-recovery button:first-child{border-color:#d8c7be;background:#f8f1ed}
