@@ -50,10 +50,6 @@ const heroSlides = [
     src: "https://images.unsplash.com/photo-1621994214182-f467e6999dc9?auto=format&fit=crop&w=1800&q=90",
     alt: "Chocolate chip banana bread",
   },
-  {
-    src: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=1800&q=90",
-    alt: "Freshly glazed cinnamon rolls",
-  },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
 
