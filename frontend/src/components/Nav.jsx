@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, House, MessageCircle, ShoppingBag } from "lucide-react";
+import { ArrowRight, ChevronDown, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/state/CartContext";
 import { api } from "@/state/api";
 import "./Nav.css";
@@ -75,6 +75,23 @@ export default function Nav({ onOpenChat }) {
   const [products, setProducts] = useState([]);
   const [giftBoxes, setGiftBoxes] = useState([]);
   const [catalogueLoading, setCatalogueLoading] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const closeMenus = (event) => {
+      const nav = document.querySelector(".nav");
+      if (event.type === "keydown" && event.key !== "Escape") return;
+      if (event.type === "pointerdown" && nav?.contains(event.target)) return;
+      nav?.querySelectorAll("details[open]").forEach((dropdown) => { dropdown.open = false; });
+      setMobileOpen(false);
+    };
+    document.addEventListener("pointerdown", closeMenus);
+    document.addEventListener("keydown", closeMenus);
+    return () => {
+      document.removeEventListener("pointerdown", closeMenus);
+      document.removeEventListener("keydown", closeMenus);
+    };
+  }, []);
 
   useEffect(() => {
     api.get("/products")
@@ -114,11 +131,17 @@ export default function Nav({ onOpenChat }) {
   ];
 
   return (
-    <nav className="nav">
+    <nav className={`nav ${mobileOpen ? "nav-mobile-open" : ""}`} aria-label="Main navigation">
+      <button className="nav-mobile-toggle" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen} aria-controls="nav-links" onClick={() => setMobileOpen(!mobileOpen)}>
+        {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
       <Link to="/" className="brand" data-testid="brand-home">
         <span className="brand-mark">SK</span>
         <span>Treats &<br /><b>Temptation</b></span>
       </Link>
+      <div id="nav-links" className="nav-links" onClick={(event) => {
+        if (event.target.closest("a")) setMobileOpen(false);
+      }}>
       <Link to="/" className="nav-home" aria-label="Go to home page" title="Home" data-testid="nav-home">
         <House size={16} />
         <span>Home</span>
@@ -137,13 +160,16 @@ export default function Nav({ onOpenChat }) {
         ]} />
       </div>
       <NavDropdown id="about" label="About Us" heading="ABOUT US" items={aboutOptions.map((option) => ({ ...option, key: option.href }))} />
-      <button className="icon-button" onClick={onOpenChat} data-testid="open-baker-chat" aria-label="Open baker chat">
+      </div>
+      <div className="nav-actions">
+      <button className="icon-button" onClick={onOpenChat} data-testid="open-baker-chat" aria-label="Open baker chat" title="Baker chat">
         <MessageCircle size={21} />
       </button>
-      <button className="cart-pill" onClick={() => setCartOpen(true)} data-testid="cart-button" aria-label="Open cart">
+      <button className="cart-pill" onClick={() => setCartOpen(true)} data-testid="cart-button" aria-label="Open cart" title="Cart">
         <ShoppingBag size={18} />
         <span data-testid="cart-count">{cartCount}</span>
       </button>
+      </div>
     </nav>
   );
 }
