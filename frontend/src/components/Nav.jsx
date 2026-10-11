@@ -20,7 +20,15 @@ function closeDropdown(event) {
   event.currentTarget.closest("details").open = false;
 }
 
-function NavDropdown({ id, label, heading, items, loading, className = "", pageHref, pageLinkLabel }) {
+function NavDropdown({ id, label, heading, items, loading, className = "", pageHref, pageLinkLabel, feature }) {
+  const groups = [];
+  items.forEach((item) => {
+    if (item.heading) groups.push({ heading: item.heading, items: [] });
+    else {
+      if (!groups.length) groups.push({ heading: null, items: [] });
+      groups[groups.length - 1].items.push(item);
+    }
+  });
   return (
     <details
       className={`nav-dropdown ${className}`}
@@ -49,22 +57,31 @@ function NavDropdown({ id, label, heading, items, loading, className = "", pageH
             </Link>
           </div>
         ) : <p className="nav-dropdown-heading">{heading}</p>}
+        <div className={`nav-mega-body ${id === "menu" ? "nav-mega-catalogue" : ""}`}>
         {loading ? (
           <p className="nav-dropdown-message">Loading…</p>
-        ) : items.length ? items.map((item) => (
-          item.heading ? (
-            <p className="nav-dropdown-category" key={item.heading}>{item.heading}</p>
-          ) : (
+        ) : items.length ? groups.map((group, index) => (
+          <div className="nav-mega-column" key={group.heading || index}>
+            {group.heading && <p className="nav-dropdown-category">{group.heading}</p>}
+            <div className="nav-mega-links">
+            {group.items.map((item) => (
             <Link key={item.key || item.label} to={item.href} onClick={closeDropdown}>
               {item.image && <img className="nav-dropdown-product-image" src={item.image} alt="" loading="lazy" />}
               <span>{item.label}</span>
               {item.detail && <small>{item.detail}</small>}
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
-          )
+            ))}
+            </div>
+          </div>
         )) : (
           <p className="nav-dropdown-message">Nothing to show right now.</p>
         )}
+        {feature && id !== "menu" && <Link to={feature.href} className="nav-mega-feature" onClick={closeDropdown}>
+          <img src={feature.image} alt={feature.label} loading="lazy" />
+          <span>{feature.label} <ArrowRight size={18} aria-hidden="true" /></span>
+        </Link>}
+        </div>
       </div>
     </details>
   );
@@ -130,6 +147,8 @@ export default function Nav({ onOpenChat }) {
     { key: "gift-box-builder", label: "Build a gift box", href: "/build" },
   ];
 
+  const feature = products[0] ? { image: products[0].image, label: "Browse the full menu", href: "/menu" } : null;
+
   return (
     <nav className={`nav ${mobileOpen ? "nav-mobile-open" : ""}`} aria-label="Main navigation">
       <button className="nav-mobile-toggle" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen} aria-controls="nav-links" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -146,20 +165,20 @@ export default function Nav({ onOpenChat }) {
         <House size={16} />
         <span>Home</span>
       </Link>
-      <NavDropdown id="order" label="Order" heading="ORDER OPTIONS" items={orderOptions.map((option) => ({ ...option, key: option.href }))} />
+      <NavDropdown id="order" label="Order" heading="ORDER OPTIONS" items={orderOptions.map((option) => ({ ...option, key: option.href }))} feature={feature} />
       <div className="nav-sections">
         <NavDropdown id="menu" label="Menu" heading="ALL BAKES" items={productItems} loading={catalogueLoading} pageHref="/menu" pageLinkLabel="View full menu" />
-        <NavDropdown id="build" label="Build a box" heading="MAKE IT YOURS" items={[
+        <NavDropdown id="build" label="Build a box" heading="MAKE IT YOURS" feature={feature} items={[
           { label: "Build a custom box", href: "/build" },
           { label: "Browse the full menu", href: "/menu" },
         ]} />
-        <NavDropdown id="gifting" label="Gifting" heading="READY-MADE GIFT BOXES" items={giftingItems} loading={catalogueLoading} />
-        <NavDropdown id="match" label="Find your perfect match" heading="FIND YOUR BAKE" items={[
+        <NavDropdown id="gifting" label="Gifting" heading="READY-MADE GIFT BOXES" items={giftingItems} loading={catalogueLoading} feature={feature} />
+        <NavDropdown id="match" label="Find your perfect match" heading="FIND YOUR BAKE" feature={feature} items={[
           { label: "Open the bake matchmaker", href: "/#match" },
           { label: "Browse every bake", href: "/menu" },
         ]} />
       </div>
-      <NavDropdown id="about" label="About Us" heading="ABOUT US" items={aboutOptions.map((option) => ({ ...option, key: option.href }))} />
+      <NavDropdown id="about" label="About Us" heading="ABOUT US" items={aboutOptions.map((option) => ({ ...option, key: option.href }))} feature={feature} />
       </div>
       <div className="nav-actions">
       <button className="icon-button" onClick={onOpenChat} data-testid="open-baker-chat" aria-label="Open baker chat" title="Baker chat">
