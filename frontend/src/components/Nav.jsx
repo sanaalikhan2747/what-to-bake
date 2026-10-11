@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Heart, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/state/CartContext";
 import { api } from "@/state/api";
 import "./Nav.css";
@@ -154,9 +154,17 @@ export default function Nav({ onOpenChat }) {
       <button className="nav-mobile-toggle" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen} aria-controls="nav-links" onClick={() => setMobileOpen(!mobileOpen)}>
         {mobileOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
-      <Link to="/" className="brand" data-testid="brand-home">
-        <span className="brand-mark">SK</span>
-        <span>Treats &<br /><b>Temptation</b></span>
+      <Link to="/" className="brand" data-testid="brand-home" aria-label="Treats & Temptation home" title="Treats & Temptation home">
+        <span className="brand-mark bakery-emblem" aria-hidden="true">
+          <svg className="bakery-emblem-pastry" width="27" height="27" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M7 19h18l-3 10H10Z" fill="#f7d8b5" />
+            <path d="m13 22 1 5m5-5-1 5" />
+            <path d="M7 19c-4-2-2-7 2-7-1-4 3-6 6-5 1-2 3-3 4-3 0 3 4 4 4 8 4 0 6 5 2 7Z" fill="#f5b9cf" />
+            <path d="M10 13c3 2 9 2 12 0" />
+          </svg>
+          <Heart className="bakery-emblem-heart" size={11} />
+        </span>
+        <span className="bakery-name"><span>Treats &</span><span>Temptation</span></span>
       </Link>
       <div id="nav-links" className="nav-links" onClick={(event) => {
         if (event.target.closest("a")) setMobileOpen(false);

@@ -85,3 +85,16 @@
 	.nav-mega-feature:hover>span{text-decoration:underline}
 }
 @media(max-width:1100px){.nav-mega-column+.nav-mega-column{margin-top:18px}.nav-mega-links{gap:2px}}
+
+.nav .brand{gap:12px;align-items:center}
+.nav .brand .bakery-emblem{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 54px;width:54px;height:54px;border-radius:50%;border:1px solid #e7bdcd;background:#fff0f5;color:#914861;box-shadow:inset 0 0 0 4px #fffafd;letter-spacing:0;transition:transform .2s ease,background .2s ease}
+.bakery-emblem-pastry{flex:0 0 auto;fill:#f7d8b5}
+.bakery-emblem-heart{position:absolute;top:5px;right:4px;fill:#d16b8f;stroke:#fffafd;stroke-width:1.5}
+.nav .bakery-emblem-signature{font:600 10px/1 "Playfair Display",Georgia,serif;letter-spacing:0;margin-top:1px}
+.nav .brand .bakery-name{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;color:#663b47;font:600 23px/1.1 "Playfair Display",Georgia,serif;letter-spacing:0;white-space:nowrap}
+.nav .bakery-name>span{display:block;font:inherit;color:inherit;letter-spacing:0}
+.nav .brand:is(:hover,:focus-visible) .bakery-emblem{transform:rotate(-6deg);background:#fce2ec}
+@media(max-width:1350px){.nav .brand .bakery-name{font-size:21px}.nav .brand .bakery-emblem{width:46px;height:46px;flex-basis:46px}.bakery-emblem-pastry{width:24px;height:24px}}
+@media(max-width:480px){.nav .brand{gap:7px}.nav .brand .bakery-name{font-size:17px;gap:1px}.nav .brand .bakery-emblem{width:36px;height:36px;flex-basis:36px;box-shadow:inset 0 0 0 2px #fffafd}.bakery-emblem-pastry{width:20px;height:20px}.nav .bakery-emblem-signature{font-size:8px}.bakery-emblem-heart{width:9px;height:9px;top:2px;right:1px}}
+@media(max-width:360px){.nav .brand .bakery-name{font-size:15px}.nav .brand{gap:5px}}
+@media(prefers-reduced-motion:reduce){.nav .brand .bakery-emblem{transition:none;transform:none}}
