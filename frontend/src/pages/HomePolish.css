@@ -124,10 +124,14 @@
 @media(max-width:800px){.hero-copy h1{font-size:42px}}
 
 /* Keep homepage section content on one shared alignment grid. */
-.hero-copy{width:100%;max-width:1530px;margin-right:auto;margin-left:auto;padding-right:5.5%;padding-left:5.5%}
-.festive-heading,.festive-grid{width:100%;max-width:1320px;margin-right:auto;margin-left:auto}
-@media(max-width:760px){
-	.hero-copy{max-width:none;padding-right:5%;padding-left:5%}
-	.match-section,.festive-section{padding-right:5%;padding-left:5%}
-}
-@media(max-width:420px){.hero-copy{padding-right:5%;padding-left:5%}}
+.hero-copy{width:100%;max-width:none;margin-right:0;margin-left:0;padding-right:3%;padding-left:3%}
+.featured-products,.match-section,.festive-section,.result-section{padding-right:3%;padding-left:3%}
+.featured-products-heading,.featured-tabs,.featured-groups{max-width:none}
+.match-section .match-heading-row,.match-section .match-form{max-width:none}
+.festive-heading,.festive-grid{width:100%;max-width:none}
+.result-section{padding-right:3%;padding-left:3%}
+.result-card{max-width:none}
+@media(max-width:1350px) and (min-width:1101px){.hero-copy,.featured-products,.match-section,.festive-section,.result-section{padding-right:2%;padding-left:2%}}
+@media(max-width:1100px){.hero-copy,.featured-products,.match-section,.festive-section,.result-section{padding-right:5%;padding-left:calc(5% + 52px)}}
+@media(max-width:480px){.hero-copy,.featured-products,.match-section,.festive-section,.result-section{padding-right:4%;padding-left:calc(4% + 38px)}}
+@media(max-width:360px){.hero-copy,.featured-products,.match-section,.festive-section,.result-section{padding-right:4%;padding-left:calc(4% + 36px)}}
