@@ -6,7 +6,7 @@ import { api } from "@/state/api";
 import "./Nav.css";
 
 const orderOptions = [
-  { label: "Advanced Order for Local Pick-Up", href: "/order/local-pickup" },
+  { label: "Place your order in advance", href: "/order/local-pickup" },
   { label: "Same-Day Pick-Up or Delivery", href: "/order/same-day" },
   { label: "Corporate Catering", href: "/order/corporate-catering" },
   { label: "Corporate Gifting", href: "/order/corporate-gifting" },
