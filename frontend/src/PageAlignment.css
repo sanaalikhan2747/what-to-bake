@@ -1,0 +1,9 @@
+:root{--page-logo-gutter:3%}
+@media(min-width:1101px) and (max-width:1350px){:root{--page-logo-gutter:2%}}
+@media(max-width:1100px){:root{--page-logo-gutter:calc(5% + 52px)}}
+@media(max-width:480px){:root{--page-logo-gutter:calc(4% + 38px)}}
+@media(max-width:360px){:root{--page-logo-gutter:calc(4% + 38px)}}
+
+.menu-page,.build-page,.checkout-page,.checkout-empty,.our-story-page,.order-option-page,.success-page{width:100%;max-width:none;margin-right:0;margin-left:0;padding-right:var(--page-logo-gutter);padding-left:var(--page-logo-gutter)}
+.order-option-hero,.order-option-steps,.order-option-next,.order-option-backlinks{width:100%;max-width:none;margin-right:0;margin-left:0}
+.success-summary{width:min(100%,720px);margin-right:auto;margin-left:auto}
