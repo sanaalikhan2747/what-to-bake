@@ -8,6 +8,13 @@
 .order-option-next{max-width:1100px;margin:0 auto;padding:26px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:24px}
 .order-option-next .eyebrow{margin-bottom:8px}
 .order-option-next p:last-child{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.advance-order-fieldset{grid-column:1/-1;min-width:0;margin:0;padding:0;border:0}
+.advance-order-fieldset legend{margin:0 0 9px;color:#584849;font-size:11px;font-weight:600}
+.advance-order-fulfilment{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.advance-order-fulfilment-option{position:relative;display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid #e5d9d3;border-radius:3px;background:#fff;color:#665558;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.advance-order-fulfilment-option input{position:absolute;width:1px;height:1px;opacity:0}
+.advance-order-fulfilment-option:has(input:focus-visible){outline:2px solid #b87588;outline-offset:2px}
+.advance-order-fulfilment-option.selected{border-color:#b87588;background:#fff0f4;color:#874c60;box-shadow:inset 0 0 0 1px #b87588}
 .advance-order-section{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:clamp(28px,6vw,88px);width:100%;max-width:1320px;margin:0 auto;padding:42px 0 48px;border-top:1px solid #e9ddd6;border-bottom:1px solid #e9ddd6}
 .advance-order-heading .eyebrow{margin:0 0 12px;color:#8b5264;font-size:9px;letter-spacing:.13em}
 .advance-order-heading h2{margin:0;color:#453536;font:500 clamp(32px,3.5vw,44px)/1.08 'Playfair Display',serif;letter-spacing:0}

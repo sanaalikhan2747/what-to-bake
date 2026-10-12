@@ -9,21 +9,21 @@ const ORDER_PAGES = {
   "local-pickup": {
     eyebrow: "PLAN AHEAD",
     title: <>A little something,<br /><em>ready when you are.</em></>,
-    intro: "Planning to collect your bakes? Browse the menu, then message Sana with your choices and preferred pick-up date and time. She'll confirm what's available.",
-    note: "Pick-up timing is confirmed directly with Sana before your order is final.",
-    prompt: "Hello Sana! I'd like to arrange an advance local pick-up. I'll share my bake choices and preferred date and time.",
+    intro: "Planning ahead? Choose pick-up or delivery, browse the menu, then send Sana your order details and preferred date and time. She'll confirm availability and arrangements.",
+    note: "Your preferred date, time and fulfilment option are confirmed directly with Sana before your order is final.",
+    prompt: "Hello Sana! I'd like to discuss an advance bakery order.",
     primary: "Browse the menu",
     primaryTo: "/menu",
     secondary: "Build a custom box",
     secondaryTo: "/build",
     label: "LOCAL PICK-UP",
     image: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
-    imageAlt: "A selection of freshly baked loaves ready for local pick-up",
+    imageAlt: "A selection of freshly baked loaves for an advance order",
     imageCaption: "Fresh from the oven, ready for your table",
     steps: [
       { title: "Choose your bakes", detail: "Browse the menu or put together a custom box." },
-      { title: "Share your timing", detail: "Send Sana your choices and preferred pick-up date and time." },
-      { title: "Confirm the details", detail: "Sana will confirm availability, timing and pick-up location with you." },
+      { title: "Share your timing", detail: "Send Sana your choices and preferred date, time and fulfilment option." },
+      { title: "Confirm the details", detail: "Sana will confirm availability, timing and pick-up or delivery arrangements with you." },
     ],
   },
   "same-day": {
@@ -108,11 +108,13 @@ const ORDER_PAGES = {
 
 export default function OrderOption({ orderType }) {
   const [advanceRequest, setAdvanceRequest] = useState({
+    fulfilment: "pickup",
     fullName: "",
     email: "",
     phone: "",
     date: "",
     time: "",
+    address: "",
     details: "",
   });
   const option = ORDER_PAGES[orderType];
@@ -126,15 +128,18 @@ export default function OrderOption({ orderType }) {
   const submitAdvanceRequest = (event) => {
     event.preventDefault();
     if (orderType !== "local-pickup") return;
+    const isDelivery = advanceRequest.fulfilment === "delivery";
+    const service = isDelivery ? "delivery" : "pick-up";
     const message = [
-      "Hello Sana! I'd like to request an advance local pick-up.",
+      `Hello Sana! I'd like to request an advance ${service} order.`,
       `Full name: ${advanceRequest.fullName.trim()}`,
       `Email: ${advanceRequest.email.trim()}`,
       `Phone: ${advanceRequest.phone.trim()}`,
-      `Preferred pick-up date: ${advanceRequest.date}`,
-      `Preferred pick-up time: ${advanceRequest.time}`,
+      `Preferred ${service} date: ${advanceRequest.date}`,
+      `Preferred ${service} time: ${advanceRequest.time}`,
+      ...(isDelivery ? [`Delivery address: ${advanceRequest.address.trim()}`] : []),
       `Order details: ${advanceRequest.details.trim()}`,
-      "Please confirm availability, timing and pick-up location.",
+      `Please confirm availability and ${isDelivery ? "delivery arrangements" : "pick-up location"}.`,
     ].join("\n");
     window.open(waLink(message), "_blank", "noopener,noreferrer");
   };
@@ -143,7 +148,7 @@ export default function OrderOption({ orderType }) {
     <div className="order-option-page">
       <section className="order-option-hero" aria-labelledby="order-option-title">
         <div className="order-option-copy">
-          <p className="eyebrow">{option.label}</p>
+          {orderType !== "local-pickup" && <p className="eyebrow">{option.label}</p>}
           <p className="order-option-kicker">{option.eyebrow}</p>
           <h1 id="order-option-title">{option.title}</h1>
           <p className="order-option-intro">{option.intro}</p>
@@ -160,11 +165,22 @@ export default function OrderOption({ orderType }) {
       </section>
       {orderType === "local-pickup" && <section className="advance-order-section" aria-labelledby="advance-order-title">
         <div className="advance-order-heading">
-          <p className="eyebrow">A PICK-UP REQUEST</p>
+          <p className="eyebrow">AN ADVANCE ORDER</p>
           <h2 id="advance-order-title">Book your order</h2>
-          <p>Share your details and preferred pick-up time. Sana will confirm availability and location with you on WhatsApp.</p>
+          <p>Choose pick-up or delivery and share your preferred date and time. Sana will confirm availability and arrangements with you on WhatsApp.</p>
         </div>
         <form className="advance-order-form" onSubmit={submitAdvanceRequest} data-testid="advance-order-form">
+          <fieldset className="advance-order-fieldset">
+            <legend>How would you like to receive your order?</legend>
+            <div className="advance-order-fulfilment" role="radiogroup" aria-label="Order fulfilment">
+              {[{ value: "pickup", label: "Pick-up" }, { value: "delivery", label: "Delivery" }].map((choice) => (
+                <label className={`advance-order-fulfilment-option${advanceRequest.fulfilment === choice.value ? " selected" : ""}`} key={choice.value}>
+                  <input type="radio" name="fulfilment" value={choice.value} checked={advanceRequest.fulfilment === choice.value} onChange={updateAdvanceRequest} data-testid={`advance-order-${choice.value}`} />
+                  <span>{choice.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label className="advance-order-field">
             <span>Full name</span>
             <input autoComplete="name" name="fullName" value={advanceRequest.fullName} onChange={updateAdvanceRequest} required maxLength={100} data-testid="advance-order-name" />
@@ -178,24 +194,28 @@ export default function OrderOption({ orderType }) {
             <input type="tel" autoComplete="tel" name="phone" value={advanceRequest.phone} onChange={updateAdvanceRequest} required maxLength={40} data-testid="advance-order-phone" />
           </label>
           <label className="advance-order-field">
-            <span>Preferred pick-up date</span>
+            <span>Preferred date</span>
             <input type="date" name="date" min={new Date().toLocaleDateString("en-CA")} value={advanceRequest.date} onChange={updateAdvanceRequest} required data-testid="advance-order-date" />
           </label>
           <label className="advance-order-field">
-            <span>Preferred pick-up time</span>
+            <span>Preferred time</span>
             <input type="time" name="time" value={advanceRequest.time} onChange={updateAdvanceRequest} required data-testid="advance-order-time" />
           </label>
+          {advanceRequest.fulfilment === "delivery" && <label className="advance-order-field advance-order-field-wide">
+            <span>Delivery address</span>
+            <textarea name="address" value={advanceRequest.address} onChange={updateAdvanceRequest} required maxLength={500} rows={2} autoComplete="street-address" placeholder="Enter the full delivery address." data-testid="advance-order-address" />
+          </label>}
           <label className="advance-order-field advance-order-field-wide">
             <span>What would you like to order?</span>
             <textarea name="details" value={advanceRequest.details} onChange={updateAdvanceRequest} required minLength={3} maxLength={1200} rows={4} placeholder="List your bakes, quantities, and any notes for Sana." data-testid="advance-order-details" />
           </label>
           <div className="advance-order-submit-row">
-            <p>Sana will confirm your request before the pick-up is final.</p>
+            <p>Sana will confirm availability and your {advanceRequest.fulfilment === "delivery" ? "delivery" : "pick-up"} arrangements before the order is final.</p>
             <button type="submit" className="button primary" data-testid="advance-order-submit">Send request to Sana <MessageCircle size={16} /></button>
           </div>
         </form>
       </section>}
-      <section className="order-option-steps" aria-label={`How ${option.label.toLowerCase()} works`}>
+      {orderType !== "local-pickup" && <section className="order-option-steps" aria-label={`How ${option.label.toLowerCase()} works`}>
         <div className="order-option-steps-heading">
           <p className="eyebrow">A SIMPLE, PERSONAL ORDER</p>
           <h2>From first thought<br /><em>to freshly baked.</em></h2>
@@ -208,7 +228,7 @@ export default function OrderOption({ orderType }) {
             </article>
           ))}
         </div>
-      </section>
+      </section>}
       <section className="order-option-next">
         <div>
           <p className="eyebrow">A NOTE BEFORE YOU ORDER</p>
