@@ -4,7 +4,9 @@ Pippa records microphone audio and posts it to `/api/speech/transcribe`.
 The backend uses faster-whisper's `tiny.en` model locally, without an API key.
 Recognized questions go through the same chat flow as typed questions.
 
-Install the backend requirements and restart the API after deploying this change.
+Install production packages with `pip install -r requirements.txt`. For local
+tests and formatting tools, install `pip install -r requirements-dev.txt`.
+Restart the API after deploying this change.
 The first transcription downloads the model from Hugging Face. Later requests
 reuse the in-memory model. A deployment needs network access for the first
 download, or a predownloaded model directory configured using `SPEECH_MODEL`.
