@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { waLink } from "@/state/api";
@@ -106,8 +107,37 @@ const ORDER_PAGES = {
 };
 
 export default function OrderOption({ orderType }) {
+  const [advanceRequest, setAdvanceRequest] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    date: "",
+    time: "",
+    details: "",
+  });
   const option = ORDER_PAGES[orderType];
   if (!option) return <Navigate to="/menu" replace />;
+
+  const updateAdvanceRequest = (event) => {
+    const { name, value } = event.target;
+    setAdvanceRequest((current) => ({ ...current, [name]: value }));
+  };
+
+  const submitAdvanceRequest = (event) => {
+    event.preventDefault();
+    if (orderType !== "local-pickup") return;
+    const message = [
+      "Hello Sana! I'd like to request an advance local pick-up.",
+      `Full name: ${advanceRequest.fullName.trim()}`,
+      `Email: ${advanceRequest.email.trim()}`,
+      `Phone: ${advanceRequest.phone.trim()}`,
+      `Preferred pick-up date: ${advanceRequest.date}`,
+      `Preferred pick-up time: ${advanceRequest.time}`,
+      `Order details: ${advanceRequest.details.trim()}`,
+      "Please confirm availability, timing and pick-up location.",
+    ].join("\n");
+    window.open(waLink(message), "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="order-option-page">
@@ -128,6 +158,43 @@ export default function OrderOption({ orderType }) {
         </div>
         <OrderShowcase image={option.image} alt={option.imageAlt} caption={option.imageCaption} />
       </section>
+      {orderType === "local-pickup" && <section className="advance-order-section" aria-labelledby="advance-order-title">
+        <div className="advance-order-heading">
+          <p className="eyebrow">A PICK-UP REQUEST</p>
+          <h2 id="advance-order-title">Book your order</h2>
+          <p>Share your details and preferred pick-up time. Sana will confirm availability and location with you on WhatsApp.</p>
+        </div>
+        <form className="advance-order-form" onSubmit={submitAdvanceRequest} data-testid="advance-order-form">
+          <label className="advance-order-field">
+            <span>Full name</span>
+            <input autoComplete="name" name="fullName" value={advanceRequest.fullName} onChange={updateAdvanceRequest} required maxLength={100} data-testid="advance-order-name" />
+          </label>
+          <label className="advance-order-field">
+            <span>Email address</span>
+            <input type="email" autoComplete="email" name="email" value={advanceRequest.email} onChange={updateAdvanceRequest} required maxLength={254} data-testid="advance-order-email" />
+          </label>
+          <label className="advance-order-field">
+            <span>Phone number</span>
+            <input type="tel" autoComplete="tel" name="phone" value={advanceRequest.phone} onChange={updateAdvanceRequest} required maxLength={40} data-testid="advance-order-phone" />
+          </label>
+          <label className="advance-order-field">
+            <span>Preferred pick-up date</span>
+            <input type="date" name="date" min={new Date().toLocaleDateString("en-CA")} value={advanceRequest.date} onChange={updateAdvanceRequest} required data-testid="advance-order-date" />
+          </label>
+          <label className="advance-order-field">
+            <span>Preferred pick-up time</span>
+            <input type="time" name="time" value={advanceRequest.time} onChange={updateAdvanceRequest} required data-testid="advance-order-time" />
+          </label>
+          <label className="advance-order-field advance-order-field-wide">
+            <span>What would you like to order?</span>
+            <textarea name="details" value={advanceRequest.details} onChange={updateAdvanceRequest} required minLength={3} maxLength={1200} rows={4} placeholder="List your bakes, quantities, and any notes for Sana." data-testid="advance-order-details" />
+          </label>
+          <div className="advance-order-submit-row">
+            <p>Sana will confirm your request before the pick-up is final.</p>
+            <button type="submit" className="button primary" data-testid="advance-order-submit">Send request to Sana <MessageCircle size={16} /></button>
+          </div>
+        </form>
+      </section>}
       <section className="order-option-steps" aria-label={`How ${option.label.toLowerCase()} works`}>
         <div className="order-option-steps-heading">
           <p className="eyebrow">A SIMPLE, PERSONAL ORDER</p>
