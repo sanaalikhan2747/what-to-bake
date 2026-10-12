@@ -65,9 +65,10 @@
 .featured-card-footer{gap:8px;padding-top:9px;font-size:14px}
 .featured-card-footer small{font-size:9px}
 .featured-add{width:32px;height:32px;flex-basis:32px}
-.match-section{position:relative;padding-top:88px;padding-bottom:92px;background:#f8e9eb}
+.match-section{position:relative;padding:88px 5.5% 92px;background:#f8e9eb}
+.match-section .match-heading-row,.match-section .match-form{width:100%;max-width:1320px;margin-right:auto;margin-left:auto}
 .match-form{border:1px solid rgba(239,227,223,.88);border-radius:8px;box-shadow:0 12px 34px rgba(61,32,40,.055)}
-.festive-section{padding-top:86px;padding-bottom:92px;background:#fffaf8}
+.festive-section{padding:86px 5.5% 92px;background:#fffaf8}
 .festive-heading{margin-bottom:38px}
 .festive-card{overflow:hidden;background:#fff;border-color:rgba(239,227,223,.82);box-shadow:0 5px 18px rgba(61,32,40,.045)}
 .festive-body{padding:19px 20px 17px}
@@ -121,3 +122,12 @@
 .hero-copy h1{font-family:"Playfair Display",serif;font-size:60px;font-weight:500;font-style:normal;line-height:1.04;letter-spacing:0}
 .hero-copy h1 em{font:inherit;font-style:italic;color:inherit}
 @media(max-width:800px){.hero-copy h1{font-size:42px}}
+
+/* Keep homepage section content on one shared alignment grid. */
+.hero-copy{width:100%;max-width:1530px;margin-right:auto;margin-left:auto;padding-right:5.5%;padding-left:5.5%}
+.festive-heading,.festive-grid{width:100%;max-width:1320px;margin-right:auto;margin-left:auto}
+@media(max-width:760px){
+	.hero-copy{max-width:none;padding-right:5%;padding-left:5%}
+	.match-section,.festive-section{padding-right:5%;padding-left:5%}
+}
+@media(max-width:420px){.hero-copy{padding-right:5%;padding-left:5%}}
