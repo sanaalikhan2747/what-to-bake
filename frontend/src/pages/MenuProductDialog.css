@@ -1,0 +1,32 @@
+.menu-card-selectable{cursor:pointer}
+.menu-card-selectable:focus-visible{outline:3px solid rgba(209,107,143,.52);outline-offset:3px}
+.menu-product-backdrop{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:24px;background:rgba(34,26,28,.58);backdrop-filter:blur(4px);animation:menu-product-fade .18s ease-out}
+.menu-product-dialog{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:min(920px,100%);max-height:min(760px,calc(100dvh - 48px));overflow:auto;border:1px solid rgba(239,227,223,.95);border-radius:8px;background:#fffdfb;box-shadow:0 24px 80px rgba(30,17,20,.3);animation:menu-product-rise .22s ease-out}
+.menu-product-dialog-close{position:absolute;top:14px;right:14px;z-index:2;display:grid;width:38px;height:38px;place-items:center;border:1px solid rgba(61,32,40,.12);border-radius:50%;background:rgba(255,255,255,.94);color:var(--ink);cursor:pointer}
+.menu-product-dialog-close:hover{background:#fff0f3;color:var(--burnt)}
+.menu-product-dialog-image{position:relative;min-height:440px;background:#f8efec}
+.menu-product-dialog-image>img{display:block;width:100%;height:100%;min-height:440px;object-fit:cover}
+.menu-product-dialog-image .pill-healthy{z-index:1}
+.menu-product-360{position:absolute;right:16px;bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid rgba(255,255,255,.8);border-radius:999px;background:rgba(255,250,249,.96);color:var(--ink);font:600 11px 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(61,32,40,.12)}
+.menu-product-360:hover{background:var(--burnt);color:#fff}
+.menu-product-dialog-copy{display:flex;flex-direction:column;align-items:flex-start;padding:54px 42px 34px}
+.menu-product-dialog-copy>.eyebrow{margin:0 0 14px;color:var(--burnt);font-size:10px;letter-spacing:.13em}
+.menu-product-dialog-copy h2{margin:0;color:var(--ink);font:500 clamp(30px,3vw,42px)/1.08 'Playfair Display',serif;letter-spacing:0}
+.menu-product-dialog-copy>.menu-note{margin:13px 0 0;color:var(--burnt);font-size:12px}
+.menu-product-story{margin:21px 0 0;color:#75666a;font:italic 16px/1.65 'Playfair Display',serif}
+.menu-product-options{width:100%;margin-top:22px}
+.menu-product-options h3{margin:0 0 9px;color:var(--ink);font-size:11px;font-weight:700}
+.menu-product-options>div{display:flex;flex-wrap:wrap;gap:7px}
+.menu-product-options>div>span{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff8fa;color:#764b59;font-size:10px;line-height:1.2}
+.menu-product-dialog-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;margin-top:auto;padding-top:26px}
+.menu-product-dialog-footer>div{display:flex;flex-direction:column;gap:3px}
+.menu-product-dialog-footer strong{color:var(--ink);font:500 25px/1.1 'Playfair Display',serif}
+.menu-product-dialog-footer small{color:var(--muted);font-size:10px}
+.menu-product-dialog-footer .button{min-height:44px;padding:0 17px;white-space:nowrap}
+.menu-product-build-link{display:inline-flex;align-items:center;gap:6px;margin-top:17px;color:var(--burnt);font-size:11px;font-weight:600;text-decoration:none}
+.menu-product-build-link:hover{text-decoration:underline}
+@keyframes menu-product-fade{from{opacity:0}to{opacity:1}}
+@keyframes menu-product-rise{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:700px){.menu-product-backdrop{align-items:end;padding:10px}.menu-product-dialog{grid-template-columns:1fr;width:min(540px,100%);max-height:calc(100dvh - 20px);border-radius:8px 8px 5px 5px}.menu-product-dialog-image{min-height:0;height:clamp(170px,30vh,260px)}.menu-product-dialog-image>img{min-height:0}.menu-product-dialog-copy{padding:24px 22px 22px}.menu-product-dialog-copy>.eyebrow{margin-bottom:8px}.menu-product-dialog-copy h2{font-size:30px}.menu-product-story{margin-top:12px;font-size:14px;line-height:1.5}.menu-product-options{margin-top:15px}.menu-product-dialog-footer{padding-top:20px}.menu-product-dialog-footer strong{font-size:22px}}
+@media(max-width:380px){.menu-product-dialog-footer{align-items:flex-end}.menu-product-dialog-footer .button{gap:7px;padding-inline:11px;font-size:11px}.menu-product-dialog-copy{padding-inline:17px}}
+@media(prefers-reduced-motion:reduce){.menu-product-backdrop,.menu-product-dialog{animation:none}}
