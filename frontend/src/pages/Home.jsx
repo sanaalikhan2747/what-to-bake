@@ -27,7 +27,6 @@ const moods = [
   { value: "Something different", label: "A little unexpected", detail: "Find a new favourite", color: "#7b8a70" },
 ];
 const featuredCategories = [
-  { id: "all", label: "All bakes" },
   { id: "loaf", label: "Loaves" },
   { id: "cheesecake", label: "Dessert boxes" },
   { id: "batch", label: "Bakes & cups" },
@@ -57,7 +56,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loaves, setLoaves] = useState([]);
   const [boxes, setBoxes] = useState([]);
-  const [featuredCategory, setFeaturedCategory] = useState("all");
+  const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
   const [occasion, setOccasion] = useState("Tea party");
   const [mood, setMood] = useState("Warm & comforting");
