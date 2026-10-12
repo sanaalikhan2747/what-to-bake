@@ -1,6 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { waLink } from "@/state/api";
+import OrderShowcase from "@/components/OrderShowcase";
 import "./OrderOption.css";
 
 const ORDER_PAGES = {
@@ -15,6 +16,14 @@ const ORDER_PAGES = {
     secondary: "Build a custom box",
     secondaryTo: "/build",
     label: "LOCAL PICK-UP",
+    image: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
+    imageAlt: "A selection of freshly baked loaves ready for local pick-up",
+    imageCaption: "Fresh from the oven, ready for your table",
+    steps: [
+      { title: "Choose your bakes", detail: "Browse the menu or put together a custom box." },
+      { title: "Share your timing", detail: "Send Sana your choices and preferred pick-up date and time." },
+      { title: "Confirm the details", detail: "Sana will confirm availability, timing and pick-up location with you." },
+    ],
   },
   "same-day": {
     eyebrow: "TODAY, IF THE OVEN SAYS YES",
@@ -26,6 +35,14 @@ const ORDER_PAGES = {
     primaryTo: "/menu",
     secondary: "Ask about availability",
     label: "SAME-DAY PICK-UP OR DELIVERY",
+    image: "https://res.cloudinary.com/dffsqfwok/image/upload/w_1800,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
+    imageAlt: "Fresh mango desserts and bakery treats",
+    imageCaption: "A little something for today",
+    steps: [
+      { title: "Pick a favourite", detail: "Browse the menu and tell Sana what you have in mind." },
+      { title: "Share your area", detail: "Include your location and preferred pick-up or delivery time." },
+      { title: "Check today's availability", detail: "Sana will confirm what can be arranged before you place the order." },
+    ],
   },
   "corporate-catering": {
     eyebrow: "FOR THE WHOLE TABLE",
@@ -37,6 +54,14 @@ const ORDER_PAGES = {
     primaryTo: "/menu",
     secondary: "Discuss catering",
     label: "CORPORATE CATERING",
+    image: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
+    imageAlt: "A curated spread of bakery treats for sharing",
+    imageCaption: "Thoughtful bakes for the whole table",
+    steps: [
+      { title: "Tell us about the gathering", detail: "Share the date, guest count, location and kind of event." },
+      { title: "Explore the bakes", detail: "Browse loaves, dessert boxes, cookies and small treats for your table." },
+      { title: "Discuss the order", detail: "Sana can confirm suitable quantities, timing and hand-off details with you." },
+    ],
   },
   "corporate-gifting": {
     eyebrow: "A THOUGHTFUL THANK-YOU",
@@ -49,6 +74,14 @@ const ORDER_PAGES = {
     secondary: "Build a gift box",
     secondaryTo: "/build",
     label: "CORPORATE GIFTING",
+    image: "https://res.cloudinary.com/dffsqfwok/image/upload/w_1800,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
+    imageAlt: "Giftable bakery desserts arranged for sharing",
+    imageCaption: "A thoughtful gesture, baked with care",
+    steps: [
+      { title: "Choose a gift", detail: "Start with a favourite bake or create a custom box." },
+      { title: "Share the occasion", detail: "Tell Sana how many gifts you need, when they are needed and any message to include." },
+      { title: "Confirm the details", detail: "Packaging, personalisation and hand-off options are confirmed for your order." },
+    ],
   },
   celebrations: {
     eyebrow: "MARK THE MOMENT",
@@ -61,6 +94,14 @@ const ORDER_PAGES = {
     secondary: "Build a custom box",
     secondaryTo: "/build",
     label: "CELEBRATIONS & EVENTS",
+    image: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
+    imageAlt: "A festive bakery box for a celebration",
+    imageCaption: "Made for the moments worth gathering for",
+    steps: [
+      { title: "Choose the centrepiece", detail: "Find a favourite celebration bake or create a box with a little variety." },
+      { title: "Plan for your guests", detail: "Share your guest count, event date and location with Sana." },
+      { title: "Arrange the hand-off", detail: "Confirm availability, timing and collection details directly with Sana." },
+    ],
   },
 };
 
@@ -70,18 +111,35 @@ export default function OrderOption({ orderType }) {
 
   return (
     <div className="order-option-page">
-      <section className="order-option-hero">
-        <p className="eyebrow">{option.label}</p>
-        <p className="order-option-kicker">{option.eyebrow}</p>
-        <h1>{option.title}</h1>
-        <p className="order-option-intro">{option.intro}</p>
-        <div className="order-option-actions">
-          <Link className="button primary" to={option.primaryTo}>{option.primary} <ArrowRight size={16} /></Link>
-          {option.secondaryTo ? (
-            <Link className="button ghost" to={option.secondaryTo}>{option.secondary} <ArrowRight size={16} /></Link>
-          ) : (
-            <a className="button ghost" href={waLink(option.prompt)} target="_blank" rel="noreferrer">{option.secondary} <MessageCircle size={16} /></a>
-          )}
+      <section className="order-option-hero" aria-labelledby="order-option-title">
+        <div className="order-option-copy">
+          <p className="eyebrow">{option.label}</p>
+          <p className="order-option-kicker">{option.eyebrow}</p>
+          <h1 id="order-option-title">{option.title}</h1>
+          <p className="order-option-intro">{option.intro}</p>
+          <div className="order-option-actions">
+            <Link className="button primary" to={option.primaryTo}>{option.primary} <ArrowRight size={16} /></Link>
+            {option.secondaryTo ? (
+              <Link className="button ghost" to={option.secondaryTo}>{option.secondary} <ArrowRight size={16} /></Link>
+            ) : (
+              <a className="button ghost" href={waLink(option.prompt)} target="_blank" rel="noreferrer">{option.secondary} <MessageCircle size={16} /></a>
+            )}
+          </div>
+        </div>
+        <OrderShowcase image={option.image} alt={option.imageAlt} caption={option.imageCaption} />
+      </section>
+      <section className="order-option-steps" aria-label={`How ${option.label.toLowerCase()} works`}>
+        <div className="order-option-steps-heading">
+          <p className="eyebrow">A SIMPLE, PERSONAL ORDER</p>
+          <h2>From first thought<br /><em>to freshly baked.</em></h2>
+        </div>
+        <div className="order-option-step-list">
+          {option.steps.map((step, index) => (
+            <article className="order-option-step" key={step.title}>
+              <span className="order-option-step-number">0{index + 1}</span>
+              <div><h3>{step.title}</h3><p>{step.detail}</p></div>
+            </article>
+          ))}
         </div>
       </section>
       <section className="order-option-next">
