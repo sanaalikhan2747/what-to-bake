@@ -7,9 +7,9 @@ import "./OrderOption.css";
 
 const ORDER_PAGES = {
   "local-pickup": {
-    eyebrow: "PLAN AHEAD",
-    title: <>A little something,<br /><em>ready when you are.</em></>,
-    intro: "Planning ahead? Choose pick-up or delivery, browse the menu, then send Sana your order details and preferred date and time. She'll confirm availability and arrangements.",
+    eyebrow: "ADVANCE ORDERS",
+    title: <em>Plan a date with your favourite bakes.</em>,
+    intro: "Choose your bakes and a preferred date. Sana will help arrange a lovely pick-up or delivery for your table.",
     note: "Your preferred date, time and fulfilment option are confirmed directly with Sana before your order is final.",
     prompt: "Hello Sana! I'd like to discuss an advance bakery order.",
     primary: "Browse the menu",
@@ -165,7 +165,6 @@ export default function OrderOption({ orderType }) {
       </section>
       {orderType === "local-pickup" && <section className="advance-order-section" aria-labelledby="advance-order-title">
         <div className="advance-order-heading">
-          <p className="eyebrow">AN ADVANCE ORDER</p>
           <h2 id="advance-order-title">Book your order</h2>
           <p>Choose pick-up or delivery and share your preferred date and time. Sana will confirm availability and arrangements with you on WhatsApp.</p>
         </div>
