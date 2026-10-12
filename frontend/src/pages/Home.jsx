@@ -157,6 +157,17 @@ export default function Home() {
     ...category,
     products: products.filter((product) => product.category === category.id),
   })).filter((group) => group.products.length > 0);
+  const featuredProducts = productGroups.flatMap((group) => group.products.map((product, index) => ({
+    product,
+    index,
+    categoryIndex: featuredCategories.findIndex((category) => category.id === group.category),
+  }))).sort((first, second) => first.index - second.index || first.categoryIndex - second.categoryIndex)
+    .slice(0, 6)
+    .map(({ product }) => product);
+  const visibleProductGroups = productGroups.map((group) => ({
+    ...group,
+    products: group.products.filter((product) => featuredProducts.some((featured) => featured.id === product.id)),
+  })).filter((group) => group.products.length > 0);
 
   const addFestive = (box) => {
     box.items.forEach(({ product, qty }) => {
@@ -251,7 +262,7 @@ export default function Home() {
           ))}
         </div>
         <div className="featured-groups">
-          {productGroups.map((group, groupIndex) => (
+          {visibleProductGroups.map((group, groupIndex) => (
             <section className="featured-category-group" key={group.id} aria-labelledby={`featured-category-${group.id}`}>
               <div className="featured-category-heading">
                 <span>{String(groupIndex + 1).padStart(2, "0")}</span>
@@ -282,6 +293,9 @@ export default function Home() {
             </section>
           ))}
         </div>
+        <Link to="/menu" className="featured-browse-menu" data-testid="browse-full-menu">
+          Browse the full menu <ArrowRight size={16} aria-hidden="true" />
+        </Link>
       </section>
 
       <section className="match-section" id="match">
