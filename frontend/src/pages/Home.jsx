@@ -292,9 +292,6 @@ export default function Home() {
             </section>
           ))}
         </div>
-        <Link to="/menu" className="featured-browse-menu" data-testid="browse-full-menu">
-          Browse the full menu <ArrowRight size={16} aria-hidden="true" />
-        </Link>
       </section>
 
       <section className="match-section" id="match">
