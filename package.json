@@ -1,5 +1,7 @@
 {
-  "dependencies": {
-    "nvm": "^0.0.4"
+  "name": "what-to-bake",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build"
   }
 }
