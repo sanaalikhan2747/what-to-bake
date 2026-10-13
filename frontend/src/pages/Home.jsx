@@ -46,37 +46,37 @@ const heroSlides = [
     position: "69% 48%",
   },
   {
-    src: "https://res.cloudinary.com/dffsqfwok/image/upload/w_1800,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
-    alt: "Signature mango dessert trays and cups",
+    src: CATALOGUE_PRODUCTS.find((product) => product.id === "cinnamon-rolls-batch")?.image,
+    alt: "Cinnamon Rolls from the menu",
     eyebrow: "FOR THE TABLE",
     heading: "Bring something sweet",
     accent: "to the table.",
     description: "From tea-time loaves to generous dessert boxes, made to share.",
     action: "Browse dessert boxes",
     href: "/menu#cat-cheesecake",
-    position: "70% 50%",
+    position: "100% 50%",
   },
   {
-    src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
-    alt: "Curated festive dessert boxes",
+    src: CATALOGUE_PRODUCTS.find((product) => product.id === "double-chocolate-cookie")?.image,
+    alt: "Double Chocolate Cookie from the menu",
     eyebrow: "A GIFT FROM OUR KITCHEN",
     heading: "Send a little",
     accent: "something lovely.",
     description: "Thoughtful bakery boxes for birthdays, thank-yous, and just because.",
     action: "Explore gifting",
     href: "/order/corporate-gifting",
-    position: "66% 50%",
+    position: "100% 50%",
   },
   {
-    src: CATALOGUE_PRODUCTS.find((product) => product.id === "chocolate-chip-banana")?.image || "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
-    alt: "Chocolate chip banana bread",
+    src: CATALOGUE_PRODUCTS.find((product) => product.id === "flourless-brownies-batch")?.image,
+    alt: "Flourless Brownies from the menu",
     eyebrow: "MADE TO BE SHARED",
     heading: "Gather around",
     accent: "the good stuff.",
     description: "Plan a fresh advance order for your table, your team, or your next big day.",
     action: "Plan your order",
     href: "/order/local-pickup",
-    position: "68% 50%",
+    position: "100% 50%",
   },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
@@ -226,12 +226,19 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className="hero-image hero-showcase" role="region" aria-label="Bakery photo carousel">
+        <div
+          className="hero-image hero-showcase"
+          role="region"
+          aria-label="Bakery photo carousel"
+          style={{
+            "--hero-photo-background": `url("${heroSlides[heroSlide].src}")`,
+            "--hero-photo-position": heroSlides[heroSlide].position,
+          }}
+        >
           <img
             key={heroSlides[heroSlide].src}
             src={heroSlides[heroSlide].src}
             alt={heroSlides[heroSlide].alt}
-            style={{ objectPosition: heroSlides[heroSlide].position }}
             data-testid="hero-dessert-image"
             loading="eager"
           />
