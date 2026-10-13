@@ -59,14 +59,14 @@ export default function OurStory() {
           <p className="eyebrow">A LITTLE PLACE, A LOT OF LOVE</p>
           <h2 id="bakehouse-title">Baked at home.<br /><em>Made for your table.</em></h2>
           <p>Sana's kitchen is a small home bakery where every order is made fresh, one thoughtful batch at a time.</p>
-          <div className="bakehouse-address"><MapPin size={17} /><span>Karachi, Pakistan<br /><small>Pickup details shared personally when arranging your order.</small></span></div>
+          <div className="bakehouse-address"><MapPin size={17} /><span>Askari X, Lahore, Pakistan<br /><small>Pickup details shared personally when arranging your order.</small></span></div>
           <a className="bakehouse-directions" href={waLink("Hi Sana! Could you please share the pickup address and directions for my order?")} target="_blank" rel="noreferrer" data-testid="bakehouse-directions">
             <Navigation size={16} /> Ask Sana for directions <ArrowUpRight size={15} />
           </a>
         </div>
 
         <div className="bakehouse-map" aria-label="Illustrated neighborhood map of the home bakery">
-          <div className="map-neighborhood-label">AROUND THE NEIGHBOURHOOD <span>·</span> KARACHI</div>
+          <div className="map-neighborhood-label">AROUND THE NEIGHBOURHOOD <span>·</span> ASKARI X, LAHORE</div>
           <div className="map-viewport">
             <div className="map-canvas" style={{ transform: `scale(${mapZoom})` }}>
               <span className="map-block block-one" />

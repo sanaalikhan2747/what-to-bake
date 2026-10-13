@@ -101,7 +101,7 @@ def test_match_returns_loaf_with_name_in_explanation():
 
 # ---------- Orders ----------
 def _customer():
-    return {"name": "TEST Buyer", "phone": "03001234567", "address": "House 1, Karachi", "delivery_date": "2026-02-14"}
+    return {"name": "TEST Buyer", "phone": "03001234567", "address": "House 1, Askari X, Lahore", "delivery_date": "2026-02-14"}
 
 
 def test_order_happy_path():
