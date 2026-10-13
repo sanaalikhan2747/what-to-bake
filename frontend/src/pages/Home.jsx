@@ -37,18 +37,46 @@ const heroSlides = [
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
     alt: "Homemade artisanal bakes and loaves",
+    eyebrow: "SMALL-BATCH, BAKED WITH CARE",
+    heading: "A little something",
+    accent: "made from scratch.",
+    description: "Fresh bakes for everyday treats and the moments worth celebrating.",
+    action: "Explore the menu",
+    href: "/menu",
+    position: "69% 48%",
   },
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/w_1800,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
     alt: "Signature mango dessert trays and cups",
+    eyebrow: "FOR THE TABLE",
+    heading: "Bring something sweet",
+    accent: "to the table.",
+    description: "From tea-time loaves to generous dessert boxes, made to share.",
+    action: "Browse dessert boxes",
+    href: "/menu#cat-cheesecake",
+    position: "70% 50%",
   },
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
     alt: "Curated festive dessert boxes",
+    eyebrow: "A GIFT FROM OUR KITCHEN",
+    heading: "Send a little",
+    accent: "something lovely.",
+    description: "Thoughtful bakery boxes for birthdays, thank-yous, and just because.",
+    action: "Explore gifting",
+    href: "/order/corporate-gifting",
+    position: "66% 50%",
   },
   {
-    src: "https://images.unsplash.com/photo-1621994214182-f467e6999dc9?auto=format&fit=crop&w=1800&q=90",
+    src: CATALOGUE_PRODUCTS.find((product) => product.id === "chocolate-chip-banana")?.image || "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
     alt: "Chocolate chip banana bread",
+    eyebrow: "MADE TO BE SHARED",
+    heading: "Gather around",
+    accent: "the good stuff.",
+    description: "Plan a fresh advance order for your table, your team, or your next big day.",
+    action: "Plan your order",
+    href: "/order/local-pickup",
+    position: "68% 50%",
   },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
@@ -186,21 +214,16 @@ export default function Home() {
     <>
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">HOMEMADE, MATCHED TO THE MOMENT</p>
-          <h1>Find the bake<br /><em>you feel like.</em></h1>
-          <p className="hero-text">
-            Not sure what to order? Tell us the occasion, the mood and who's coming. We'll match you with the bake that fits — or build your own box, your way.
-          </p>
+          <p className="eyebrow">{heroSlides[heroSlide].eyebrow}</p>
+          <h1><span>{heroSlides[heroSlide].heading}</span><em>{heroSlides[heroSlide].accent}</em></h1>
+          <p className="hero-text">{heroSlides[heroSlide].description}</p>
           <div className="hero-actions">
-            <a href="#match" className="button primary" data-testid="hero-find-bake">
-              Find my perfect bake <ArrowRight size={17} />
-            </a>
+            <Link to={heroSlides[heroSlide].href} className="button primary" data-testid="hero-find-bake">
+              {heroSlides[heroSlide].action} <ArrowRight size={17} />
+            </Link>
             <Link to="/build" className="button text-button" data-testid="hero-build-box">
               <WandSparkles size={17} /> Build a box
             </Link>
-          </div>
-          <div className="hero-note">
-            <Sparkles size={16} /> Baked in small batches, chosen with care
           </div>
         </div>
         <div className="hero-image hero-showcase" role="region" aria-label="Bakery photo carousel">
@@ -208,6 +231,7 @@ export default function Home() {
             key={heroSlides[heroSlide].src}
             src={heroSlides[heroSlide].src}
             alt={heroSlides[heroSlide].alt}
+            style={{ objectPosition: heroSlides[heroSlide].position }}
             data-testid="hero-dessert-image"
             loading="eager"
           />

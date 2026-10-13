@@ -171,7 +171,7 @@ export default function Menu() {
           </div>
         </section>
       ))}
-      {viewingProduct && <Product360Viewer product={viewingProduct} onClose={() => setViewingProduct(null)} />}
+      {viewingProduct && <Product360Viewer product={viewingProduct} products={products} onClose={() => setViewingProduct(null)} />}
       {selectedProduct && <div className="menu-product-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
         <section className="menu-product-dialog" role="dialog" aria-modal="true" aria-labelledby="menu-product-title" data-testid="menu-product-dialog">
           <button type="button" className="menu-product-dialog-close" onClick={() => setSelectedProduct(null)} aria-label="Close product details" data-testid="menu-product-close"><X size={19} /></button>

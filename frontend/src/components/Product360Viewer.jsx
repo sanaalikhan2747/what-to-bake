@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { RotateCcw, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, X } from "lucide-react";
 import "./Product360Viewer.css";
 
 const PALETTE = {
@@ -10,11 +10,45 @@ const PALETTE = {
   cookie: { crust: 0xb87948, crumb: 0xdba267, accent: 0x59382d },
 };
 
-export default function Product360Viewer({ product, onClose }) {
+export default function Product360Viewer({ product, products = [], onClose }) {
   const canvasRef = useRef(null);
   const stageRef = useRef(null);
   const draggingRef = useRef(false);
+  const dragPositionRef = useRef(null);
   const reducedMotion = useRef(false);
+  const rotationDistanceRef = useRef(0);
+  const recordRotationRef = useRef(null);
+  const galleryProducts = useMemo(() => {
+    const seenImages = new Set();
+    return (products.length ? products : [product]).filter((item) => {
+      if (!item.image || seenImages.has(item.image)) return false;
+      seenImages.add(item.image);
+      return true;
+    });
+  }, [product, products]);
+  const initialPhotoIndex = Math.max(0, galleryProducts.findIndex((item) => item.id === product.id));
+  const [photoIndex, setPhotoIndex] = useState(initialPhotoIndex);
+  const activePhoto = galleryProducts[photoIndex] || product;
+
+  useEffect(() => {
+    setPhotoIndex(initialPhotoIndex);
+    rotationDistanceRef.current = 0;
+  }, [initialPhotoIndex, product.id]);
+
+  const changePhoto = (direction) => {
+    if (galleryProducts.length < 2) return;
+    setPhotoIndex((current) => (current + direction + galleryProducts.length) % galleryProducts.length);
+    rotationDistanceRef.current = 0;
+  };
+
+  recordRotationRef.current = (distance) => {
+    if (galleryProducts.length < 2) return;
+    rotationDistanceRef.current += Math.abs(distance);
+    while (rotationDistanceRef.current >= Math.PI * 2) {
+      rotationDistanceRef.current -= Math.PI * 2;
+      setPhotoIndex((current) => (current + 1) % galleryProducts.length);
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -152,7 +186,10 @@ export default function Product360Viewer({ product, onClose }) {
     let animationFrame;
     const animate = () => {
       animationFrame = window.requestAnimationFrame(animate);
-      if (!draggingRef.current && !reducedMotion.current) stage.rotation.y += 0.004;
+      if (!draggingRef.current && !reducedMotion.current) {
+        stage.rotation.y += 0.004;
+        recordRotationRef.current?.(0.004);
+      }
       renderer.render(scene, camera);
     };
     animate();
@@ -182,14 +219,23 @@ export default function Product360Viewer({ product, onClose }) {
 
   const dragStart = (event) => {
     draggingRef.current = true;
+    dragPositionRef.current = { x: event.clientX, y: event.clientY };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
   const dragMove = (event) => {
-    if (!draggingRef.current || !stageRef.current) return;
-    stageRef.current.rotation.y += event.movementX * 0.012;
-    stageRef.current.rotation.x = THREE.MathUtils.clamp(stageRef.current.rotation.x + event.movementY * 0.008, -0.32, 0.32);
+    if (!draggingRef.current || !stageRef.current || !dragPositionRef.current) return;
+    const deltaX = event.clientX - dragPositionRef.current.x;
+    const deltaY = event.clientY - dragPositionRef.current.y;
+    dragPositionRef.current = { x: event.clientX, y: event.clientY };
+    const rotation = deltaX * 0.012;
+    stageRef.current.rotation.y += rotation;
+    recordRotationRef.current?.(rotation);
+    stageRef.current.rotation.x = THREE.MathUtils.clamp(stageRef.current.rotation.x + deltaY * 0.008, -0.32, 0.32);
   };
-  const dragEnd = () => { draggingRef.current = false; };
+  const dragEnd = () => {
+    draggingRef.current = false;
+    dragPositionRef.current = null;
+  };
 
   return (
     <div className="product360-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
@@ -201,9 +247,19 @@ export default function Product360Viewer({ product, onClose }) {
         <div className="product360-stage" onPointerDown={dragStart} onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={dragEnd} onLostPointerCapture={dragEnd}>
           <canvas ref={canvasRef} aria-label={`Rotating 3D model of ${product.name}`} data-testid="product-360-canvas" />
           <span className="product360-orbit-label"><RotateCcw size={14} /> Drag to rotate</span>
-          <img className="product360-photo" src={product.image} alt={`${product.name} menu photo`} />
+          <aside className="product360-gallery" aria-label="Menu photo gallery" onPointerDown={(event) => event.stopPropagation()}>
+            <img className="product360-photo" src={activePhoto.image} alt={`${activePhoto.name} menu photo`} data-testid="product-360-gallery-image" />
+            <div className="product360-gallery-controls">
+              <span data-testid="product-360-gallery-count">{photoIndex + 1} / {galleryProducts.length}</span>
+              <div>
+                <button type="button" onClick={() => changePhoto(-1)} aria-label="Previous menu photo"><ChevronLeft size={15} /></button>
+                <button type="button" onClick={() => changePhoto(1)} aria-label="Next menu photo"><ChevronRight size={15} /></button>
+              </div>
+            </div>
+            <span className="product360-gallery-name">{activePhoto.name}</span>
+          </aside>
         </div>
-        <footer className="product360-footer"><span>Illustrated turntable preview</span><strong>Rs. {product.price.toLocaleString()} <small>/ {product.unit}</small></strong></footer>
+        <footer className="product360-footer"><span>Turn a full circle to see the next menu bake</span><strong>Rs. {product.price.toLocaleString()} <small>/ {product.unit}</small></strong></footer>
       </section>
     </div>
   );
