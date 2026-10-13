@@ -1,7 +1,5 @@
 {
-  "name": "what-to-bake",
-  "private": true,
-  "scripts": {
-    "build": "cd frontend && npm run build"
+  "dependencies": {
+    "nvm": "^0.0.4"
   }
 }
