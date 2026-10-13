@@ -1,12 +1,49 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import "./OrderShowcase.css";
 
-export default function OrderShowcase({ image, alt, caption }) {
+export default function OrderShowcase({ image, alt, caption, gallery = [] }) {
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
   const cardRef = useRef(null);
   const renderRef = useRef(null);
   const dragRef = useRef(null);
+  const galleryRef = useRef([]);
+  const selectPhotoRef = useRef(null);
+  const photoMaterialRef = useRef(null);
+  const textureLoaderRef = useRef(null);
+  const currentTextureRef = useRef(null);
+  const threeRef = useRef(null);
+  const [activePhoto, setActivePhoto] = useState(0);
+  galleryRef.current = [...new Set([image, ...gallery].filter(Boolean))];
+
+  const selectPhoto = (requestedIndex) => {
+    const photos = galleryRef.current;
+    if (!photos.length) return;
+    const nextIndex = (requestedIndex + photos.length) % photos.length;
+    if (nextIndex === activePhotoRef.current) return;
+    activePhotoRef.current = nextIndex;
+    setActivePhoto(nextIndex);
+    if (!photoMaterialRef.current || !textureLoaderRef.current || !threeRef.current) return;
+    textureLoaderRef.current.load(photos[nextIndex], (nextTexture) => {
+      if (activePhotoRef.current !== nextIndex) {
+        nextTexture.dispose();
+        return;
+      }
+      nextTexture.colorSpace = threeRef.current.SRGBColorSpace;
+      nextTexture.anisotropy = Math.min(8, rendererRef.current?.capabilities.getMaxAnisotropy() || 1);
+      const previousTexture = currentTextureRef.current;
+      photoMaterialRef.current.map = nextTexture;
+      photoMaterialRef.current.needsUpdate = true;
+      currentTextureRef.current = nextTexture;
+      previousTexture?.dispose();
+      renderRef.current?.();
+    });
+  };
+  const activePhotoRef = useRef(activePhoto);
+  const rendererRef = useRef(null);
+  activePhotoRef.current = activePhoto;
+  selectPhotoRef.current = selectPhoto;
 
   useEffect(() => {
     let disposed = false;
@@ -22,6 +59,7 @@ export default function OrderShowcase({ image, alt, caption }) {
           import("three/addons/geometries/RoundedBoxGeometry.js"),
         ]);
         if (disposed || !stageRef.current || !canvasRef.current) return;
+        threeRef.current = THREE;
         renderer = new THREE.WebGLRenderer({
           canvas: canvasRef.current,
           alpha: true,
@@ -29,6 +67,7 @@ export default function OrderShowcase({ image, alt, caption }) {
           powerPreference: "low-power",
         });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        rendererRef.current = renderer;
         renderer.setClearColor(0x000000, 0);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
@@ -60,7 +99,8 @@ export default function OrderShowcase({ image, alt, caption }) {
 
         const loader = new THREE.TextureLoader();
         loader.setCrossOrigin("anonymous");
-        texture = await new Promise((resolve, reject) => loader.load(image, resolve, undefined, reject));
+        textureLoaderRef.current = loader;
+        texture = await new Promise((resolve, reject) => loader.load(galleryRef.current[0] || image, resolve, undefined, reject));
         if (disposed) {
           texture.dispose();
           return;
@@ -69,6 +109,8 @@ export default function OrderShowcase({ image, alt, caption }) {
         texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
         const imageGeometry = new THREE.PlaneGeometry(4.34, 2.75);
         const imageMaterial = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false });
+        photoMaterialRef.current = imageMaterial;
+        currentTextureRef.current = texture;
         geometries.push(imageGeometry);
         materials.push(imageMaterial);
         const photo = new THREE.Mesh(imageGeometry, imageMaterial);
@@ -94,17 +136,21 @@ export default function OrderShowcase({ image, alt, caption }) {
 
         const render = () => {
           if (disposed || !stageRef.current) return;
+          renderer.render(scene, camera);
+        };
+        const resize = () => {
+          if (disposed || !stageRef.current) return;
           const { clientWidth, clientHeight } = stageRef.current;
           if (!clientWidth || !clientHeight) return;
           renderer.setSize(clientWidth, clientHeight, false);
           camera.aspect = clientWidth / clientHeight;
           camera.updateProjectionMatrix();
-          renderer.render(scene, camera);
+          render();
         };
         renderRef.current = render;
-        observer = new ResizeObserver(render);
+        observer = new ResizeObserver(resize);
         observer.observe(stageRef.current);
-        render();
+        resize();
         stageRef.current.dataset.ready = "true";
       } catch {
         if (stageRef.current) stageRef.current.dataset.ready = "fallback";
@@ -121,18 +167,18 @@ export default function OrderShowcase({ image, alt, caption }) {
       renderer?.dispose();
       cardRef.current = null;
       renderRef.current = null;
+      photoMaterialRef.current = null;
+      textureLoaderRef.current = null;
+      currentTextureRef.current = null;
+      rendererRef.current = null;
+      threeRef.current = null;
     };
   }, [image]);
 
   const handlePointerMove = (event) => {
     const bounds = stageRef.current?.getBoundingClientRect();
     if (!bounds || !cardRef.current) return;
-    if (dragRef.current) {
-      cardRef.current.rotation.y += event.movementX * 0.006;
-      cardRef.current.rotation.x = Math.max(-0.2, Math.min(0.2, cardRef.current.rotation.x + event.movementY * 0.004));
-      renderRef.current?.();
-      return;
-    }
+    if (dragRef.current) return;
     const x = (event.clientX - bounds.left) / bounds.width * 2 - 1;
     const y = (event.clientY - bounds.top) / bounds.height * 2 - 1;
     cardRef.current.rotation.y = x * 0.13;
@@ -141,7 +187,7 @@ export default function OrderShowcase({ image, alt, caption }) {
   };
 
   const resetCard = () => {
-    dragRef.current = null;
+    if (dragRef.current) return;
     if (!cardRef.current) return;
     cardRef.current.rotation.x = 0;
     cardRef.current.rotation.y = 0;
@@ -149,14 +195,43 @@ export default function OrderShowcase({ image, alt, caption }) {
   };
 
   const startDrag = (event) => {
-    dragRef.current = { pointerId: event.pointerId };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const endDrag = (event) => {
-    if (dragRef.current?.pointerId !== event.pointerId) return;
-    dragRef.current = null;
-    renderRef.current?.();
+    if (event.target.closest("button")) return;
+    const drag = { pointerId: event.pointerId, lastX: event.clientX, rotation: 0 };
+    drag.move = (pointerEvent) => {
+      if (pointerEvent.pointerId !== drag.pointerId || !cardRef.current) return;
+      const bounds = stageRef.current?.getBoundingClientRect();
+      if (!bounds?.width) return;
+      const deltaX = pointerEvent.clientX - drag.lastX;
+      drag.lastX = pointerEvent.clientX;
+      const rotationDelta = deltaX / bounds.width * Math.PI * 2;
+      drag.rotation += rotationDelta;
+      cardRef.current.rotation.y += rotationDelta;
+      cardRef.current.rotation.x = Math.max(-0.2, Math.min(0.2, cardRef.current.rotation.x + pointerEvent.movementY * 0.003));
+      const rotationThreshold = Math.PI * 2 * 0.9;
+      while (drag.rotation >= rotationThreshold) {
+        drag.rotation -= rotationThreshold;
+        cardRef.current.rotation.y -= Math.PI * 2;
+        selectPhotoRef.current?.(activePhotoRef.current + 1);
+      }
+      while (drag.rotation <= -rotationThreshold) {
+        drag.rotation += rotationThreshold;
+        cardRef.current.rotation.y += Math.PI * 2;
+        selectPhotoRef.current?.(activePhotoRef.current - 1);
+      }
+      renderRef.current?.();
+    };
+    drag.end = (pointerEvent) => {
+      if (pointerEvent.pointerId !== drag.pointerId) return;
+      window.removeEventListener("pointermove", drag.move);
+      window.removeEventListener("pointerup", drag.end);
+      window.removeEventListener("pointercancel", drag.end);
+      dragRef.current = null;
+      renderRef.current?.();
+    };
+    dragRef.current = drag;
+    window.addEventListener("pointermove", drag.move);
+    window.addEventListener("pointerup", drag.end);
+    window.addEventListener("pointercancel", drag.end);
   };
 
   return (
@@ -167,14 +242,17 @@ export default function OrderShowcase({ image, alt, caption }) {
         style={{ "--order-showcase-image": `url("${image}")` }}
         onPointerMove={handlePointerMove}
         onPointerDown={startDrag}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onLostPointerCapture={endDrag}
         onPointerLeave={resetCard}
         data-testid="order-showcase-stage"
       >
         <canvas ref={canvasRef} aria-hidden="true" />
-        <span className="order-showcase-interaction">Move to explore</span>
+        <div className="order-showcase-controls" aria-label="Menu photo controls">
+          <button type="button" className="order-showcase-arrow" onClick={() => selectPhoto(activePhotoRef.current - 1)} aria-label="Previous menu photo" data-testid="order-photo-previous"><ChevronLeft size={17} /></button>
+          <span className="order-showcase-count" aria-live="polite" data-testid="order-photo-count">{activePhoto + 1} / {galleryRef.current.length}</span>
+          <button type="button" className="order-showcase-arrow" onClick={() => selectPhoto(activePhotoRef.current + 1)} aria-label="Next menu photo" data-testid="order-photo-next"><ChevronRight size={17} /></button>
+          <span className="order-showcase-rotation-hint"><RotateCw size={13} /><span>Turn to browse</span></span>
+        </div>
+        <span className="order-showcase-interaction">Drag the frame one full turn to see the next bake</span>
       </div>
       <figcaption>{caption}</figcaption>
     </figure>

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
-import { waLink } from "@/state/api";
+import { api, waLink } from "@/state/api";
 import OrderShowcase from "@/components/OrderShowcase";
 import "./OrderOption.css";
 
@@ -107,6 +107,7 @@ const ORDER_PAGES = {
 };
 
 export default function OrderOption({ orderType }) {
+  const [menuPhotos, setMenuPhotos] = useState([]);
   const [advanceRequest, setAdvanceRequest] = useState({
     fulfilment: "pickup",
     fullName: "",
@@ -118,6 +119,20 @@ export default function OrderOption({ orderType }) {
     details: "",
   });
   const option = ORDER_PAGES[orderType];
+
+  useEffect(() => {
+    if (orderType !== "local-pickup") return undefined;
+    let active = true;
+    api.get("/products")
+      .then(({ data }) => {
+        if (!active) return;
+        const photos = [...new Set(data.map((product) => product.image).filter(Boolean))];
+        setMenuPhotos(photos);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [orderType]);
+
   if (!option) return <Navigate to="/menu" replace />;
 
   const updateAdvanceRequest = (event) => {
@@ -161,7 +176,7 @@ export default function OrderOption({ orderType }) {
             )}
           </div>
         </div>
-        <OrderShowcase image={option.image} alt={option.imageAlt} caption={option.imageCaption} />
+        <OrderShowcase image={option.image} alt={option.imageAlt} caption={option.imageCaption} gallery={orderType === "local-pickup" ? menuPhotos : []} />
       </section>
       {orderType === "local-pickup" && <section className="advance-order-section" aria-labelledby="advance-order-title">
         <div className="advance-order-heading">
