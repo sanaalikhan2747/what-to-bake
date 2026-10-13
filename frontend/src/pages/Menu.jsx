@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Rotate3D, ShoppingBag, WandSparkles, X } from "lucide-react";
 import { api } from "@/state/api";
+import { CATALOGUE_PRODUCTS } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
 import Product360Viewer from "@/components/Product360Viewer";
 import "./MenuProductDialog.css";
@@ -21,7 +22,7 @@ const CATEGORY_EYEBROW = {
 };
 
 export default function Menu() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(CATALOGUE_PRODUCTS);
   const [filter, setFilter] = useState("all");
   const [viewingProduct, setViewingProduct] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -29,7 +30,11 @@ export default function Menu() {
   const location = useLocation();
 
   useEffect(() => {
-    api.get("/products").then((r) => setProducts(r.data)).catch(() => setProducts([]));
+    api.get("/products")
+      .then((r) => {
+        if (Array.isArray(r.data) && r.data.length > 0) setProducts(r.data);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

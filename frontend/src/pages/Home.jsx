@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
+import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
 import MagicBaker from "@/components/MagicBaker";
 import GiftingBackground from "@/components/GiftingBackground";
@@ -53,9 +54,9 @@ const heroSlides = [
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
-  const [loaves, setLoaves] = useState([]);
-  const [boxes, setBoxes] = useState([]);
+  const [products, setProducts] = useState(CATALOGUE_PRODUCTS);
+  const [loaves, setLoaves] = useState(CATALOGUE_PRODUCTS.filter((p) => p.category === "loaf"));
+  const [boxes, setBoxes] = useState(CATALOGUE_FESTIVE_BOXES);
   const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
   const [occasion, setOccasion] = useState("Tea party");
@@ -73,10 +74,16 @@ export default function Home() {
 
   useEffect(() => {
     api.get("/products").then((r) => {
-      setProducts(r.data);
-      setLoaves(r.data.filter((p) => p.category === "loaf"));
+      if (Array.isArray(r.data) && r.data.length > 0) {
+        setProducts(r.data);
+        setLoaves(r.data.filter((p) => p.category === "loaf"));
+      }
     }).catch(() => {});
-    api.get("/festive-boxes").then((r) => setBoxes(r.data)).catch(() => {});
+    api.get("/festive-boxes").then((r) => {
+      if (Array.isArray(r.data) && r.data.length > 0) {
+        setBoxes(r.data);
+      }
+    }).catch(() => {});
     const params = new URLSearchParams(window.location.search);
     const savedId = params.get("match");
     if (savedId) {

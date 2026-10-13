@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, ChevronDown, Gift, Minus, Plus, Trash2 } from "lucide-react";
 import { api } from "@/state/api";
+import { CATALOGUE_PRODUCTS, getFestiveBoxById } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
 import { flyToBox } from "@/lib/flyToBox";
 
@@ -21,7 +22,7 @@ export default function FestiveBoxEditor() {
   const { boxId } = useParams();
   const navigate = useNavigate();
   const [box, setBox] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(CATALOGUE_PRODUCTS);
   const [selection, setSelection] = useState({}); // {product_id: qty}
   const [pack, setPack] = useState("white-box");
   const [message, setMessage] = useState("");
@@ -31,13 +32,24 @@ export default function FestiveBoxEditor() {
   const { addItem, setPackaging, setMessage: saveCartMessage } = useCart();
 
   useEffect(() => {
-    api.get(`/festive-boxes/${boxId}`).then((r) => {
-      setBox(r.data);
+    const fallbackBox = getFestiveBoxById(boxId);
+    if (fallbackBox) {
+      setBox(fallbackBox);
       const seed = {};
-      r.data.items.forEach(({ product, qty }) => { seed[product.id] = qty; });
+      fallbackBox.items.forEach(({ product, qty }) => { if (product?.id) seed[product.id] = qty; });
       setSelection(seed);
-    }).catch(() => setBox(null));
-    api.get("/products").then((r) => setProducts(r.data)).catch(() => {});
+    }
+    api.get(`/festive-boxes/${boxId}`).then((r) => {
+      if (r.data && Array.isArray(r.data.items) && r.data.items.length > 0) {
+        setBox(r.data);
+        const seed = {};
+        r.data.items.forEach(({ product, qty }) => { if (product?.id) seed[product.id] = qty; });
+        setSelection(seed);
+      }
+    }).catch(() => {});
+    api.get("/products").then((r) => {
+      if (Array.isArray(r.data) && r.data.length > 0) setProducts(r.data);
+    }).catch(() => {});
   }, [boxId]);
 
   const productById = useMemo(() => Object.fromEntries(products.map((p) => [p.id, p])), [products]);

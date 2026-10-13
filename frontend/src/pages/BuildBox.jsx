@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Gift, Minus, Plus, ShoppingBag } from "lucide-react";
 import { api } from "@/state/api";
+import { CATALOGUE_PRODUCTS } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
 import { flyToBox } from "@/lib/flyToBox";
 import "./BuildBox.css";
@@ -16,7 +17,7 @@ const RIBBONS = [
 ];
 
 export default function BuildBox() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(CATALOGUE_PRODUCTS.filter((p) => p.custom_box_unit));
   const [selection, setSelection] = useState({}); // {productId: qty}
   const [pack, setPack] = useState("white-box");
   const [message, setMessage] = useState("");
@@ -25,7 +26,13 @@ export default function BuildBox() {
   const { addItem, setPackaging, setMessage: saveCartMessage, setCartOpen } = useCart();
 
   useEffect(() => {
-    api.get("/products").then((r) => setProducts(r.data.filter((p) => p.custom_box_unit))).catch(() => {});
+    api.get("/products")
+      .then((r) => {
+        if (Array.isArray(r.data) && r.data.length > 0) {
+          setProducts(r.data.filter((p) => p.custom_box_unit));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const bump = (product, delta, srcEl) => {

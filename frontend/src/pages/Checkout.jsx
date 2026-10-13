@@ -31,7 +31,9 @@ export default function Checkout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/packaging").then((r) => setPackagings(r.data)).catch(() => {});
+    api.get("/packaging").then((r) => {
+      if (Array.isArray(r.data) && r.data.length > 0) setPackagings(r.data);
+    }).catch(() => {});
   }, []);
 
   const subtotal = useMemo(() => items.reduce((n, i) => n + i.qty * i.price, 0), [items]);

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown, Heart, House, Menu, MessageCircle, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/state/CartContext";
 import { api } from "@/state/api";
+import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueData";
 import "./Nav.css";
 
 const orderOptions = [
@@ -89,9 +90,9 @@ function NavDropdown({ id, label, heading, items, loading, className = "", pageH
 
 export default function Nav({ onOpenChat }) {
   const { cartCount, setCartOpen } = useCart();
-  const [products, setProducts] = useState([]);
-  const [giftBoxes, setGiftBoxes] = useState([]);
-  const [catalogueLoading, setCatalogueLoading] = useState(true);
+  const [products, setProducts] = useState(CATALOGUE_PRODUCTS);
+  const [giftBoxes, setGiftBoxes] = useState(CATALOGUE_FESTIVE_BOXES);
+  const [catalogueLoading, setCatalogueLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -112,42 +113,54 @@ export default function Nav({ onOpenChat }) {
 
   useEffect(() => {
     api.get("/products")
-      .then((response) => setProducts(response.data))
+      .then((response) => {
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setProducts(response.data);
+        }
+      })
       .catch(() => {})
       .finally(() => setCatalogueLoading(false));
     api.get("/festive-boxes")
-      .then((response) => setGiftBoxes(response.data))
+      .then((response) => {
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setGiftBoxes(response.data);
+        }
+      })
       .catch(() => {});
   }, []);
 
-  const productItems = products.flatMap((product, index) => {
-    const previousCategory = index > 0 ? products[index - 1].category : null;
-    const categoryHeading = product.category !== previousCategory
-      ? [{ heading: ({ loaf: "LOAVES", cheesecake: "DESSERTS", batch: "BATCHES", cookie: "COOKIES" })[product.category] || product.category.toUpperCase() }]
-      : [];
-    return [
-      ...categoryHeading,
-      {
-        key: product.id,
-        label: product.name,
-        href: `/menu#product-${product.id}`,
-        detail: `Rs. ${product.price.toLocaleString()}`,
-        image: product.image,
-      },
-    ];
-  });
+  const productItems = Array.isArray(products)
+    ? products.flatMap((product, index) => {
+        const previousCategory = index > 0 ? products[index - 1].category : null;
+        const categoryHeading = product.category !== previousCategory
+          ? [{ heading: ({ loaf: "LOAVES", cheesecake: "DESSERTS", batch: "BATCHES", cookie: "COOKIES" })[product.category] || product.category.toUpperCase() }]
+          : [];
+        return [
+          ...categoryHeading,
+          {
+            key: product.id,
+            label: product.name,
+            href: `/menu#product-${product.id}`,
+            detail: `Rs. ${product.price.toLocaleString()}`,
+            image: product.image,
+          },
+        ];
+      })
+    : [];
 
   const giftingItems = [
-    ...giftBoxes.map((box) => ({
+    ...(Array.isArray(giftBoxes) ? giftBoxes.map((box) => ({
       key: box.id,
       label: box.name,
       href: `/festive/${box.id}`,
       detail: `From Rs. ${box.total.toLocaleString()}`,
-    })),
+    })) : []),
     { key: "gift-box-builder", label: "Build a gift box", href: "/build" },
   ];
 
-  const feature = products[0] ? { image: products[0].image, label: "Browse the full menu", href: "/menu" } : null;
+  const feature = Array.isArray(products) && products[0]
+    ? { image: products[0].image, label: "Browse the full menu", href: "/menu" }
+    : null;
 
   return (
     <nav className={`nav ${mobileOpen ? "nav-mobile-open" : ""}`} aria-label="Main navigation">
