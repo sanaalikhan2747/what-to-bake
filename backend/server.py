@@ -23,12 +23,16 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(
-    mongo_url,
-    serverSelectionTimeoutMS=int(os.environ.get("MONGO_SERVER_SELECTION_TIMEOUT_MS", "5000")),
-)
-db = client[os.environ['DB_NAME']]
+mongo_url = os.environ.get('MONGO_URL', '')
+if mongo_url:
+    client = AsyncIOMotorClient(
+        mongo_url,
+        serverSelectionTimeoutMS=int(os.environ.get("MONGO_SERVER_SELECTION_TIMEOUT_MS", "5000")),
+    )
+    db = client[os.environ.get('DB_NAME', 'whattobake')]
+else:
+    client = None
+    db = None
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
