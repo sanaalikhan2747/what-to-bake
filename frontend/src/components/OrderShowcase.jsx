@@ -207,7 +207,7 @@ export default function OrderShowcase({ image, alt, caption, gallery = [] }) {
       drag.rotation += rotationDelta;
       cardRef.current.rotation.y += rotationDelta;
       cardRef.current.rotation.x = Math.max(-0.2, Math.min(0.2, cardRef.current.rotation.x + pointerEvent.movementY * 0.003));
-      const rotationThreshold = Math.PI * 2 * 0.9;
+      const rotationThreshold = Math.PI * 2 * 0.35;
       while (drag.rotation >= rotationThreshold) {
         drag.rotation -= rotationThreshold;
         cardRef.current.rotation.y -= Math.PI * 2;
@@ -252,7 +252,7 @@ export default function OrderShowcase({ image, alt, caption, gallery = [] }) {
           <button type="button" className="order-showcase-arrow" onClick={() => selectPhoto(activePhotoRef.current + 1)} aria-label="Next menu photo" data-testid="order-photo-next"><ChevronRight size={17} /></button>
           <span className="order-showcase-rotation-hint"><RotateCw size={13} /><span>Turn to browse</span></span>
         </div>
-        <span className="order-showcase-interaction">Drag the frame one full turn to see the next bake</span>
+        <span className="order-showcase-interaction">Drag the frame to browse the next bake</span>
       </div>
       <figcaption>{caption}</figcaption>
     </figure>
