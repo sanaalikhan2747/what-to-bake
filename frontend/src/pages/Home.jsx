@@ -9,22 +9,22 @@ import "./Home.css";
 import "./HomePolish.css";
 
 const occasions = [
-  { value: "Birthday", label: "A birthday", detail: "Make their day" },
-  { value: "Anniversary", label: "An anniversary", detail: "Celebrate together" },
-  { value: "Tea party", label: "Tea with friends", detail: "Put the kettle on" },
-  { value: "Family gathering", label: "Family gathering", detail: "For the whole table" },
-  { value: "Graduation", label: "A new milestone", detail: "Mark the moment" },
-  { value: "Eid", label: "Eid", detail: "Something to share" },
-  { value: "Baby born", label: "A new arrival", detail: "Welcome, little one" },
-  { value: "Gift", label: "A thoughtful gift", detail: "Send a little joy" },
-  { value: "Just craving something", label: "Just because", detail: "No reason needed" },
+  { value: "Birthday", label: "A birthday", detail: "For a day worth celebrating" },
+  { value: "Anniversary", label: "An anniversary", detail: "Celebrate a special date" },
+  { value: "Tea party", label: "Tea with friends", detail: "Something for the table" },
+  { value: "Family gathering", label: "A family gathering", detail: "Made to share" },
+  { value: "Graduation", label: "A milestone", detail: "Recognise an achievement" },
+  { value: "Eid", label: "Eid", detail: "For sharing with loved ones" },
+  { value: "Baby born", label: "A new arrival", detail: "A thoughtful welcome" },
+  { value: "Gift", label: "A thoughtful gift", detail: "Send something special" },
+  { value: "Just craving something", label: "Just because", detail: "No occasion necessary" },
 ];
 const moods = [
-  { value: "Chocolate lover", label: "Chocolate, always", detail: "Deep & indulgent", color: "#75514b" },
-  { value: "Fresh & citrusy", label: "Bright & citrusy", detail: "Light & lively", color: "#cf9d4c" },
-  { value: "Warm & comforting", label: "Warm & spiced", detail: "Soft & familiar", color: "#b97759" },
-  { value: "Coffee lover", label: "Coffee & a treat", detail: "Toasty & mellow", color: "#83705a" },
-  { value: "Something different", label: "A little unexpected", detail: "Find a new favourite", color: "#7b8a70" },
+  { value: "Chocolate lover", label: "Chocolate", detail: "Rich and indulgent", color: "#75514b" },
+  { value: "Fresh & citrusy", label: "Citrus & fruit", detail: "Bright, refreshing notes", color: "#cf9d4c" },
+  { value: "Warm & comforting", label: "Warm spices", detail: "Comforting and aromatic", color: "#b97759" },
+  { value: "Coffee lover", label: "Coffee", detail: "Toasty, balanced notes", color: "#83705a" },
+  { value: "Something different", label: "Something different", detail: "Explore a new favourite", color: "#7b8a70" },
 ];
 const featuredCategories = [
   { id: "loaf", label: "Loaves" },
@@ -86,8 +86,8 @@ export default function Home() {
   const [boxes, setBoxes] = useState(CATALOGUE_FESTIVE_BOXES);
   const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
-  const [occasion, setOccasion] = useState("Tea party");
-  const [mood, setMood] = useState("Warm & comforting");
+  const [occasion, setOccasion] = useState("");
+  const [mood, setMood] = useState("");
   const [people, setPeople] = useState(6);
   const [budget, setBudget] = useState(1500);
   const [dietary, setDietary] = useState("No preference");
@@ -342,10 +342,10 @@ export default function Home() {
         </div>
         <div className="match-form">
           <div className="question">
-            <label>What are we celebrating?</label>
+            <label>What is the occasion?</label>
             <div className="choice-grid occasion-choice-grid">
               {occasions.map((choice) => (
-                <button className={occasion === choice.value ? "choice active" : "choice"} onClick={() => setOccasion(choice.value)} data-testid={`occasion-${slug(choice.value)}`} key={choice.value}>
+                <button type="button" className={occasion === choice.value ? "choice active" : "choice"} aria-pressed={occasion === choice.value} onClick={() => setOccasion(choice.value)} data-testid={`occasion-${slug(choice.value)}`} key={choice.value}>
                   <span className="choice-title">{choice.label}</span>
                   <small>{choice.detail}</small>
                 </button>
@@ -353,10 +353,10 @@ export default function Home() {
             </div>
           </div>
           <div className="question">
-            <label>What sounds good today?</label>
+            <label>Which flavours do you prefer?</label>
             <div className="choice-grid mood-choice-grid">
               {moods.map((choice) => (
-                <button className={mood === choice.value ? "choice mood-choice active" : "choice mood-choice"} onClick={() => setMood(choice.value)} data-testid={`mood-${slug(choice.value)}`} key={choice.value}>
+                <button type="button" className={mood === choice.value ? "choice mood-choice active" : "choice mood-choice"} aria-pressed={mood === choice.value} onClick={() => setMood(choice.value)} data-testid={`mood-${slug(choice.value)}`} key={choice.value}>
                   <span className="mood-choice-title"><i style={{ "--mood-swatch": choice.color }} />{choice.label}</span>
                   <small>{choice.detail}</small>
                 </button>
@@ -391,7 +391,7 @@ export default function Home() {
             </select>
           </div>
           {matchError && <p className="inline-error" data-testid="match-error">{matchError}</p>}
-          <button className="button primary wide" onClick={runMatch} disabled={loading} data-testid="find-match-button">
+          <button className="button primary wide" onClick={runMatch} disabled={loading || !occasion || !mood} data-testid="find-match-button">
             {loading ? "Finding your match…" : <>Find my perfect match <ArrowRight size={17} /></>}
           </button>
         </div>
