@@ -56,7 +56,7 @@ const heroSlides = [
     position: "100% 50%",
   },
   {
-    src: CATALOGUE_PRODUCTS.find((product) => product.id === "double-chocolate-cookie")?.image,
+    src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_0,w_980,h_675/v1790938869/IMG-20261002-WA0190.jpg",
     alt: "Double Chocolate Cookie from the menu",
     eyebrow: "A GIFT FROM OUR KITCHEN",
     heading: "A thoughtful gesture",
@@ -67,7 +67,7 @@ const heroSlides = [
     position: "100% 50%",
   },
   {
-    src: CATALOGUE_PRODUCTS.find((product) => product.id === "flourless-brownies-batch")?.image,
+    src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_120,w_1700,h_1416/v1791141497/Gemini_Generated_Image_jh3tl4jh3tl4jh3t.jpg",
     alt: "Flourless Brownies from the menu",
     eyebrow: "MADE TO BE SHARED",
     heading: "Turning art",
