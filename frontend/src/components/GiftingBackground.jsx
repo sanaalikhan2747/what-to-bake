@@ -179,29 +179,47 @@ export default function GiftingBackground() {
           const mobile = host.clientWidth < 760;
           const bounds = host.getBoundingClientRect();
           const heading = section.querySelector(".festive-heading")?.getBoundingClientRect();
-          const headingBottom = heading ? heading.bottom - bounds.top : 310;
+          const headingTop = heading ? heading.top - bounds.top : 66;
+          const headingHeight = heading?.height || 190;
+          const headingBottom = headingTop + headingHeight;
           const headingRight = heading ? heading.right - bounds.left : host.clientWidth * 0.5;
-          const topSpace = heading ? heading.top - bounds.top : 66;
-          const lowerRows = Math.max(1, Math.ceil((host.clientHeight - headingBottom) / 400));
-          const giftCount = (mobile ? 2 : 3) + lowerRows * 2;
+          const grid = section.querySelector(".festive-grid");
+          const gridBounds = grid?.getBoundingClientRect();
+          const cards = grid ? [...grid.querySelectorAll(".festive-card")] : [];
+          const columns = grid
+            ? getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length
+            : 1;
+          const lastRowCount = cards.length % columns;
+          const emptySlots = lastRowCount
+            ? Array.from({ length: columns - lastRowCount }, (_, index) => lastRowCount + index)
+            : [];
+          const heroCount = mobile ? 1 : 3;
+          const lastRowCards = cards.slice(-(lastRowCount || columns));
+          const lastRowTop = lastRowCards.length
+            ? Math.min(...lastRowCards.map((card) => card.getBoundingClientRect().top)) - bounds.top
+            : 0;
+          const lastRowBottom = lastRowCards.length
+            ? Math.max(...lastRowCards.map((card) => card.getBoundingClientRect().bottom)) - bounds.top
+            : 0;
+          const columnWidth = gridBounds ? gridBounds.width / columns : host.clientWidth;
+          const giftCount = heroCount + emptySlots.length;
           while (gifts.length < giftCount) gifts.push(createGift(gifts.length));
           gifts.forEach((gift, index) => {
             gift.visible = index < giftCount;
             if (!gift.visible) return;
-            const heroCount = mobile ? 2 : 3;
             let horizontal;
             let vertical;
             let size;
             if (index < heroCount) {
               const available = host.clientWidth - headingRight;
-              horizontal = mobile ? (index === 0 ? 0.77 : 0.24) : (headingRight + available * [0.37, 0.72, 0.16][index]) / host.clientWidth;
-              vertical = mobile ? topSpace * 0.45 / host.clientHeight : (headingBottom * [0.44, 0.65, 0.83][index]) / host.clientHeight;
-              size = mobile ? [45, 32][index] : Math.min([164, 112, 76][index], available * [0.34, 0.24, 0.16][index]);
+              horizontal = (headingRight + available * (mobile ? 0.55 : [0.37, 0.72, 0.16][index])) / host.clientWidth;
+              vertical = (headingTop + headingHeight * (mobile ? 0.55 : [0.24, 0.55, 0.84][index])) / host.clientHeight;
+              size = mobile ? Math.min(46, available * 0.72) : Math.min([164, 112, 76][index], available * [0.34, 0.24, 0.16][index]);
             } else {
-              const edgeIndex = index - heroCount;
-              horizontal = edgeIndex % 2 === 0 ? 0.025 : 0.975;
-              vertical = (headingBottom + 180 + Math.floor(edgeIndex / 2) * 400) / host.clientHeight;
-              size = mobile ? 44 : 72 + scatter(index, 3) * 20;
+              const slot = emptySlots[index - heroCount];
+              horizontal = (gridBounds.left - bounds.left + (slot + 0.5) * columnWidth) / host.clientWidth;
+              vertical = ((lastRowTop + lastRowBottom) * 0.5) / host.clientHeight;
+              size = Math.min(mobile ? 48 : 112, columnWidth * 0.38);
             }
             gift.position.set(horizontal * 10 - 5, camera.top - vertical * worldHeight, 0);
             gift.scale.setScalar(pixelScale * size);
@@ -214,7 +232,7 @@ export default function GiftingBackground() {
             const vertical = scatter(index, 6);
             const inHeading = heading && horizontal * host.clientWidth > heading.left - bounds.left - 20
               && horizontal * host.clientWidth < headingRight + 20
-              && vertical * host.clientHeight > topSpace - 20
+              && vertical * host.clientHeight > headingTop - 20
               && vertical * host.clientHeight < headingBottom + 20;
             if (inHeading) continue;
             transform.position.set(horizontal * 10 - 5, camera.top - vertical * worldHeight, -0.8);
@@ -246,7 +264,7 @@ export default function GiftingBackground() {
           renderer.render(scene, camera);
           if (visible && !document.hidden && !motion.matches) frame = window.requestAnimationFrame(render);
         };
-        resizeObserver = new ResizeObserver(() => {
+        const resize = () => {
           const width = host.clientWidth;
           const height = host.clientHeight;
           if (!width || !height) return;
@@ -257,8 +275,10 @@ export default function GiftingBackground() {
           layout();
           stop();
           render();
-        });
+        };
+        resizeObserver = new ResizeObserver(resize);
         resizeObserver.observe(host);
+        resize();
       } catch (error) {
         console.error("Unable to initialize gifting background", error);
         stop();
