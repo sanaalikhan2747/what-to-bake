@@ -10,11 +10,11 @@ export default function GiftingBackground() {
     let disposed = false;
     let visible = false;
     let started = false;
-    let idle;
     let renderer;
     const geometries = [];
     const materials = [];
     let resizeObserver;
+    let resizeCanvas;
     let render;
     let frame;
     let detachInteraction;
@@ -80,7 +80,7 @@ export default function GiftingBackground() {
         const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.12, depthWrite: false });
         geometries.push(boxGeometry, bowGeometry, tailGeometry, shadowGeometry);
         materials.push(shadowMaterial);
-        const colors = [0x678f82, 0xd2a0a5, 0x7e9ead, 0xf1e6d7, 0x9d555e];
+        const colors = [0x678f82, 0xd2a0a5, 0x7e9ead, 0xff4f9a, 0x9d555e];
         const parcelMaterials = colors.map((color) =>
           new THREE.MeshPhysicalMaterial({ color, roughness: 0.48, metalness: 0.06, clearcoat: 0.25 })
         );
@@ -193,7 +193,11 @@ export default function GiftingBackground() {
           const emptySlots = lastRowCount
             ? Array.from({ length: columns - lastRowCount }, (_, index) => lastRowCount + index)
             : [];
-          const heroCount = mobile ? 1 : 3;
+          const decorationSlots = emptySlots.length > 1
+            ? [emptySlots[0], emptySlots[emptySlots.length - 1]]
+            : emptySlots;
+          const availableHeadingSpace = host.clientWidth - headingRight;
+          const headingGiftCount = availableHeadingSpace < 300 ? 5 : 2;
           const lastRowCards = cards.slice(-(lastRowCount || columns));
           const lastRowTop = lastRowCards.length
             ? Math.min(...lastRowCards.map((card) => card.getBoundingClientRect().top)) - bounds.top
@@ -202,7 +206,7 @@ export default function GiftingBackground() {
             ? Math.max(...lastRowCards.map((card) => card.getBoundingClientRect().bottom)) - bounds.top
             : 0;
           const columnWidth = gridBounds ? gridBounds.width / columns : host.clientWidth;
-          const giftCount = heroCount + emptySlots.length;
+          const giftCount = headingGiftCount + decorationSlots.length;
           while (gifts.length < giftCount) gifts.push(createGift(gifts.length));
           gifts.forEach((gift, index) => {
             gift.visible = index < giftCount;
@@ -210,16 +214,22 @@ export default function GiftingBackground() {
             let horizontal;
             let vertical;
             let size;
-            if (index < heroCount) {
-              const available = host.clientWidth - headingRight;
-              horizontal = (headingRight + available * (mobile ? 0.55 : [0.37, 0.72, 0.16][index])) / host.clientWidth;
-              vertical = (headingTop + headingHeight * (mobile ? 0.55 : [0.24, 0.55, 0.84][index])) / host.clientHeight;
-              size = mobile ? Math.min(46, available * 0.72) : Math.min([164, 112, 76][index], available * [0.34, 0.24, 0.16][index]);
+            if (index < headingGiftCount) {
+              const compactHeading = headingGiftCount === 5;
+              const horizontalPosition = compactHeading ? 0.5 : index === 0 ? 0.34 : 0.86;
+              const verticalPosition = compactHeading
+                ? [0.12, 0.31, 0.5, 0.69, 0.88][index]
+                : index === 0 ? 0.3 : 0.76;
+              horizontal = (headingRight + availableHeadingSpace * horizontalPosition) / host.clientWidth;
+              vertical = (headingTop + headingHeight * verticalPosition) / host.clientHeight;
+              size = compactHeading
+                ? Math.min([30, 22, 34, 24, 28][index], availableHeadingSpace * 0.48)
+                : [116, 78][index];
             } else {
-              const slot = emptySlots[index - heroCount];
+              const slot = decorationSlots[index - headingGiftCount];
               horizontal = (gridBounds.left - bounds.left + (slot + 0.5) * columnWidth) / host.clientWidth;
               vertical = ((lastRowTop + lastRowBottom) * 0.5) / host.clientHeight;
-              size = Math.min(mobile ? 48 : 112, columnWidth * 0.38);
+              size = Math.min(88, columnWidth * 0.3);
             }
             gift.position.set(horizontal * 10 - 5, camera.top - vertical * worldHeight, 0);
             gift.scale.setScalar(pixelScale * size);
@@ -264,7 +274,7 @@ export default function GiftingBackground() {
           renderer.render(scene, camera);
           if (visible && !document.hidden && !motion.matches) frame = window.requestAnimationFrame(render);
         };
-        const resize = () => {
+        resizeCanvas = () => {
           const width = host.clientWidth;
           const height = host.clientHeight;
           if (!width || !height) return;
@@ -276,9 +286,9 @@ export default function GiftingBackground() {
           stop();
           render();
         };
-        resizeObserver = new ResizeObserver(resize);
+        resizeObserver = new ResizeObserver(resizeCanvas);
         resizeObserver.observe(host);
-        resize();
+        resizeCanvas();
       } catch (error) {
         console.error("Unable to initialize gifting background", error);
         stop();
@@ -289,25 +299,41 @@ export default function GiftingBackground() {
         materials.forEach((material) => material.dispose());
       }
     };
+    const refreshViewport = () => {
+      if (!host.isConnected) return;
+      const bounds = host.getBoundingClientRect();
+      visible = bounds.bottom > 0 && bounds.top < window.innerHeight;
+      if (visible) {
+        if (!started) initialize();
+        else resizeCanvas?.();
+      } else {
+        synchronize();
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.hidden) synchronize();
+      else refreshViewport();
+    };
+    const handleWindowResize = () => refreshViewport();
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible && !started) {
-        if ("requestIdleCallback" in window) idle = window.requestIdleCallback(initialize, { timeout: 1200 });
-        else initialize();
+        initialize();
       }
       synchronize();
     });
     observer.observe(host);
-    document.addEventListener("visibilitychange", synchronize);
+    window.addEventListener("resize", handleWindowResize);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     motion.addEventListener("change", synchronize);
     return () => {
       disposed = true;
       stop();
       detachInteraction?.();
-      if (idle !== undefined) window.cancelIdleCallback(idle);
       observer.disconnect();
       resizeObserver?.disconnect();
-      document.removeEventListener("visibilitychange", synchronize);
+      window.removeEventListener("resize", handleWindowResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       motion.removeEventListener("change", synchronize);
       geometries.forEach((geometry) => geometry.dispose());
       materials.forEach((material) => material.dispose());
