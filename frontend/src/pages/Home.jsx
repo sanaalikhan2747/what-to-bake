@@ -5,7 +5,6 @@ import { api } from "@/state/api";
 import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
 import MagicBaker from "@/components/MagicBaker";
-import GiftingBackground from "@/components/GiftingBackground";
 import "./Home.css";
 import "./HomePolish.css";
 
@@ -434,7 +433,6 @@ export default function Home() {
       )}
 
       <section className="festive-section" id="festive">
-        <GiftingBackground />
         <div className="festive-heading">
           <p className="eyebrow">02 / READY-MADE FESTIVE BOXES</p>
           <h2>One-tap<br /><em>gifting.</em></h2>
