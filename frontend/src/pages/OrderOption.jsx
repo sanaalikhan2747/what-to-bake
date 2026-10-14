@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { api, waLink } from "@/state/api";
+import { CATALOGUE_PRODUCTS } from "@/state/catalogueData";
 import OrderShowcase from "@/components/OrderShowcase";
 import "./OrderOption.css";
 
@@ -107,7 +108,7 @@ const ORDER_PAGES = {
 };
 
 export default function OrderOption({ orderType }) {
-  const [menuPhotos, setMenuPhotos] = useState([]);
+  const [menuPhotos, setMenuPhotos] = useState(() => [...new Set(CATALOGUE_PRODUCTS.map((product) => product.image).filter(Boolean))]);
   const [advanceRequest, setAdvanceRequest] = useState({
     fulfilment: "pickup",
     fullName: "",
@@ -127,7 +128,7 @@ export default function OrderOption({ orderType }) {
       .then(({ data }) => {
         if (!active) return;
         const photos = [...new Set(data.map((product) => product.image).filter(Boolean))];
-        setMenuPhotos(photos);
+        if (photos.length) setMenuPhotos(photos);
       })
       .catch(() => {});
     return () => { active = false; };
