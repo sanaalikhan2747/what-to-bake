@@ -76,6 +76,7 @@ const heroSlides = [
     action: "Plan your order",
     href: "/order/local-pickup",
     position: "100% 50%",
+    fit: "cover",
   },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
@@ -232,6 +233,7 @@ export default function Home() {
           style={{
             "--hero-photo-background": `url("${heroSlides[heroSlide].src}")`,
             "--hero-photo-position": heroSlides[heroSlide].position,
+            "--hero-photo-fit": heroSlides[heroSlide].fit || "cover",
           }}
         >
           <img
