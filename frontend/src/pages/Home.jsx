@@ -278,7 +278,7 @@ export default function Home() {
         <div className="featured-products-heading">
           <div>
               <p className="eyebrow">FROM THE LITTLE BAKESHOP</p>
-              <h2 id="featured-products-title">Made for sharing.<br /><em>Or keeping close.</em></h2>
+              <h2 id="featured-products-title">Made for sharing.<br /><em>And devouring.</em></h2>
               <p>Loaves, little treats and celebration bakes, made in small batches and ready to find their way to your table.</p>
           </div>
           <Link to="/menu" className="featured-menu-link">Explore the whole menu <ArrowRight size={16} /></Link>
