@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight, Link2, MessageCircle, Minus, Plus, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import { api } from "@/state/api";
 import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
-import MagicBaker from "@/components/MagicBaker";
 import "./Home.css";
 import "./HomePolish.css";
 
@@ -87,6 +86,7 @@ export default function Home() {
   const [boxes, setBoxes] = useState(CATALOGUE_FESTIVE_BOXES);
   const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
+  const featuredRailRef = useRef(null);
   const [occasion, setOccasion] = useState("");
   const [mood, setMood] = useState("");
   const [people, setPeople] = useState(6);
@@ -182,6 +182,11 @@ export default function Home() {
   const addProductToCart = (product) => {
     addItem({ id: product.id, name: product.name, price: product.price, image: product.image, custom_box: false });
     setCartOpen(true);
+  };
+
+  const scrollFeaturedRail = (direction) => {
+    const rail = featuredRailRef.current;
+    if (rail) rail.scrollBy({ left: direction * rail.clientWidth * 0.78, behavior: "smooth" });
   };
 
   const productGroups = (featuredCategory === "all"
@@ -307,8 +312,12 @@ export default function Home() {
                 <h3 id={`featured-category-${group.id}`}>{group.label}</h3>
                 <i />
                 <small>{group.products.length} {group.products.length === 1 ? "bake" : "bakes"}</small>
+                <div className="featured-rail-controls" role="group" aria-label="Browse featured bakes">
+                  <button type="button" onClick={() => scrollFeaturedRail(-1)} aria-label="Scroll featured bakes left"><ChevronLeft size={17} /></button>
+                  <button type="button" onClick={() => scrollFeaturedRail(1)} aria-label="Scroll featured bakes right"><ChevronRight size={17} /></button>
+                </div>
               </div>
-              <div className="featured-grid">
+              <div className="featured-grid" ref={featuredRailRef}>
                 {group.products.map((product, index) => (
                   <article className="featured-card" key={product.id} data-testid={`featured-product-${product.id}`}>
                     <Link to={`/menu#product-${product.id}`} className="featured-card-image" aria-label={`Browse menu: ${product.name}`}>
@@ -340,7 +349,15 @@ export default function Home() {
             <h2>Let's Find Your<br /><em>Match.</em></h2>
             <p>A few little questions, then a loaf recommendation that feels like it was made for you.</p>
           </div>
-          <MagicBaker onActivate={surprise} />
+          <button type="button" className="match-surprise-button" onClick={surprise} aria-label="Ask the baker for a magical surprise bake" data-testid="match-mascot-surprise">
+            <Sparkles size={21} aria-hidden="true" />
+            <span className="match-surprise-copy">
+              <small>YOUR LITTLE BAKER</small>
+              <b>Tap her wand for a<br />magical bake match</b>
+              <span>Let’s make a little magic <Sparkles size={13} aria-hidden="true" /></span>
+            </span>
+            <ArrowRight className="match-surprise-arrow" size={17} aria-hidden="true" />
+          </button>
         </div>
         <div className="match-form">
           <div className="question">

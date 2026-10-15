@@ -15,6 +15,8 @@ import OrderSuccess from "@/pages/OrderSuccess";
 import OrderOption from "@/pages/OrderOption";
 import OurStory from "@/pages/OurStory";
 import "@/PageAlignment.css";
+import "@/StorefrontExperience.css";
+import "@/pages/HomeExperience.css";
 
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
