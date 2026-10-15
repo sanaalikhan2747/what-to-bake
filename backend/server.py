@@ -257,6 +257,7 @@ class MatchRequest(BaseModel):
     people: int
     budget: int
     dietary: str = "No preference"
+    category: Optional[str] = "all"
 
 
 class ChatRequest(BaseModel):
@@ -311,28 +312,113 @@ FULL_CATALOGUE_FOR_AI = [
 ]
 
 
+def _product_serves_range(product):
+    if "serves_min" in product and "serves_max" in product:
+        return product["serves_min"], product["serves_max"]
+    batch_size = product.get("batch_size")
+    if batch_size:
+        return batch_size, batch_size
+    unit = str(product.get("unit", "")).lower()
+    if any(k in unit for k in ("cup", "piece", "each")):
+        return 1, 2
+    return 6, 8
+
+
 def _score(product, req: MatchRequest):
-    if product["category"] != "loaf":
-        return -1e9
-    score = 0
-    if req.mood in product["moods"]:
-        score += 3
-    if req.occasion in product["occasions"]:
-        score += 3
-    if product["price"] <= req.budget:
-        score += 2
-    mid = (product["serves_min"] + product["serves_max"]) / 2
-    score -= abs(mid - req.people) * 0.1
-    if product["price"] > req.budget:
-        score -= (product["price"] - req.budget) / 200
-    if req.dietary.lower().startswith("less sweet") or "sugar" in req.dietary.lower():
+    if req.category and req.category != "all":
+        if product["category"] != req.category:
+            return -1e9
+
+    score = 0.0
+
+    # 1. Mood alignment
+    if req.mood in product.get("moods", []):
+        score += 4.5
+
+    # 2. Occasion alignment
+    if req.occasion in product.get("occasions", []):
+        score += 4.5
+
+    # 3. Dietary preferences
+    diet = (req.dietary or "No preference").lower().strip()
+    if "sugar" in diet or "less sweet" in diet:
         if product.get("healthy"):
-            score += 4
+            score += 5.0
+        if product.get("id") == "sugar-free-dates":
+            score += 4.0
+        elif product.get("id") in ("coconut-loaf", "apple-cinnamon-loaf", "oat-flour-banana-bread", "oat-flour-choco-chip-cookie"):
+            score += 2.5
+    elif "gluten" in diet:
+        if product.get("id") == "flourless-brownies-batch":
+            score += 8.0
+        elif product.get("healthy") or "oat" in product.get("id", ""):
+            score += 5.0
+    elif "eggless" in diet:
+        score += 1.0
+
+    # 4. Guest count fit
+    s_min, s_max = _product_serves_range(product)
+    people = max(1, req.people)
+    if s_min <= people <= s_max:
+        score += 3.5
+    else:
+        mid = (s_min + s_max) / 2.0
+        dist = abs(mid - people)
+        score -= min(dist * 0.2, 3.5)
+
+    # 5. Budget fit
+    price = product.get("price", 0)
+    budget = req.budget or 1500
+    if price <= budget:
+        score += 3.0
+        ratio = price / max(1, budget)
+        if 0.4 <= ratio <= 1.0:
+            score += 1.5
+    else:
+        over = price - budget
+        score -= (over / 250.0)
+
     return score
 
 
+def _pick_options(req: MatchRequest, limit: int = 4):
+    scored = [(p, _score(p, req)) for p in PRODUCTS]
+    scored = [x for x in scored if x[1] > -1e8]
+    scored.sort(key=lambda x: x[1], reverse=True)
+
+    if not scored:
+        return [PRODUCTS[0]] if PRODUCTS else []
+
+    selected = []
+    seen_cats = set()
+
+    # Top overall match
+    top = scored[0][0]
+    selected.append(top)
+    seen_cats.add(top["category"])
+
+    # If category is "all", prioritize category diversity across options
+    if not req.category or req.category == "all":
+        for p, s in scored[1:]:
+            if len(selected) >= limit:
+                break
+            if p["category"] not in seen_cats:
+                selected.append(p)
+                seen_cats.add(p["category"])
+
+    # Fill remaining spots with top scores
+    for p, s in scored[1:]:
+        if len(selected) >= limit:
+            break
+        if p not in selected:
+            selected.append(p)
+
+    return selected
+
+
 def _pick_product(req: MatchRequest):
-    return max(PRODUCTS, key=lambda p: _score(p, req))
+    options = _pick_options(req, limit=1)
+    return options[0] if options else PRODUCTS[0]
 
 
 async def ask_baker(prompt: str, session_id: str, system_extra: str = "", full_catalogue: bool = True, history=None):
@@ -661,28 +747,38 @@ async def get_festive_box(box_id: str):
 
 @api_router.post("/match")
 async def match_dessert(request: MatchRequest):
-    best = _pick_product(request)
+    options = _pick_options(request, limit=4)
+    best = options[0] if options else PRODUCTS[0]
+    s_min, s_max = _product_serves_range(best)
+    serves_val = best.get("serves") or (f"{s_min}–{s_max}" if s_min != s_max else str(s_min))
+    category_name = {
+        "loaf": "loaf",
+        "cheesecake": "dessert box",
+        "batch": "batch bake",
+        "cookie": "cookie treat",
+    }.get(best.get("category"), "bake")
+
     prompt = (
-        f"The perfect loaf for this customer is: {best['name']} (Rs. {best['price']}, serves {best['serves']}). "
+        f"The perfect bake for this customer is: {best['name']} (Rs. {best['price']}, serves {serves_val}). "
         f"They are buying for a {request.occasion.lower()}, in the mood for {request.mood.lower()}, "
         f"for {request.people} people, budget around Rs. {request.budget}, dietary: {request.dietary}. "
         f"Write ONE warm, personal sentence (max 30 words) explaining why {best['name']} suits them. "
-        f"You MUST use the exact name '{best['name']}' and MUST NOT mention any other loaf or bake."
+        f"You MUST use the exact name '{best['name']}' and MUST NOT mention any other bake."
     )
     try:
         explanation = await ask_baker(
             prompt,
             "match-" + uuid.uuid4().hex,
             system_extra=f"For this reply you must only talk about '{best['name']}'.",
-            full_catalogue=False,
+            full_catalogue=True,
         )
     except Exception as e:
         logging.getLogger(__name__).warning("match LLM error: %s", e)
         explanation = f"{best['name']} feels just right — warm, homemade, and made for the moment you're planning."
-    other_names = [p["name"] for p in PRODUCTS if p["category"] == "loaf" and p["id"] != best["id"]]
+    other_names = [p["name"] for p in PRODUCTS if p["id"] != best["id"]]
     if best["name"].lower() not in explanation.lower() or any(n.lower() in explanation.lower() for n in other_names):
-        explanation = f"{best['name']} — a warm, homemade pick for your {request.occasion.lower()}. Perfect for {request.people} and stays gently within your Rs. {request.budget} budget."
-    return {"product": best, "explanation": explanation}
+        explanation = f"{best['name']} — a warm, homemade {category_name} for your {request.occasion.lower()}. Perfect for {request.people} and stays gently within your Rs. {request.budget} budget."
+    return {"product": best, "explanation": explanation, "options": options}
 
 
 @api_router.post("/match/save")

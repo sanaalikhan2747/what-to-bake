@@ -4,6 +4,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, Link2, MessageCircle, Minus, Plu
 import { api } from "@/state/api";
 import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueData";
 import { useCart } from "@/state/CartContext";
+import { findMatches, getProductServes } from "@/state/matchmaker";
 import "./Home.css";
 import "./HomePolish.css";
 
@@ -87,12 +88,14 @@ export default function Home() {
   const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
   const featuredRailRef = useRef(null);
+  const [matchCategory, setMatchCategory] = useState("all");
   const [occasion, setOccasion] = useState("");
   const [mood, setMood] = useState("");
   const [people, setPeople] = useState(6);
   const [budget, setBudget] = useState(1500);
   const [dietary, setDietary] = useState("No preference");
   const [match, setMatch] = useState(null);
+  const [matchOptions, setMatchOptions] = useState([]);
   const [matchError, setMatchError] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -115,10 +118,24 @@ export default function Home() {
     const params = new URLSearchParams(window.location.search);
     const savedId = params.get("match");
     if (savedId) {
-      api.get(`/match/${savedId}`).then((r) => {
-        setMatch({ product: r.data.product, explanation: r.data.explanation });
+      const directMatch = CATALOGUE_PRODUCTS.find((p) => p.id === savedId);
+      if (directMatch) {
+        setMatch({
+          product: directMatch,
+          explanation: `${directMatch.name} — a special bake hand-picked for your celebration.`,
+        });
+        setMatchOptions([directMatch]);
         setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 300);
-      }).catch(() => {});
+      } else {
+        api.get(`/match/${savedId}`).then((r) => {
+          if (r?.data?.product?.id) {
+            setMatch({ product: r.data.product, explanation: r.data.explanation });
+            const opts = Array.isArray(r.data.options) && r.data.options.length ? r.data.options : [r.data.product];
+            setMatchOptions(opts);
+            setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 300);
+          }
+        }).catch(() => {});
+      }
     }
   }, []);
 
@@ -138,39 +155,106 @@ export default function Home() {
 
   const runMatch = async () => {
     setLoading(true); setMatchError(""); setSavedNote("");
-    try {
-      const r = await api.post("/match", { occasion, mood, people, budget: Number(budget) || 0, dietary });
-      setMatch(r.data);
+    const numericPeople = Number(people) || 6;
+    const numericBudget = Number(budget) || 1500;
+    const cataloguePool = (products && products.length) ? products : CATALOGUE_PRODUCTS;
+
+    // Immediately calculate whole-menu match client-side so customer never experiences delay or failure
+    const instantResult = findMatches(cataloguePool, {
+      occasion,
+      mood,
+      people: numericPeople,
+      budget: numericBudget,
+      dietary,
+      category: matchCategory,
+    });
+
+    if (instantResult?.product) {
+      setMatch({ product: instantResult.product, explanation: instantResult.explanation });
+      setMatchOptions(instantResult.options?.length ? instantResult.options : [instantResult.product]);
       setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 60);
+    }
+
+    try {
+      const r = await api.post("/match", {
+        occasion, mood, people: numericPeople, budget: numericBudget, dietary, category: matchCategory,
+      });
+      if (r?.data?.product?.id) {
+        setMatch({ product: r.data.product, explanation: r.data.explanation });
+        const opts = Array.isArray(r.data.options) && r.data.options.length ? r.data.options : [r.data.product];
+        setMatchOptions(opts);
+      }
     } catch {
-      setMatchError("Our little kitchen is offline for a moment — please try again shortly.");
-    } finally { setLoading(false); }
+      // Backend is optional/offline; client match is already seamlessly displayed
+    } finally {
+      setLoading(false);
+    }
   };
 
   const surprise = () => {
-    if (!loaves.length) return null;
-    const picked = loaves[Math.floor(Math.random() * loaves.length)];
-    setMatch({ product: picked, explanation: `${picked.name} — a little baker's instinct says this is the loaf you didn't know you were craving.` });
+    const cataloguePool = (products && products.length) ? products : CATALOGUE_PRODUCTS;
+    const pool = matchCategory === "all" ? cataloguePool : cataloguePool.filter((p) => p.category === matchCategory);
+    const activePool = pool.length ? pool : cataloguePool;
+    const picked = activePool[Math.floor(Math.random() * activePool.length)];
+    const otherPicks = activePool.filter((p) => p.id !== picked.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+    const surpriseCategoryLabel = {
+      loaf: "loaf",
+      cheesecake: "dessert box",
+      batch: "bake",
+      cookie: "cookie treat",
+    }[picked.category] || "bake";
+    setMatch({
+      product: picked,
+      explanation: `${picked.name} — a little baker's instinct says this is the ${surpriseCategoryLabel} you didn't know you were craving.`,
+    });
+    setMatchOptions([picked, ...otherPicks]);
     setSavedNote("");
     setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 60);
     return picked;
   };
 
+  const selectAlternativeMatch = (opt) => {
+    const servesInfo = getProductServes(opt);
+    const catLabel = {
+      loaf: "loaf",
+      cheesecake: "dessert box",
+      batch: "bake",
+      cookie: "cookie treat",
+    }[opt.category] || "bake";
+    setMatch({
+      product: opt,
+      explanation: `${opt.name} — a lovely ${catLabel} pick for your ${occasion.toLowerCase()} gathering. Serves ${servesInfo.text} and fits right into your Rs. ${Number(budget || 1500).toLocaleString()} budget.`,
+    });
+    setSavedNote("");
+    setTimeout(() => document.getElementById("match-result")?.scrollIntoView({ behavior: "smooth" }), 60);
+  };
+
   const saveMatch = async () => {
-    if (!match || saving) return;
+    if (!match?.product || saving) return;
     setSaving(true); setSavedNote("");
+    const directUrl = `${window.location.origin}/?match=${match.product.id}`;
     try {
       const r = await api.post("/match/save", {
         product_id: match.product.id, occasion, mood, people,
         budget: Number(budget) || 0, dietary, explanation: match.explanation,
       });
-      const url = `${window.location.origin}/?match=${r.data.id}`;
+      const url = r?.data?.id ? `${window.location.origin}/?match=${r.data.id}` : directUrl;
       try {
         await navigator.clipboard.writeText(url);
         setSavedNote("Link copied — paste it anywhere to come back to this bake.");
-      } catch { setSavedNote(url); }
-    } catch { setSavedNote("Couldn't save right now — please try again in a moment."); }
-    finally { setSaving(false); }
+      } catch {
+        setSavedNote(url);
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(directUrl);
+        setSavedNote("Link copied — paste it anywhere to come back to this bake.");
+      } catch {
+        setSavedNote(directUrl);
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const addMatchToCart = () => {
@@ -345,9 +429,9 @@ export default function Home() {
       <section className="match-section" id="match">
         <div className="match-heading-row">
           <div className="section-intro">
-            <p className="eyebrow">01 / THE LOAF MATCHMAKER</p>
+            <p className="eyebrow">01 / THE BAKE MATCHMAKER</p>
             <h2>Let's Find Your<br /><em>Match.</em></h2>
-            <p>A few little questions, then a loaf recommendation that feels like it was made for you.</p>
+            <p>A few little questions, then perfect recommendations curated from our whole menu just for you.</p>
           </div>
           <button type="button" className="match-surprise-button" onClick={surprise} aria-label="Ask the baker for a magical surprise bake" data-testid="match-mascot-surprise">
             <Sparkles size={21} aria-hidden="true" />
@@ -360,6 +444,29 @@ export default function Home() {
           </button>
         </div>
         <div className="match-form">
+          <div className="question">
+            <label>Looking for a specific bake category?</label>
+            <div className="choice-grid category-choice-grid">
+              {[
+                { id: "all", label: "Whole Menu (All bakes)" },
+                { id: "loaf", label: "Loaves" },
+                { id: "cheesecake", label: "Dessert boxes" },
+                { id: "batch", label: "Bakes & cups" },
+                { id: "cookie", label: "Artisanal cookies" },
+              ].map((choice) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  className={matchCategory === choice.id ? "choice active" : "choice"}
+                  aria-pressed={matchCategory === choice.id}
+                  onClick={() => setMatchCategory(choice.id)}
+                  data-testid={`match-category-${choice.id}`}
+                >
+                  <span className="choice-title">{choice.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="question">
             <label>What is the occasion?</label>
             <div className="choice-grid occasion-choice-grid">
@@ -411,7 +518,7 @@ export default function Home() {
           </div>
           {matchError && <p className="inline-error" data-testid="match-error">{matchError}</p>}
           <button className="button primary wide" onClick={runMatch} disabled={loading || !occasion || !mood} data-testid="find-match-button">
-            {loading ? "Finding your match…" : <>Find my perfect match <ArrowRight size={17} /></>}
+            {loading ? "Finding your matches…" : <>Find my perfect matches <ArrowRight size={17} /></>}
           </button>
         </div>
       </section>
@@ -434,7 +541,7 @@ export default function Home() {
                 </p>
               )}
               <div className="result-meta">
-                <span>Serves {match.product.serves}</span>
+                <span>Serves {getProductServes(match.product).text}</span>
                 <b>Rs. {match.product.price.toLocaleString()}</b>
               </div>
               <div className="result-actions">
@@ -448,6 +555,66 @@ export default function Home() {
               {savedNote && <p className="saved-note" data-testid="saved-note">{savedNote}</p>}
             </div>
           </div>
+
+          {matchOptions.filter((opt) => opt.id !== match.product.id).length > 0 && (
+            <div className="match-alternatives-container" data-testid="match-alternatives">
+              <div className="match-alternatives-heading">
+                <p className="eyebrow">MORE OPTIONS FOR YOU</p>
+                <h3>Other Perfect Matches From Our Menu</h3>
+                <p>Curated alternatives that fit your {mood.toLowerCase()} craving for a {occasion.toLowerCase()}.</p>
+              </div>
+              <div className="match-alternatives-grid">
+                {matchOptions
+                  .filter((opt) => opt.id !== match.product.id)
+                  .map((opt) => {
+                    const categoryLabel = {
+                      loaf: "Loaf",
+                      cheesecake: "Dessert Box",
+                      batch: "Bakes & Cups",
+                      cookie: "Artisanal Cookie",
+                    }[opt.category] || "Bake";
+                    const servesInfo = getProductServes(opt);
+                    return (
+                      <article className="match-alt-card" key={opt.id} data-testid={`match-alt-${opt.id}`}>
+                        <div className="match-alt-image-wrap">
+                          <img src={opt.image} alt={opt.name} loading="lazy" />
+                          <span className="match-alt-badge">{categoryLabel}</span>
+                        </div>
+                        <div className="match-alt-copy">
+                          <div className="match-alt-header">
+                            <h4>{opt.name}</h4>
+                            <b>Rs. {opt.price.toLocaleString()}</b>
+                          </div>
+                          <p className="match-alt-story">{opt.story}</p>
+                          <div className="match-alt-footer">
+                            <span className="match-alt-serves">Serves {servesInfo.text}</span>
+                            <div className="match-alt-actions">
+                              <button
+                                type="button"
+                                className="button ghost small"
+                                onClick={() => selectAlternativeMatch(opt)}
+                                data-testid={`match-alt-select-${opt.id}`}
+                              >
+                                View note
+                              </button>
+                              <button
+                                type="button"
+                                className="featured-add"
+                                onClick={() => addProductToCart(opt)}
+                                aria-label={`Add ${opt.name} to box`}
+                                data-testid={`match-alt-add-${opt.id}`}
+                              >
+                                <ShoppingBag size={15} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </section>
       )}
 

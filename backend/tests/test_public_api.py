@@ -97,6 +97,32 @@ def test_match_returns_loaf_with_name_in_explanation():
     data = r.json()
     assert data["product"]["category"] == "loaf"
     assert data["product"]["name"].lower() in data["explanation"].lower()
+    assert "options" in data
+    assert len(data["options"]) >= 1
+
+
+def test_match_whole_menu_options_and_category_filter():
+    # Birthday + Chocolate lover with Rs. 2500 budget
+    r = requests.post(f"{BASE}/api/match", json={
+        "occasion": "Birthday", "mood": "Chocolate lover", "people": 6, "budget": 2500, "dietary": "No preference", "category": "all"
+    }, timeout=60)
+    assert r.status_code == 200
+    data = r.json()
+    assert "options" in data
+    assert len(data["options"]) >= 2
+    # Verify options contain items across whole menu categories
+    categories = {opt["category"] for opt in data["options"]}
+    assert len(categories) >= 2, f"Expected diverse menu categories in options, got {categories}"
+
+    # Now filter explicitly by cheesecake
+    r_cheese = requests.post(f"{BASE}/api/match", json={
+        "occasion": "Birthday", "mood": "Chocolate lover", "people": 6, "budget": 2500, "dietary": "No preference", "category": "cheesecake"
+    }, timeout=60)
+    assert r_cheese.status_code == 200
+    cheese_data = r_cheese.json()
+    assert cheese_data["product"]["category"] == "cheesecake"
+    for opt in cheese_data["options"]:
+        assert opt["category"] == "cheesecake"
 
 
 # ---------- Orders ----------
