@@ -32,11 +32,11 @@ export default function OurStory() {
   return (
     <div className="our-story-page">
       <header className="our-story-heading">
-        <p className="eyebrow">04 / STORY BEHIND THE BAKE</p>
-        <h1>Good things<br /><em>take time.</em></h1>
-        <p>Every loaf has a mood, a memory, a reason to be shared. Here are a few of ours.</p>
+        <p className="eyebrow">ABOUT US</p>
+        <h1>Our Story</h1>
+        <p>Crafting artisanal bakes with pure butter, time, and premium ingredients.</p>
         <a className="inline-link" href="https://www.instagram.com/treatsandtemptationbysk/" target="_blank" rel="noreferrer" data-testid="instagram-link">
-          See more on Instagram <Instagram size={17} />
+          Instagram <Instagram size={17} />
         </a>
       </header>
       <section className="our-story-bakes" aria-label="Stories behind our loaves">
@@ -56,12 +56,12 @@ export default function OurStory() {
 
       <section className="bakehouse-section" aria-labelledby="bakehouse-title">
         <div className="bakehouse-copy">
-          <p className="eyebrow">A LITTLE PLACE, A LOT OF LOVE</p>
-          <h2 id="bakehouse-title">Baked at home.<br /><em>Made for your table.</em></h2>
-          <p>Sana's kitchen is a small home bakery where every order is made fresh, one thoughtful batch at a time.</p>
-          <div className="bakehouse-address"><MapPin size={17} /><span>Askari X, Lahore, Pakistan<br /><small>Pickup details shared personally when arranging your order.</small></span></div>
+          <p className="eyebrow">OUR KITCHEN</p>
+          <h2 id="bakehouse-title">Small-Batch Artisan Bakery</h2>
+          <p>Based in Askari X, Lahore. Each order is prepared fresh on demand for your table.</p>
+          <div className="bakehouse-address"><MapPin size={17} /><span>Askari X, Lahore, Pakistan<br /><small>Exact address provided upon order booking.</small></span></div>
           <a className="bakehouse-directions" href={waLink("Hi Sana! Could you please share the pickup address and directions for my order?")} target="_blank" rel="noreferrer" data-testid="bakehouse-directions">
-            <Navigation size={16} /> Ask Sana for directions <ArrowUpRight size={15} />
+            <Navigation size={16} /> Get Directions <ArrowUpRight size={15} />
           </a>
         </div>
 

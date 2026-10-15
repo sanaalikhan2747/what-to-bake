@@ -94,7 +94,7 @@ export function findMatches(products, criteria, limit = 4) {
     const fallback = products[0];
     return {
       product: fallback,
-      explanation: `${fallback.name} is a baker's favourite, handcrafted with love.`,
+      explanation: `${fallback.name} — a signature favourite handcrafted in small batches.`,
       options: [fallback],
     };
   }
@@ -129,12 +129,12 @@ export function findMatches(products, criteria, limit = 4) {
   const categoryName = {
     loaf: "loaf",
     cheesecake: "dessert box",
-    batch: "batch bake",
+    batch: "bake",
     cookie: "cookie treat",
   }[best.category] || "bake";
 
   const serves = getProductServes(best);
-  const explanation = `${best.name} — a warm, homemade ${categoryName} tailored for your ${criteria.occasion ? criteria.occasion.toLowerCase() : "celebration"}. Ideal for ${criteria.people || 6} and fits gently within your Rs. ${Number(criteria.budget || 1500).toLocaleString()} budget.`;
+  const explanation = `${best.name} is an ideal match for your ${criteria.occasion ? criteria.occasion.toLowerCase() : "celebration"} — freshly baked to serve ${serves.text} within your budget.`;
 
   return {
     product: best,

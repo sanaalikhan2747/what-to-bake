@@ -7,8 +7,8 @@ import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueDa
 import "./Nav.css";
 
 const orderOptions = [
-  { label: "Place your order in advance", href: "/order/local-pickup" },
-  { label: "Same-Day Pick-Up or Delivery", href: "/order/same-day" },
+  { label: "Advance Orders", href: "/order/local-pickup" },
+  { label: "Same-Day Orders", href: "/order/same-day" },
   { label: "Corporate Catering", href: "/order/corporate-catering" },
   { label: "Corporate Gifting", href: "/order/corporate-gifting" },
   { label: "Celebrations & Events", href: "/order/celebrations" },
@@ -155,11 +155,11 @@ export default function Nav({ onOpenChat }) {
       href: `/festive/${box.id}`,
       detail: `From Rs. ${box.total.toLocaleString()}`,
     })) : []),
-    { key: "gift-box-builder", label: "Build a gift box", href: "/build" },
+    { key: "gift-box-builder", label: "Custom Gift Box", href: "/build" },
   ];
 
   const feature = Array.isArray(products) && products[0]
-    ? { image: products[0].image, label: "Browse the full menu", href: "/menu" }
+    ? { image: products[0].image, label: "View Full Menu", href: "/menu" }
     : null;
 
   return (

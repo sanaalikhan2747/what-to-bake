@@ -9,71 +9,71 @@ import "./Home.css";
 import "./HomePolish.css";
 
 const occasions = [
-  { value: "Birthday", label: "A birthday", detail: "For a day worth celebrating" },
-  { value: "Anniversary", label: "An anniversary", detail: "Celebrate a special date" },
-  { value: "Tea party", label: "Tea with friends", detail: "Something for the table" },
-  { value: "Family gathering", label: "A family gathering", detail: "Made to share" },
-  { value: "Graduation", label: "A milestone", detail: "Recognise an achievement" },
-  { value: "Eid", label: "Eid", detail: "For sharing with loved ones" },
-  { value: "Baby born", label: "A new arrival", detail: "A thoughtful welcome" },
-  { value: "Gift", label: "A thoughtful gift", detail: "Send something special" },
-  { value: "Just craving something", label: "Just because", detail: "No occasion necessary" },
+  { value: "Birthday", label: "Birthday", detail: "Celebrations" },
+  { value: "Anniversary", label: "Anniversary", detail: "Milestones" },
+  { value: "Tea party", label: "Tea & Coffee", detail: "Afternoons" },
+  { value: "Family gathering", label: "Family Gathering", detail: "Sharing" },
+  { value: "Graduation", label: "Milestone", detail: "Achievements" },
+  { value: "Eid", label: "Eid", detail: "Festive" },
+  { value: "Baby born", label: "New Arrival", detail: "Welcome" },
+  { value: "Gift", label: "Gift", detail: "Thoughtful" },
+  { value: "Just craving something", label: "Everyday Treat", detail: "Indulgence" },
 ];
 const moods = [
-  { value: "Chocolate lover", label: "Chocolate", detail: "Rich and indulgent", color: "#75514b" },
-  { value: "Fresh & citrusy", label: "Citrus & fruit", detail: "Bright, refreshing notes", color: "#cf9d4c" },
-  { value: "Warm & comforting", label: "Warm spices", detail: "Comforting and aromatic", color: "#b97759" },
-  { value: "Coffee lover", label: "Coffee", detail: "Toasty, balanced notes", color: "#83705a" },
-  { value: "Something different", label: "Something different", detail: "Explore a new favourite", color: "#7b8a70" },
+  { value: "Chocolate lover", label: "Chocolate", detail: "Rich & indulgent", color: "#75514b" },
+  { value: "Fresh & citrusy", label: "Citrus & Fruit", detail: "Bright & refreshing", color: "#cf9d4c" },
+  { value: "Warm & comforting", label: "Warm Spices", detail: "Comforting & aromatic", color: "#b97759" },
+  { value: "Coffee lover", label: "Coffee", detail: "Toasty & balanced", color: "#83705a" },
+  { value: "Something different", label: "Baker's Choice", detail: "Unique & distinctive", color: "#7b8a70" },
 ];
 const featuredCategories = [
   { id: "loaf", label: "Loaves" },
-  { id: "cheesecake", label: "Dessert boxes" },
-  { id: "batch", label: "Bakes & cups" },
-  { id: "cookie", label: "Artisanal cookies" },
+  { id: "cheesecake", label: "Dessert Boxes" },
+  { id: "batch", label: "Bakes & Cups" },
+  { id: "cookie", label: "Cookies" },
 ];
 const heroSlides = [
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
-    alt: "Homemade artisanal bakes and loaves",
-    eyebrow: "SMALL-BATCH, BAKED WITH CARE",
-    heading: "A little something",
-    accent: "made from scratch.",
-    description: "Fresh bakes for everyday treats and the moments worth celebrating.",
-    action: "Explore the menu",
+    alt: "Artisanal bakes and loaves",
+    eyebrow: "ARTISANAL BAKERY",
+    heading: "Freshly baked",
+    accent: "from scratch.",
+    description: "Small-batch loaves, cakes, and treats handcrafted with premium ingredients.",
+    action: "Explore Menu",
     href: "/menu",
     position: "69% 48%",
   },
   {
     src: CATALOGUE_PRODUCTS.find((product) => product.id === "cinnamon-rolls-batch")?.image,
     alt: "Cinnamon Rolls from the menu",
-    eyebrow: "FOR THE TABLE",
-    heading: "Bring something sweet",
-    accent: "to the table.",
-    description: "From tea-time loaves to generous dessert boxes, made to share.",
-    action: "Browse dessert boxes",
+    eyebrow: "MADE FOR SHARING",
+    heading: "Dessert boxes &",
+    accent: "signature bakes.",
+    description: "From morning tea loaves to generous dessert boxes, baked fresh to order.",
+    action: "Browse Desserts",
     href: "/menu#cat-cheesecake",
     position: "100% 50%",
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_0,w_980,h_675/v1790938869/IMG-20261002-WA0190.jpg",
     alt: "Double Chocolate Cookie from the menu",
-    eyebrow: "A GIFT FROM OUR KITCHEN",
-    heading: "A thoughtful gesture",
-    accent: "beautifully baked.",
-    description: "Thoughtful bakery boxes for birthdays, thank-yous, and just because.",
-    action: "Explore gifting",
+    eyebrow: "GIFTING & CELEBRATIONS",
+    heading: "Thoughtfully packaged",
+    accent: "for any occasion.",
+    description: "Curated bakery boxes for birthdays, corporate gifts, and celebrations.",
+    action: "Explore Gifting",
     href: "/order/corporate-gifting",
     position: "100% 50%",
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_120,w_1700,h_1416/v1791141497/Gemini_Generated_Image_jh3tl4jh3tl4jh3t.jpg",
     alt: "Flourless Brownies from the menu",
-    eyebrow: "MADE TO BE SHARED",
-    heading: "Turning art",
-    accent: "into sweetness.",
-    description: "Plan a fresh advance order for your table, your team, or your next big day.",
-    action: "Plan your order",
+    eyebrow: "PRE-ORDER SERVICE",
+    heading: "Baked to order,",
+    accent: "ready for your table.",
+    description: "Schedule your fresh order in advance for local pick-up or doorstep delivery.",
+    action: "Schedule Order",
     href: "/order/local-pickup",
     position: "100% 50%",
     fit: "cover",
@@ -368,11 +368,11 @@ export default function Home() {
       <section className="featured-products" aria-labelledby="featured-products-title">
         <div className="featured-products-heading">
           <div>
-              <p className="eyebrow">FROM THE LITTLE BAKESHOP</p>
-              <h2 id="featured-products-title">Made for sharing.<br /><em>And devouring.</em></h2>
-              <p>Loaves, little treats and celebration bakes, made in small batches and ready to find their way to your table.</p>
+            <p className="eyebrow">OUR SPECIALITIES</p>
+            <h2 id="featured-products-title">Signature Bakes</h2>
+            <p>Handcrafted daily in small batches with premium ingredients.</p>
           </div>
-          <Link to="/menu" className="featured-menu-link">Explore the whole menu <ArrowRight size={16} /></Link>
+          <Link to="/menu" className="featured-menu-link">Explore Menu <ArrowRight size={16} /></Link>
         </div>
         <div className="featured-tabs" role="group" aria-label="Filter all bakes">
           {featuredCategories.map((category) => (
@@ -429,30 +429,30 @@ export default function Home() {
       <section className="match-section" id="match">
         <div className="match-heading-row">
           <div className="section-intro">
-            <p className="eyebrow">01 / THE BAKE MATCHMAKER</p>
-            <h2>Let's Find Your<br /><em>Match.</em></h2>
-            <p>A few little questions, then perfect recommendations curated from our whole menu just for you.</p>
+            <p className="eyebrow">CURATED RECOMMENDATIONS</p>
+            <h2>Bake Matchmaker</h2>
+            <p>Select your preferences for a personalized menu recommendation.</p>
           </div>
-          <button type="button" className="match-surprise-button" onClick={surprise} aria-label="Ask the baker for a magical surprise bake" data-testid="match-mascot-surprise">
-            <Sparkles size={21} aria-hidden="true" />
+          <button type="button" className="match-surprise-button" onClick={surprise} aria-label="Surprise bake recommendation" data-testid="match-mascot-surprise">
+            <Sparkles size={20} aria-hidden="true" />
             <span className="match-surprise-copy">
-              <small>YOUR LITTLE BAKER</small>
-              <b>Tap her wand for a<br />magical bake match</b>
-              <span>Let’s make a little magic <Sparkles size={13} aria-hidden="true" /></span>
+              <small>QUICK RECOMMENDATION</small>
+              <b>Surprise Me</b>
+              <span>Baker's instinct <Sparkles size={12} aria-hidden="true" /></span>
             </span>
-            <ArrowRight className="match-surprise-arrow" size={17} aria-hidden="true" />
+            <ArrowRight className="match-surprise-arrow" size={16} aria-hidden="true" />
           </button>
         </div>
         <div className="match-form">
           <div className="question">
-            <label>Looking for a specific bake category?</label>
+            <label>Bake Category</label>
             <div className="choice-grid category-choice-grid">
               {[
-                { id: "all", label: "Whole Menu (All bakes)" },
+                { id: "all", label: "Whole Menu" },
                 { id: "loaf", label: "Loaves" },
-                { id: "cheesecake", label: "Dessert boxes" },
-                { id: "batch", label: "Bakes & cups" },
-                { id: "cookie", label: "Artisanal cookies" },
+                { id: "cheesecake", label: "Dessert Boxes" },
+                { id: "batch", label: "Bakes & Cups" },
+                { id: "cookie", label: "Cookies" },
               ].map((choice) => (
                 <button
                   key={choice.id}
@@ -468,7 +468,7 @@ export default function Home() {
             </div>
           </div>
           <div className="question">
-            <label>What is the occasion?</label>
+            <label>Occasion</label>
             <div className="choice-grid occasion-choice-grid">
               {occasions.map((choice) => (
                 <button type="button" className={occasion === choice.value ? "choice active" : "choice"} aria-pressed={occasion === choice.value} onClick={() => setOccasion(choice.value)} data-testid={`occasion-${slug(choice.value)}`} key={choice.value}>
@@ -479,7 +479,7 @@ export default function Home() {
             </div>
           </div>
           <div className="question">
-            <label>Which flavours do you prefer?</label>
+            <label>Flavour Profile</label>
             <div className="choice-grid mood-choice-grid">
               {moods.map((choice) => (
                 <button type="button" className={mood === choice.value ? "choice mood-choice active" : "choice mood-choice"} aria-pressed={mood === choice.value} onClick={() => setMood(choice.value)} data-testid={`mood-${slug(choice.value)}`} key={choice.value}>
@@ -491,7 +491,7 @@ export default function Home() {
           </div>
           <div className="split-questions">
             <div className="question">
-              <label>How many people?</label>
+              <label>Guests / Servings</label>
               <div className="stepper">
                 <button onClick={() => setPeople(Math.max(1, people - 1))} data-testid="people-minus"><Minus size={15} /></button>
                 <strong data-testid="people-count">{people}</strong>
@@ -499,7 +499,7 @@ export default function Home() {
               </div>
             </div>
             <div className="question">
-              <label>Budget</label>
+              <label>Budget (PKR)</label>
               <div className="budget-input">
                 <span>Rs.</span>
                 <input value={budget} onChange={(e) => setBudget(e.target.value)} data-testid="budget-input" />
@@ -507,7 +507,7 @@ export default function Home() {
             </div>
           </div>
           <div className="question">
-            <label>Any dietary preferences?</label>
+            <label>Dietary Requirements</label>
             <select value={dietary} onChange={(e) => setDietary(e.target.value)} data-testid="dietary-select">
               <option>No preference</option>
               <option>Eggless</option>
@@ -518,7 +518,7 @@ export default function Home() {
           </div>
           {matchError && <p className="inline-error" data-testid="match-error">{matchError}</p>}
           <button className="button primary wide" onClick={runMatch} disabled={loading || !occasion || !mood} data-testid="find-match-button">
-            {loading ? "Finding your matches…" : <>Find my perfect matches <ArrowRight size={17} /></>}
+            {loading ? "Finding matches…" : <>Find My Match <ArrowRight size={17} /></>}
           </button>
         </div>
       </section>
@@ -528,10 +528,10 @@ export default function Home() {
           <div className="result-card">
             <div className="result-image">
               <img src={match.product.image} alt={match.product.name} data-testid="match-product-image" />
-              <span>YOUR PERFECT MATCH</span>
+              <span>CURATED MATCH</span>
             </div>
             <div className="result-copy">
-              <p className="eyebrow">A NOTE FROM THE BAKER</p>
+              <p className="eyebrow">RECOMMENDATION</p>
               <h2 data-testid="match-product-name">{match.product.name}</h2>
               <p className="result-description" data-testid="match-explanation">{match.explanation}</p>
               <p className="story">"{match.product.story}"</p>
@@ -546,10 +546,10 @@ export default function Home() {
               </div>
               <div className="result-actions">
                 <button className="button primary" onClick={addMatchToCart} data-testid="add-match-to-cart">
-                  Add to my box <ShoppingBag size={17} />
+                  Add to Cart <ShoppingBag size={17} />
                 </button>
                 <button className="button ghost" onClick={saveMatch} disabled={saving} data-testid="save-match-button">
-                  {saving ? "Saving…" : <>Save & share <Link2 size={16} /></>}
+                  {saving ? "Saving…" : <>Share Link <Link2 size={16} /></>}
                 </button>
               </div>
               {savedNote && <p className="saved-note" data-testid="saved-note">{savedNote}</p>}
@@ -559,9 +559,9 @@ export default function Home() {
           {matchOptions.filter((opt) => opt.id !== match.product.id).length > 0 && (
             <div className="match-alternatives-container" data-testid="match-alternatives">
               <div className="match-alternatives-heading">
-                <p className="eyebrow">MORE OPTIONS FOR YOU</p>
-                <h3>Other Perfect Matches From Our Menu</h3>
-                <p>Curated alternatives that fit your {mood.toLowerCase()} craving for a {occasion.toLowerCase()}.</p>
+                <p className="eyebrow">MORE OPTIONS</p>
+                <h3>Other Recommended Bakes</h3>
+                <p>Handpicked alternatives matching your preferences.</p>
               </div>
               <div className="match-alternatives-grid">
                 {matchOptions
@@ -571,7 +571,7 @@ export default function Home() {
                       loaf: "Loaf",
                       cheesecake: "Dessert Box",
                       batch: "Bakes & Cups",
-                      cookie: "Artisanal Cookie",
+                      cookie: "Cookie",
                     }[opt.category] || "Bake";
                     const servesInfo = getProductServes(opt);
                     return (
@@ -620,9 +620,9 @@ export default function Home() {
 
       <section className="festive-section" id="festive">
         <div className="festive-heading">
-          <p className="eyebrow">02 / READY-MADE FESTIVE BOXES</p>
-          <h2>One-tap<br /><em>gifting.</em></h2>
-          <p>Curated pairings for the moments you don't want to think twice about.</p>
+          <p className="eyebrow">GIFTING</p>
+          <h2>Curated Gift Boxes</h2>
+          <p>Artisanal gift boxes for celebrations and thoughtful gifting.</p>
         </div>
         <div className="festive-grid">
           {boxes.map((box) => (

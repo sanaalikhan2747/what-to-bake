@@ -754,7 +754,7 @@ async def match_dessert(request: MatchRequest):
     category_name = {
         "loaf": "loaf",
         "cheesecake": "dessert box",
-        "batch": "batch bake",
+        "batch": "bake",
         "cookie": "cookie treat",
     }.get(best.get("category"), "bake")
 
@@ -774,10 +774,10 @@ async def match_dessert(request: MatchRequest):
         )
     except Exception as e:
         logging.getLogger(__name__).warning("match LLM error: %s", e)
-        explanation = f"{best['name']} feels just right — warm, homemade, and made for the moment you're planning."
+        explanation = f"{best['name']} is an ideal match for your {request.occasion.lower()} — freshly baked to serve {serves_val}."
     other_names = [p["name"] for p in PRODUCTS if p["id"] != best["id"]]
     if best["name"].lower() not in explanation.lower() or any(n.lower() in explanation.lower() for n in other_names):
-        explanation = f"{best['name']} — a warm, homemade {category_name} for your {request.occasion.lower()}. Perfect for {request.people} and stays gently within your Rs. {request.budget} budget."
+        explanation = f"{best['name']} is an ideal match for your {request.occasion.lower()} — freshly baked to serve {serves_val} within your budget."
     return {"product": best, "explanation": explanation, "options": options}
 
 

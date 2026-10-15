@@ -74,15 +74,15 @@ export default function BuildBox() {
   return (
     <div className="build-page">
       <header className="build-header">
-        <p className="eyebrow">CUSTOM BOX BUILDER</p>
-        <h1>Pick, mix,<br /><em>send with love.</em></h1>
-        <p>Choose your treats, packaging, and a personal note. Your box total updates as you build it.</p>
+        <p className="eyebrow">CUSTOM GIFT BOX</p>
+        <h1>Build Your Box</h1>
+        <p>Select individual bakes, gift packaging, and an optional personalized note.</p>
       </header>
 
       <div className="build-layout">
         <div className="build-picker">
           <div className="build-step-heading" id="pick-your-mix">
-            <p className="eyebrow">01 / PICK YOUR MIX</p>
+            <p className="eyebrow">01 / SELECT TREATS</p>
             <span>{itemsCount} {itemsCount === 1 ? "treat" : "treats"} · Rs. {itemsTotal.toLocaleString()}</span>
           </div>
           <div className="picker-grid">
@@ -107,8 +107,8 @@ export default function BuildBox() {
           </div>
 
           <div className="pack-section">
-            <p className="eyebrow">02 / PICK YOUR PACKAGING</p>
-            <p className="pack-hint">Every box comes tied with a pink ribbon and, on request, a personal note.</p>
+            <p className="eyebrow">02 / PACKAGING</p>
+            <p className="pack-hint">Each box is finished with our signature ribbon and an optional gift tag.</p>
             <div className="pack-options">
               {RIBBONS.map((r) => (
                 <button
@@ -129,10 +129,10 @@ export default function BuildBox() {
           </div>
 
           <div className="message-section">
-            <p className="eyebrow">03 / ADD A PERSONAL NOTE</p>
+            <p className="eyebrow">03 / GIFT NOTE (OPTIONAL)</p>
             <textarea
               maxLength={140}
-              placeholder="e.g. Happy birthday, favourite person."
+              placeholder="e.g. Wishing you a wonderful celebration."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               data-testid="build-message"
@@ -142,14 +142,14 @@ export default function BuildBox() {
         </div>
 
         <aside className="build-preview">
-          <p className="eyebrow">YOUR BOX</p>
+          <p className="eyebrow">BOX SUMMARY</p>
           <div className={`preview-box ${ribbonClass} ${styleClass}`} ref={boxRef} data-testid="preview-box">
             <div className="preview-lid" />
             <div className="preview-body">
               {chosen.length === 0 ? (
                 <div className="preview-empty">
                   <Gift size={24} />
-                  <p>Pick a treat on the left — we'll drop it in here.</p>
+                  <p>Select bakes to add to your box.</p>
                 </div>
               ) : (
                 <div className="preview-items" data-testid="preview-items">
@@ -183,9 +183,9 @@ export default function BuildBox() {
             onClick={addToCartAndCheckout}
             data-testid="build-checkout"
           >
-            {chosen.length ? <>Continue to checkout <ArrowRight size={17} /></> : "Add at least one treat"}
+            {chosen.length ? <>Add Box & Checkout <ArrowRight size={17} /></> : "Select at least 1 treat"}
           </button>
-          <Link to="/menu" className="preview-link">or browse the full menu →</Link>
+          <Link to="/menu" className="preview-link">Explore Full Menu →</Link>
         </aside>
       </div>
     </div>

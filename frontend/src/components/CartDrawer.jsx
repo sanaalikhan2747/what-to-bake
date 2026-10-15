@@ -15,8 +15,8 @@ export default function CartDrawer() {
       <aside className="cart-drawer" data-testid="cart-drawer" role="dialog" aria-label="Your bake box">
         <div className="cart-header">
           <div>
-            <p className="eyebrow">YOUR BAKE BOX</p>
-            <b>{cartCount ? `${cartCount} item${cartCount === 1 ? "" : "s"} chosen` : "Nothing in the box yet"}</b>
+            <p className="eyebrow">ORDER SUMMARY</p>
+            <b>{cartCount ? `${cartCount} ${cartCount === 1 ? "item" : "items"}` : "Cart is empty"}</b>
           </div>
           <button onClick={() => setCartOpen(false)} data-testid="close-cart" aria-label="Close cart">
             <X />
@@ -25,8 +25,8 @@ export default function CartDrawer() {
         <div className="cart-body">
           {items.length === 0 ? (
             <div className="cart-empty" data-testid="cart-empty-state">
-              <p>Your box is empty. Find a match, add a festive box, or build your own — it'll land right here.</p>
-              <Link to="/menu" className="button ghost small" onClick={() => setCartOpen(false)}>Browse menu</Link>
+              <p>Your cart is empty.</p>
+              <Link to="/menu" className="button ghost small" onClick={() => setCartOpen(false)}>Explore Menu</Link>
             </div>
           ) : (
             items.map((i) => {
@@ -67,7 +67,7 @@ export default function CartDrawer() {
             >
               Proceed to checkout <ShoppingBag size={16} />
             </button>
-            <button className="cart-clear" onClick={clearCart} data-testid="cart-clear">Clear box</button>
+            <button className="cart-clear" onClick={clearCart} data-testid="cart-clear">Clear cart</button>
           </div>
         )}
       </aside>

@@ -9,15 +9,15 @@ import "./MenuProductDialog.css";
 
 const CATEGORY_ORDER = ["loaf", "cheesecake", "batch", "cookie"];
 const CATEGORY_LABEL = {
-  loaf: "Loaves — freshly baked, made with love",
-  cheesecake: "Cheesecake & Dessert Boxes",
-  batch: "Brownies, Bakes & Dessert Cups",
+  loaf: "Artisanal Loaves",
+  cheesecake: "Dessert Boxes & Cakes",
+  batch: "Bakes & Dessert Cups",
   cookie: "Artisanal Cookies",
 };
 const CATEGORY_EYEBROW = {
   loaf: "01 / LOAVES",
-  cheesecake: "02 / CHEESECAKE & DESSERT BOXES",
-  batch: "03 / BROWNIES, BAKES & CUPS",
+  cheesecake: "02 / DESSERT BOXES",
+  batch: "03 / BAKES & CUPS",
   cookie: "04 / COOKIES",
 };
 
@@ -100,14 +100,14 @@ export default function Menu() {
     <div className="menu-page">
       <header className="menu-header">
         <div className="menu-order-note">
-          <strong>24 Hours Notice Required</strong>
-          <span>Freshly prepared &amp; baked to order with love.</span>
+          <strong>24-Hour Notice</strong>
+          <span>Baked fresh to order for local pick-up or delivery.</span>
         </div>
-        <p className="eyebrow">THE FULL MENU</p>
-        <h1>Freshly baked,<br /><em>made with love.</em></h1>
+        <p className="eyebrow">OUR MENU</p>
+        <h1>Artisanal Bakes</h1>
         <p className="menu-lead">
-          Browse the whole kitchen — artisanal loaves, dessert boxes, bakes, cookies, and wholesome treats. Or, for a small mix,{" "}
-          <Link to="/build" className="inline-link light" data-testid="menu-build-link">build a custom box <WandSparkles size={14} /></Link>.
+          Small-batch loaves, dessert boxes, bakes, and cookies. Looking for a mix?{" "}
+          <Link to="/build" className="inline-link light" data-testid="menu-build-link">Build a custom box <WandSparkles size={14} /></Link>.
         </p>
         <div className="menu-filters">
           <button className={filter === "all" ? "chip active" : "chip"} onClick={() => setFilter("all")} data-testid="filter-all">All</button>
@@ -183,14 +183,14 @@ export default function Menu() {
             </button>
           </div>
           <div className="menu-product-dialog-copy">
-            <p className="eyebrow">FRESH FROM THE KITCHEN</p>
+            <p className="eyebrow">PRODUCT DETAILS</p>
             <h2 id="menu-product-title">{selectedProduct.name}</h2>
             {selectedProduct.note && <p className="menu-note">{selectedProduct.note}</p>}
             <p className="menu-product-story">{selectedProduct.story}</p>
-            {selectedProduct.variants?.length > 0 && <div className="menu-product-options"><h3>Available options</h3><div>{selectedProduct.variants.map((variant) => <span key={variant}>{variant}</span>)}</div></div>}
-            {selectedProduct.addons?.length > 0 && <div className="menu-product-options"><h3>Optional extras</h3><div>{selectedProduct.addons.map((addon) => <span key={addon.name}>{addon.name} + Rs. {addon.price.toLocaleString()}</span>)}</div></div>}
-            <div className="menu-product-dialog-footer"><div><strong>Rs. {selectedProduct.price.toLocaleString()}</strong><small>/ {selectedProduct.unit}</small></div><button type="button" className="button primary" onClick={() => { add(selectedProduct); setSelectedProduct(null); }} data-testid="menu-product-add">Add to my box <ShoppingBag size={16} /></button></div>
-            <Link to="/build" className="menu-product-build-link" onClick={() => setSelectedProduct(null)}>Build a custom box instead <ArrowRight size={14} /></Link>
+            {selectedProduct.variants?.length > 0 && <div className="menu-product-options"><h3>Flavours</h3><div>{selectedProduct.variants.map((variant) => <span key={variant}>{variant}</span>)}</div></div>}
+            {selectedProduct.addons?.length > 0 && <div className="menu-product-options"><h3>Add-ons</h3><div>{selectedProduct.addons.map((addon) => <span key={addon.name}>{addon.name} + Rs. {addon.price.toLocaleString()}</span>)}</div></div>}
+            <div className="menu-product-dialog-footer"><div><strong>Rs. {selectedProduct.price.toLocaleString()}</strong><small>/ {selectedProduct.unit}</small></div><button type="button" className="button primary" onClick={() => { add(selectedProduct); setSelectedProduct(null); }} data-testid="menu-product-add">Add to Cart <ShoppingBag size={16} /></button></div>
+            <Link to="/build" className="menu-product-build-link" onClick={() => setSelectedProduct(null)}>Build a custom box <ArrowRight size={14} /></Link>
           </div>
         </section>
       </div>}

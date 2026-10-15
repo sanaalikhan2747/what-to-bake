@@ -7,9 +7,9 @@ export default function Footer() {
     <footer className="site-footer" id="contact">
       <section className="footer-contact" aria-labelledby="footer-contact-title" data-testid="footer-contact">
         <div className="footer-contact-intro">
-          <p className="eyebrow">SAY HELLO</p>
-          <h2 id="footer-contact-title">A little question?<br /><em>We’re here.</em></h2>
-          <p>Need help choosing a bake, checking an order, or arranging a pick-up? Send Sana a note and she’ll get back to you.</p>
+          <p className="eyebrow">CONTACT</p>
+          <h2 id="footer-contact-title">Get in Touch</h2>
+          <p>For orders, custom gift boxes, or dietary requests, reach out directly.</p>
         </div>
         <div className="footer-contact-details">
           <a className="footer-contact-method" href={`tel:+${WHATSAPP_PHONE}`} data-testid="contact-phone">
@@ -17,7 +17,7 @@ export default function Footer() {
             <span className="footer-contact-copy">
               <small>CALL OR WHATSAPP</small>
               <b>+92 322 411 2832</b>
-              <em>Orders, questions & pick-up arrangements</em>
+              <em>Direct inquiries &amp; orders</em>
             </span>
             <ArrowRight size={17} />
           </a>
@@ -26,28 +26,28 @@ export default function Footer() {
             <span className="footer-contact-copy">
               <small>MESSAGE THE BAKER</small>
               <b>Chat on WhatsApp</b>
-              <em>Tell us what you’re planning</em>
+              <em>Direct message for quick replies</em>
             </span>
             <ArrowRight size={17} />
           </a>
           <a className="footer-contact-method" href="https://www.instagram.com/treatsandtemptationbysk/" target="_blank" rel="noreferrer" data-testid="contact-instagram">
             <span className="footer-contact-icon"><Instagram size={19} /></span>
             <span className="footer-contact-copy">
-              <small>FOLLOW ALONG</small>
+              <small>INSTAGRAM</small>
               <b>@treatsandtemptationbysk</b>
-              <em>Fresh bakes and kitchen moments</em>
+              <em>Latest bakes &amp; updates</em>
             </span>
             <ArrowRight size={17} />
           </a>
-          <p className="footer-pickup-note"><b>Pick-up:</b> Sana confirms availability, timing, and the pick-up location with you directly when arranging your order.</p>
+          <p className="footer-pickup-note"><b>Pick-up Location:</b> Askari X, Lahore · Confirmed upon order booking.</p>
         </div>
       </section>
       <div className="footer-bottom">
         <div className="brand">
           <span className="brand-mark">SK</span>
-          <span>Treats &<br /><b>Temptation</b></span>
+          <span>Treats &amp;<br /><b>Temptation</b></span>
         </div>
-        <span className="footer-signoff">Made with butter, time & a little bit of magic.</span>
+        <span className="footer-signoff">Artisanal Small-Batch Bakery · Lahore, Pakistan</span>
         <a href="https://www.instagram.com/treatsandtemptationbysk/" target="_blank" rel="noreferrer" data-testid="footer-instagram">
           @treatsandtemptationbysk <Instagram size={16} />
         </a>
