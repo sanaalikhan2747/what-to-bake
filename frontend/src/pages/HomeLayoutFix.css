@@ -17,6 +17,35 @@
   padding-bottom: clamp(48px, 5vw, 72px);
 }
 
+.hero-copy .eyebrow,
+.featured-products-heading > div > p:last-child,
+.featured-category-heading > span,
+.featured-category-heading small,
+.featured-card-story,
+.match-heading-row .section-intro > p:last-child,
+.match-form .choice small,
+.festive-heading > p:last-child,
+.festive-tagline,
+.festive-items {
+  display: none;
+}
+
+.featured-products-heading {
+  margin-bottom: 24px;
+}
+
+.featured-card-copy {
+  padding-top: 12px;
+}
+
+.festive-heading {
+  margin-bottom: 24px;
+}
+
+.festive-body {
+  padding-top: 12px;
+}
+
 @media (max-width: 760px) {
   .hero {
     height: clamp(600px, 78vh, 700px);
