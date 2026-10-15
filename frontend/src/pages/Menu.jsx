@@ -20,6 +20,14 @@ const CATEGORY_EYEBROW = {
   batch: "03 / BAKES & CUPS",
   cookie: "04 / COOKIES",
 };
+const FILTER_LABEL = {
+  all: "All",
+  loaf: "Loaves",
+  cheesecake: "Dessert Boxes",
+  batch: "Bakes & Cups",
+  cookie: "Cookies",
+  healthy: "Healthy Range",
+};
 
 export default function Menu() {
   const [products, setProducts] = useState(CATALOGUE_PRODUCTS);
@@ -100,24 +108,26 @@ export default function Menu() {
     <div className="menu-page">
       <header className="menu-header">
         <div className="menu-order-note">
-          <strong>24-Hour Notice</strong>
-          <span>Baked fresh to order for local pick-up or delivery.</span>
+          <strong>Fresh to Order</strong>
+          <span>Baked fresh daily · Order 24 hours ahead for pick-up or delivery</span>
         </div>
         <p className="eyebrow">OUR MENU</p>
         <h1>Artisanal Bakes</h1>
         <p className="menu-lead">
-          Small-batch loaves, dessert boxes, bakes, and cookies. Looking for a mix?{" "}
-          <Link to="/build" className="inline-link light" data-testid="menu-build-link">Build a custom box <WandSparkles size={14} /></Link>.
+          Baked fresh in small batches. Looking for a mix?{" "}
+          <Link to="/build" className="inline-link light" data-testid="menu-build-link">Build a custom box <WandSparkles size={14} /></Link>
         </p>
         <div className="menu-filters">
-          <button className={filter === "all" ? "chip active" : "chip"} onClick={() => setFilter("all")} data-testid="filter-all">All</button>
+          <button className={filter === "all" ? "chip active" : "chip"} onClick={() => setFilter("all")} data-testid="filter-all">
+            {FILTER_LABEL.all}
+          </button>
           {CATEGORY_ORDER.map((c) => (
             <button key={c} className={filter === c ? "chip active" : "chip"} onClick={() => setFilter(c)} data-testid={`filter-${c}`}>
-              {CATEGORY_LABEL[c].split(" — ")[0]}
+              {FILTER_LABEL[c]}
             </button>
           ))}
           <button className={filter === "healthy" ? "chip active" : "chip"} onClick={() => setFilter("healthy")} data-testid="filter-healthy">
-            Healthy Range
+            {FILTER_LABEL.healthy}
           </button>
         </div>
       </header>
@@ -132,7 +142,7 @@ export default function Menu() {
             {categoryProducts.map((p) => (
               <article className="menu-card menu-card-selectable" id={`product-${p.id}`} key={p.id} data-testid={`menu-item-${p.id}`} tabIndex={0} aria-label={`View details for ${p.name}`} aria-haspopup="dialog" onClick={(event) => openProduct(event, p)} onKeyDown={(event) => handleProductKeyDown(event, p)}>
                 <div className="menu-card-image">
-                  <img src={p.image} alt={p.name} />
+                  <img src={p.image} alt={p.name} loading="lazy" />
                   {p.healthy && <span className="pill-healthy">Healthy option</span>}
                   <button
                     type="button"
@@ -146,22 +156,25 @@ export default function Menu() {
                 </div>
                 <div className="menu-card-body">
                   <h3>{p.name}</h3>
-                  {p.note && <p className="menu-note">{p.note}</p>}
-                  {p.variants && (
-                    <p className="menu-note">Choose: {p.variants.join(" · ")}</p>
-                  )}
-                  <p className="menu-story">"{p.story}"</p>
-                  {p.addons?.length > 0 && (
-                    <p className="menu-addon">
-                      Add {p.addons.map((a) => `${a.name} +Rs. ${a.price}`).join(", ")}
-                    </p>
-                  )}
+                  {p.note ? (
+                    <p className="menu-note">{p.note}</p>
+                  ) : p.variants?.length > 1 ? (
+                    <p className="menu-note">{p.variants.join(" · ")}</p>
+                  ) : p.serves ? (
+                    <p className="menu-note">Serves {p.serves}</p>
+                  ) : null}
                   <div className="menu-card-footer">
                     <div>
                       <b>Rs. {p.price.toLocaleString()}</b>
-                      <small>{p.unit}</small>
+                      <small>/ {p.unit}</small>
                     </div>
-                    <button className="button primary small" onClick={() => add(p)} data-testid={`menu-add-${p.id}`}>
+                    <button
+                      type="button"
+                      className="button primary small"
+                      onClick={(e) => { e.stopPropagation(); add(p); }}
+                      data-testid={`menu-add-${p.id}`}
+                      aria-label={`Add ${p.name} to cart`}
+                    >
                       Add <ShoppingBag size={14} />
                     </button>
                   </div>
@@ -183,12 +196,13 @@ export default function Menu() {
             </button>
           </div>
           <div className="menu-product-dialog-copy">
-            <p className="eyebrow">PRODUCT DETAILS</p>
+            <p className="eyebrow">FRESH BAKE</p>
             <h2 id="menu-product-title">{selectedProduct.name}</h2>
             {selectedProduct.note && <p className="menu-note">{selectedProduct.note}</p>}
             <p className="menu-product-story">{selectedProduct.story}</p>
-            {selectedProduct.variants?.length > 0 && <div className="menu-product-options"><h3>Flavours</h3><div>{selectedProduct.variants.map((variant) => <span key={variant}>{variant}</span>)}</div></div>}
-            {selectedProduct.addons?.length > 0 && <div className="menu-product-options"><h3>Add-ons</h3><div>{selectedProduct.addons.map((addon) => <span key={addon.name}>{addon.name} + Rs. {addon.price.toLocaleString()}</span>)}</div></div>}
+            {selectedProduct.serves && <p className="menu-serves-badge">Serves {selectedProduct.serves}</p>}
+            {selectedProduct.variants?.length > 0 && <div className="menu-product-options"><h3>Available Flavours</h3><div>{selectedProduct.variants.map((variant) => <span key={variant}>{variant}</span>)}</div></div>}
+            {selectedProduct.addons?.length > 0 && <div className="menu-product-options"><h3>Optional Add-ons</h3><div>{selectedProduct.addons.map((addon) => <span key={addon.name}>{addon.name} (+Rs. {addon.price.toLocaleString()})</span>)}</div></div>}
             <div className="menu-product-dialog-footer"><div><strong>Rs. {selectedProduct.price.toLocaleString()}</strong><small>/ {selectedProduct.unit}</small></div><button type="button" className="button primary" onClick={() => { add(selectedProduct); setSelectedProduct(null); }} data-testid="menu-product-add">Add to Cart <ShoppingBag size={16} /></button></div>
             <Link to="/build" className="menu-product-build-link" onClick={() => setSelectedProduct(null)}>Build a custom box <ArrowRight size={14} /></Link>
           </div>

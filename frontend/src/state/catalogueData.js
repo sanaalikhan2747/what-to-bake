@@ -12,7 +12,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting"],
     occasions: ["Tea party", "Family gathering", "Anniversary", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867603/IMG-20250824-WA0183.jpg",
-    story: "Warm, gentle spice and cinnamon — it makes the kitchen smell like a Sunday afternoon.",
+    story: "Warm spice and cinnamon folded into a tender, golden crumb.",
   },
   {
     id: "chocolate-chip-banana",
@@ -27,7 +27,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting", "Chocolate lover"],
     occasions: ["Tea party", "Family gathering", "Just craving something", "Birthday"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-    story: "The loaf you slice on a slow Sunday, with chocolate melting into every crumb.",
+    story: "Classic banana bread loaded with melted semi-sweet chocolate chips.",
   },
   {
     id: "lemon-loaf",
@@ -41,7 +41,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Fresh & citrusy"],
     occasions: ["Tea party", "Gift", "Baby born", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791123638/IMG-20261004-WA0232.jpg",
-    story: "Bright lemon zest folded into a tender crumb and drizzled with a sweet citrus glaze.",
+    story: "Zesty lemon loaf with a moist crumb, topped with citrus glaze.",
   },
   {
     id: "coconut-loaf",
@@ -55,7 +55,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Something different", "Fresh & citrusy"],
     occasions: ["Tea party", "Gift", "Eid", "Anniversary"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790866286/IMG-20250821-WA0289.jpg",
-    story: "Toasted coconut, soft crumb, quiet luxury — the loaf that surprises everyone at the table.",
+    story: "Toasted coconut loaf with a tender, buttery crumb.",
   },
   {
     id: "coffee-walnut-loaf",
@@ -69,7 +69,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Coffee lover", "Warm & comforting"],
     occasions: ["Anniversary", "Family gathering", "Graduation", "Tea party"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790869322/image_6aeade9c_1.jpg",
-    story: "For the ones who take their afternoons with a strong cup and a slower conversation.",
+    story: "Espresso-infused loaf topped with a buttery, crunchy walnut crumble.",
   },
   {
     id: "double-chocolate-loaf",
@@ -83,7 +83,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Birthday", "Gift", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791141262/Gemini_Generated_Image_asmttfasmttfasmt.jpg",
-    story: "Deep, velvety cocoa crumb studded with molten chocolate chunks for the true devotee.",
+    story: "Rich cocoa crumb studded with molten chocolate chunks throughout.",
   },
   {
     id: "mini-loaves-pack",
@@ -99,7 +99,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Something different", "Gift"],
     occasions: ["Gift", "Tea party", "Family gathering"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791140536/Gemini_Generated_Image_sajcjgsajcjgsajc.jpg",
-    story: "Four adorable mini loaves — mix any combination of Lemon, Coconut, Coffee Walnut, or Double Chocolate.",
+    story: "Four artisanal mini loaves — mix any combination of loaf flavours.",
   },
   {
     id: "sugar-free-dates",
@@ -115,7 +115,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting", "Something different"],
     occasions: ["Gift", "Family gathering", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790869786/image_8402ea07.jpg",
-    story: "Naturally sweet with Arabian dates and walnuts — the loaf you bring for mindful indulgence.",
+    story: "Naturally sweetened with Arabian dates and crunchy walnuts.",
   },
   {
     id: "oat-flour-banana-bread",
@@ -131,7 +131,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting", "Chocolate lover"],
     occasions: ["Tea party", "Gift", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-    story: "Wholesome oat flour, ripe sweet bananas, and rich chocolate chips baked to golden perfection.",
+    story: "Wholesome oat flour, ripe bananas, and rich chocolate chips.",
   },
 
   // Cheesecake & dessert boxes
@@ -148,7 +148,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Fresh & citrusy", "Something different"],
     occasions: ["Anniversary", "Birthday", "Gift"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867632/IMG-20250913-WA0191.jpg",
-    story: "Slow-baked, silky New York style cheesecake on a buttery biscuit crust. Comes with your choice of Strawberry or Lemon topping.",
+    story: "Silky slow-baked cheesecake on a buttery biscuit crust with fruit topping.",
   },
   {
     id: "pineapple-cheesecake",
@@ -162,7 +162,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Fresh & citrusy", "Something different"],
     occasions: ["Tea party", "Gift", "Family gathering"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791622441/419066.jpg",
-    story: "Bright tropical pineapple chunks against a light, pillowy cream cheese filling.",
+    story: "Juicy tropical pineapple layered with light, pillowy cream cheese.",
   },
   {
     id: "banoffee-pie",
@@ -176,7 +176,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting"],
     occasions: ["Family gathering", "Anniversary", "Gift"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621229/Gemini_Generated_Image_5o2yxo5o2yxo5o2y.jpg",
-    story: "Rich dulce de leche toffee, fresh sliced bananas, and clouds of coffee-dusted whipped cream.",
+    story: "Dulce de leche toffee, fresh bananas, and coffee-dusted whipped cream.",
   },
   {
     id: "coffee-cake-nutty",
@@ -190,7 +190,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Coffee lover"],
     occasions: ["Tea party", "Anniversary", "Graduation"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621156/Gemini_Generated_Image_xbirs4xbirs4xbir.jpg",
-    story: "Deep roast coffee crumb frosted with brown butter buttercream and crowned with caramelized nut brittle.",
+    story: "Deep roast coffee crumb frosted with buttercream and crunchy nut brittle.",
   },
   {
     id: "fruit-trifle-box",
@@ -204,7 +204,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Fresh & citrusy"],
     occasions: ["Family gathering", "Tea party", "Gift"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621178/Gemini_Generated_Image_6u3an76u3an76u3a.jpg",
-    story: "Generous party box layered with golden sponge, fresh seasonal fruit medley, and silky homemade custard.",
+    story: "Golden sponge layered with fresh seasonal fruit and silky custard.",
   },
   {
     id: "salted-caramel-brownie-trifle",
@@ -218,7 +218,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Birthday", "Family gathering", "Gift"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791624702/Gemini_Generated_Image_5j06gv5j06gv5j06.jpg",
-    story: "Fudgy brownie bites, housemade golden salted caramel, and chantilly cream in an indulgent party tray.",
+    story: "Fudgy brownie bites, housemade salted caramel, and chantilly cream.",
   },
   {
     id: "malt-cake-box",
@@ -232,7 +232,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Birthday", "Family gathering", "Gift"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621203/Gemini_Generated_Image_92833d92833d9283.jpg",
-    story: "Tender chocolate malt cake generously frosted with our signature malt fudge frosting.",
+    story: "Tender chocolate malt cake frosted with signature malt fudge.",
   },
 
   // Brownies, bakes & dessert cups
@@ -250,7 +250,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Gift", "Just craving something", "Birthday"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791141497/Gemini_Generated_Image_jh3tl4jh3tl4jh3t.jpg",
-    story: "Incredibly fudgy and rich without a speck of flour — gluten-friendly comfort at its finest.",
+    story: "Gluten-friendly, intensely rich dark chocolate fudge brownies.",
   },
   {
     id: "brownies-batch",
@@ -264,7 +264,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Gift", "Just craving something", "Birthday"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791141801/Gemini_Generated_Image_wxnq4owxnq4owxnq.jpg",
-    story: "Dense, crinkly-topped and intensely fudgy. Pick any mix of Classic, Walnut Fudge, and Flourless.",
+    story: "Dense, crinkly-topped fudge brownies in your favourite mix of flavours.",
   },
   {
     id: "cinnamon-rolls-batch",
@@ -278,7 +278,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Warm & comforting"],
     occasions: ["Tea party", "Family gathering", "Baby born"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790941291/IMG-20261002-WA0200.jpg",
-    story: "Soft brioche spirals warmly spiced with Ceylon cinnamon. Choose any ratio of Chocolate and Vanilla glaze.",
+    story: "Soft brioche spirals spiced with Ceylon cinnamon and sweet glaze.",
   },
   {
     id: "papparoti-batch",
@@ -292,7 +292,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Coffee lover", "Warm & comforting"],
     occasions: ["Tea party", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790938012/IMG-20261002-WA0137.jpg",
-    story: "Golden, buttery buns blanketed under a crisp, fragrant coffee caramel crust.",
+    story: "Buttery brioche buns topped with a crisp coffee caramel crust.",
   },
   {
     id: "mango-trifle-cup",
@@ -303,7 +303,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Fresh & citrusy"],
     occasions: ["Tea party", "Gift", "Just craving something"],
     image: "https://res.cloudinary.com/dffsqfwok/image/upload/w_900,q_auto,f_auto/v1790760596/Mango_dessert_trays_on_surface_2K_20260930142859_zpcb6w.jpg",
-    story: "Layers of moist sponge, fresh sweet mango puree, and delicate velvety custard cream.",
+    story: "Layers of sponge, fresh mango puree, and delicate custard cream.",
   },
   {
     id: "chocolate-trifle-cup",
@@ -314,7 +314,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Gift", "Birthday", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791142811/Gemini_Generated_Image_kp9srkp9srkp9srk.jpg",
-    story: "Layers of rich chocolate sponge, silky mousse, and chocolate shavings in every spoonful.",
+    story: "Rich chocolate sponge, silky mousse, and chocolate shavings.",
   },
   {
     id: "malt-cake-cup",
@@ -325,7 +325,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Gift", "Birthday", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867380/ChatGPT_Image_Jun_13_2026_12_23_46_AM.png",
-    story: "Old-fashioned malted chocolate cake topped with a fluffy malt glaze in a cute individual cup.",
+    story: "Malted chocolate sponge topped with fluffy malt glaze.",
   },
   {
     id: "dessert-cups-pack",
@@ -338,7 +338,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Something different", "Gift"],
     occasions: ["Gift", "Tea party", "Family gathering"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1791142771/Gemini_Generated_Image_kvm9lykvm9lykvm9_1.jpg",
-    story: "Four individual dessert cups — mix and match Mango Trifle, Chocolate Trifle, or Malt Cake in any combination.",
+    story: "Four individual dessert cups in any mix of flavours you choose.",
   },
 
   // Artisanal cookies
@@ -354,7 +354,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover", "Warm & comforting"],
     occasions: ["Gift", "Just craving something"],
     image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=85",
-    story: "Hearty rolled oat flour studded with melted chocolate chips — crisp edges with a soft, chewy center.",
+    story: "Hearty oat flour with melted chocolate chips — crisp edges and a soft center.",
   },
   {
     id: "chocolate-chip-cookie",
@@ -366,7 +366,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover", "Warm & comforting"],
     occasions: ["Gift", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790937990/IMG-20261002-WA0186.jpg",
-    story: "The cookie that behaves — golden crisp on the outer rim, gooey chocolate pooled inside.",
+    story: "Crisp golden edges with gooey semi-sweet chocolate pooled inside.",
   },
   {
     id: "double-chocolate-cookie",
@@ -378,7 +378,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover"],
     occasions: ["Gift", "Birthday", "Just craving something"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790938869/IMG-20261002-WA0190.jpg",
-    story: "Pure chocolate cookie dough crammed with milk and semi-sweet chocolate pockets.",
+    story: "Pure chocolate dough packed with milk and dark chocolate chunks.",
   },
   {
     id: "cookies-pack",
@@ -391,7 +391,7 @@ export const CATALOGUE_PRODUCTS = [
     moods: ["Chocolate lover", "Gift"],
     occasions: ["Gift", "Tea party", "Birthday"],
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790937990/IMG-20261002-WA0186.jpg",
-    story: "Four freshly baked artisanal cookies — pick your 4 favourite cookies in any combination.",
+    story: "Four freshly baked artisanal cookies in any combination you choose.",
   },
 ];
 

@@ -14,6 +14,7 @@
 .menu-product-dialog-copy h2{margin:0;color:var(--ink);font:500 clamp(30px,3vw,42px)/1.08 'Playfair Display',serif;letter-spacing:0}
 .menu-product-dialog-copy>.menu-note{margin:13px 0 0;color:var(--burnt);font-size:12px}
 .menu-product-story{margin:21px 0 0;color:#75666a;font:italic 16px/1.65 'Playfair Display',serif}
+.menu-serves-badge{display:inline-block;margin:12px 0 0;padding:4px 10px;border-radius:999px;background:#f8edf0;color:var(--burnt);font-size:11px;font-weight:600}
 .menu-product-options{width:100%;margin-top:22px}
 .menu-product-options h3{margin:0 0 9px;color:var(--ink);font-size:11px;font-weight:700}
 .menu-product-options>div{display:flex;flex-wrap:wrap;gap:7px}
