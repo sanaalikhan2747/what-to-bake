@@ -1,0 +1,32 @@
+.hero {
+  height: clamp(600px, 72vh, 760px);
+  height: clamp(600px, 72svh, 760px);
+  min-height: 0;
+}
+
+.hero-copy {
+  min-height: 0;
+}
+
+.featured-products,
+.match-section,
+.festive-section,
+.result-section {
+  min-height: 0;
+  padding-top: clamp(48px, 5vw, 72px);
+  padding-bottom: clamp(48px, 5vw, 72px);
+}
+
+@media (max-width: 760px) {
+  .hero {
+    height: clamp(600px, 78vh, 700px);
+    height: clamp(600px, 78svh, 700px);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: clamp(580px, 82vh, 660px);
+    height: clamp(580px, 82svh, 660px);
+  }
+}

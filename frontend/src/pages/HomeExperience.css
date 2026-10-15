@@ -34,32 +34,6 @@
   border-radius: 2px;
   background: var(--shop-ink);
 }
-
-.hero-actions .button.primary:hover {
-  background: var(--shop-berry);
-}
-
-.hero-actions .text-button {
-  border-bottom: 1px solid rgba(33, 59, 49, .45);
-}
-
-.hero-image.hero-showcase::after {
-  background: linear-gradient(90deg, rgba(250, 249, 244, .95) 0%, rgba(250, 249, 244, .84) 25%, rgba(250, 249, 244, .48) 44%, rgba(250, 249, 244, .08) 68%, transparent 84%);
-}
-
-.hero-carousel-controls {
-  right: clamp(20px, 3vw, 44px);
-  bottom: 24px;
-}
-
-.hero-slide-dots {
-  border-radius: 2px;
-}
-
-.hero-slide-arrow {
-  border-radius: 2px;
-}
-
 .featured-products {
   min-height: 0;
   padding: clamp(58px, 7vw, 96px) clamp(24px, 5vw, 76px) clamp(66px, 8vw, 108px);
