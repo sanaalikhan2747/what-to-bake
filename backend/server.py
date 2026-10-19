@@ -579,8 +579,11 @@ def _catalogue_chat_reply(message: str, history=None):
     if any(word in lowered for word in ("delivery fee", "delivery fees", "delivery charge", "shipping cost", "delivery cost", "how much for delivery", "how much is delivery", "how much does delivery cost")):
         return "Delivery charges depend on your area and aren't listed as a fixed price here. Send Sana your location and order details for a quote: https://wa.me/923224112832."
 
-    if any(word in lowered for word in ("same day", "today", "delivery", "deliver", "pick up", "pickup", "pick-up", "collect", "shipping")):
-        return "Pick-up and delivery depend on the date and area. Send Sana your location and preferred time; she confirms availability and arrangements directly: https://wa.me/923224112832."
+    if any(word in lowered for word in ("same day", "today")):
+        return "For same-day orders, only freshly baked Banana Bread (Classic Choco Chip & Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm: https://wa.me/923224112832."
+
+    if any(word in lowered for word in ("delivery", "deliver", "pick up", "pickup", "pick-up", "collect", "shipping")):
+        return "Pick-up is available in Askari X and doorstep delivery across Lahore. Send Sana your location and preferred time; she confirms availability and arrangements directly: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("gift box", "gift boxes", "gifting", "festive box", "festive boxes", "eid box", "anniversary box", "birthday box", "graduation box", "baby born box")):
         boxes = [_hydrate_box(box) for box in FESTIVE_BOXES]

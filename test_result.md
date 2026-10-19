@@ -102,10 +102,10 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "the loaf matchmaker just give few options it should find perfect options according to customer requirements from whole menu"
+user_problem_statement: "in my website order menu should just have one option of advance order and in same day order just banna bread is available"
 
 backend:
-  - task: "Whole-menu matchmaker scoring and options selection"
+  - task: "Baker chat logic update for same-day Banana Bread availability"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -115,47 +115,60 @@ backend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Updated MatchRequest with category, replaced loaf-only _score with whole-menu scoring, added _pick_options returning top 4 diverse matches, updated /api/match endpoint to return both product and options."
+        comment: "Updated same-day chat response in server.py to state that same-day ordering is exclusively available for Banana Bread while all other bakes require 24 hours advance pre-order."
 
 frontend:
-  - task: "Whole-menu matchmaker engine and client fallback"
+  - task: "Streamline Order dropdown in navigation"
     implemented: true
     working: true
-    file: "frontend/src/state/matchmaker.js"
+    file: "frontend/src/components/Nav.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "main"
-        comment: "Created matchmaker.js with getProductServes, scoreProduct, and findMatches supporting whole-menu scoring and instant client fallback."
+        comment: "Updated orderOptions to only show Advance Orders (full menu · 24h pre-order) and Same-Day Orders (Banana bread only), removing corporate/celebrations from this menu."
 
-  - task: "Matchmaker UI with category selector and multiple perfect options"
+  - task: "Dedicated Same-Day Banana Bread showcase and order form"
     implemented: true
     working: true
-    file: "frontend/src/pages/Home.jsx"
+    file: "frontend/src/pages/OrderOption.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "main"
-        comment: "Updated matchmaker UI to support whole-menu search, category selector (all, loaf, cheesecake, batch, cookie), MagicBaker surprise from whole menu, and alternative options showcase with Add to Box and View Note."
+        comment: "Updated OrderOption same-day page to feature authentic Banana Bread imagery, showcase Choco Chip & Oat Flour Banana Bread with instant Add to Cart & WhatsApp order buttons, quick same-day request form, and callout for advance orders."
+
+  - task: "Menu badges and notices for Same-Day Banana Bread exclusivity"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/Menu.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added same-day order note in header and Same-Day Available pill badges on Banana Bread items in cards and modal dialog."
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "1.1"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Whole-menu matchmaker scoring and options selection"
-    - "Matchmaker UI with category selector and multiple perfect options"
+    - "Streamline Order dropdown in navigation"
+    - "Dedicated Same-Day Banana Bread showcase and order form"
+    - "Menu badges and notices for Same-Day Banana Bread exclusivity"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implemented whole-menu scoring across loaves, dessert boxes, bakes & cups, and cookies on both backend and frontend with resilient fallback and alternatives showcase."
+    message: "Updated order menu options in navigation to Advance Orders and Same-Day Orders (Banana Bread only), created dedicated Same-Day Banana Bread ordering page with Add to Cart and WhatsApp booking, and updated Menu page and chat responses."

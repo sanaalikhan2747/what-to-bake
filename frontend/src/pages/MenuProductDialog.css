@@ -7,6 +7,8 @@
 .menu-product-dialog-image{position:relative;min-height:440px;background:#f8efec}
 .menu-product-dialog-image>img{display:block;width:100%;height:100%;min-height:440px;object-fit:cover}
 .menu-product-dialog-image .pill-healthy{z-index:1}
+.menu-product-dialog-image .pill-sameday{z-index:2}
+.menu-product-dialog-image .pill-sameday ~ .pill-healthy{left:auto;right:14px}
 .menu-product-360{position:absolute;right:16px;bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid rgba(255,255,255,.8);border-radius:999px;background:rgba(255,250,249,.96);color:var(--ink);font:600 11px 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(61,32,40,.12)}
 .menu-product-360:hover{background:var(--burnt);color:#fff}
 .menu-product-dialog-copy{display:flex;flex-direction:column;align-items:flex-start;padding:54px 42px 34px}

@@ -7,11 +7,8 @@ import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES } from "@/state/catalogueDa
 import "./Nav.css";
 
 const orderOptions = [
-  { label: "Advance Orders", href: "/order/local-pickup" },
-  { label: "Same-Day Orders", href: "/order/same-day" },
-  { label: "Corporate Catering", href: "/order/corporate-catering" },
-  { label: "Corporate Gifting", href: "/order/corporate-gifting" },
-  { label: "Celebrations & Events", href: "/order/celebrations" },
+  { label: "Advance Orders", href: "/order/local-pickup", detail: "Full menu · 24h pre-order" },
+  { label: "Same-Day Orders", href: "/order/same-day", detail: "Banana bread only" },
 ];
 const aboutOptions = [
   { label: "Our Story", href: "/our-story" },

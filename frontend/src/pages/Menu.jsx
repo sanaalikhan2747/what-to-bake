@@ -109,7 +109,7 @@ export default function Menu() {
       <header className="menu-header">
         <div className="menu-order-note">
           <strong>Fresh to Order</strong>
-          <span>Baked fresh daily · Order 24 hours ahead for pick-up or delivery</span>
+          <span>Order 24 hours ahead for pick-up or delivery · <strong>Same-day ordering is exclusively available for Banana Bread</strong></span>
         </div>
         <p className="eyebrow">OUR MENU</p>
         <h1>Artisanal Bakes</h1>
@@ -143,6 +143,9 @@ export default function Menu() {
               <article className="menu-card menu-card-selectable" id={`product-${p.id}`} key={p.id} data-testid={`menu-item-${p.id}`} tabIndex={0} aria-label={`View details for ${p.name}`} aria-haspopup="dialog" onClick={(event) => openProduct(event, p)} onKeyDown={(event) => handleProductKeyDown(event, p)}>
                 <div className="menu-card-image">
                   <img src={p.image} alt={p.name} loading="lazy" />
+                  {["chocolate-chip-banana", "oat-flour-banana-bread"].includes(p.id) && (
+                    <span className="pill-sameday" data-testid={`sameday-badge-${p.id}`}>Same-Day Available</span>
+                  )}
                   {p.healthy && <span className="pill-healthy">Healthy option</span>}
                   <button
                     type="button"
@@ -190,13 +193,20 @@ export default function Menu() {
           <button type="button" className="menu-product-dialog-close" onClick={() => setSelectedProduct(null)} aria-label="Close product details" data-testid="menu-product-close"><X size={19} /></button>
           <div className="menu-product-dialog-image">
             <img src={selectedProduct.image} alt={selectedProduct.name} />
+            {["chocolate-chip-banana", "oat-flour-banana-bread"].includes(selectedProduct.id) && (
+              <span className="pill-sameday">Same-Day Available</span>
+            )}
             {selectedProduct.healthy && <span className="pill-healthy">Healthy option</span>}
             <button type="button" className="menu-product-360" onClick={() => { setViewingProduct(selectedProduct); setSelectedProduct(null); }} data-testid="menu-product-360">
               <Rotate3D size={15} /> View in 360°
             </button>
           </div>
           <div className="menu-product-dialog-copy">
-            <p className="eyebrow">FRESH BAKE</p>
+            <p className="eyebrow">
+              {["chocolate-chip-banana", "oat-flour-banana-bread"].includes(selectedProduct.id)
+                ? "AVAILABLE SAME-DAY · FRESH BAKE"
+                : "ADVANCE PRE-ORDER · 24H NOTICE"}
+            </p>
             <h2 id="menu-product-title">{selectedProduct.name}</h2>
             {selectedProduct.note && <p className="menu-note">{selectedProduct.note}</p>}
             <p className="menu-product-story">{selectedProduct.story}</p>
