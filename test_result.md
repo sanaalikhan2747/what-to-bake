@@ -164,12 +164,12 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Redesigned homepage hero carousel inspired by Magnolia Bakery with full-bleed bakery photography, frosted cream editorial cards with Playfair Display typography, circular chevron navigation arrows, pill capsule indicators with active dash, pause-on-hover, touch swiping, and curated slides promoting daily bakes, same-day banana bread, dessert boxes, and custom gifting. Streamlined card text and reduced visual clutter per user feedback."
+        comment: "Redesigned homepage hero carousel inspired by Magnolia Bakery with full-bleed bakery photography, frosted cream editorial cards with Playfair Display typography, circular chevron navigation arrows, pill capsule indicators with active dash, pause-on-hover, touch swiping, and curated slides. Shortened descriptions to 4-5 words styled in Playfair Display italic, upgraded card to luminous frosted glass with inset glow and rounded corners, and verified zero build errors."
 
 metadata:
   created_by: "main_agent"
-  version: "1.3"
-  test_sequence: 4
+  version: "1.4"
+  test_sequence: 5
   run_ui: false
 
 test_plan:
@@ -181,4 +181,4 @@ test_plan:
 
 agent_communication:
   - agent: "main"
-    message: "Streamlined the text box in the hero carousel: shortened all descriptions to crisp single-line phrases, simplified kicker tags, trimmed headlines, replaced double button clutter with a single clean pill button, and reduced card padding and width for an uncluttered Magnolia Bakery editorial aesthetic."
+    message: "Further reduced text in the hero carousel card: descriptions are now 4-5 word artisanal taglines ('Small-batch bakes, pure butter.', 'Baked daily · Delivered today.', etc.) styled as an elegant italic subtitle in Playfair Display. Redesigned the card with a luminous warm frosted glass gradient, subtle inset rim-lighting, and refined proportions for a true Magnolia Bakery look."

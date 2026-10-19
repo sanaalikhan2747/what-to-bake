@@ -105,14 +105,14 @@
 /* Magnolia Bakery-style Frosted Parchment Card */
 .hero-editorial-card {
   position: relative;
-  max-width: 440px;
-  padding: 28px 32px;
-  background: rgba(255, 252, 250, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(230, 206, 201, 0.85);
-  border-radius: 16px;
-  box-shadow: 0 20px 48px rgba(35, 17, 24, 0.18), 0 4px 16px rgba(35, 17, 24, 0.06);
+  max-width: 390px;
+  padding: 30px 34px;
+  background: linear-gradient(145deg, rgba(255, 254, 252, 0.96) 0%, rgba(254, 248, 246, 0.93) 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(226, 203, 198, 0.75);
+  border-radius: 20px;
+  box-shadow: 0 24px 56px -12px rgba(42, 18, 26, 0.22), 0 2px 8px rgba(42, 18, 26, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 0.5s ease-out 0.15s, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s;
@@ -130,13 +130,13 @@
   gap: 6px;
   margin: 0 0 10px 0;
   padding: 4px 11px;
-  background: rgba(184, 93, 105, 0.1);
-  border: 1px solid rgba(184, 93, 105, 0.22);
+  background: rgba(184, 93, 105, 0.08);
+  border: 1px solid rgba(184, 93, 105, 0.18);
   border-radius: 999px;
   color: var(--burnt, #a14558);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -147,18 +147,17 @@
 
 /* Display Serif Headline */
 .hero-heading {
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(26px, 2.9vw, 36px);
-  font-weight: 500;
-  line-height: 1.1;
-  color: var(--ink, #2a1b21);
-  letter-spacing: -0.015em;
+  font-size: clamp(28px, 3.1vw, 36px);
+  font-weight: 600;
+  line-height: 1.08;
+  color: #27161e;
+  letter-spacing: -0.02em;
 }
 
 .hero-heading span {
   display: block;
-  font-weight: 600;
 }
 
 .hero-heading em {
@@ -169,13 +168,15 @@
   font-weight: 500;
 }
 
-/* Narrative / Description */
+/* Editorial Subtitle / Tagline */
 .hero-description {
-  margin: 0 0 18px 0;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: #583e46;
-  max-width: 360px;
+  margin: 0 0 20px 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #6e555e;
+  letter-spacing: 0.01em;
 }
 
 /* Action Buttons */
@@ -188,17 +189,18 @@
 
 .hero-actions .hero-primary-btn {
   min-height: 44px;
-  padding: 11px 22px;
+  padding: 11px 24px;
   border: 0;
   border-radius: 999px;
-  background: var(--ink, #2a1b21);
+  background: #2a161f;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(44, 22, 30, 0.18);
+  box-shadow: 0 4px 14px rgba(42, 18, 26, 0.2);
   transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   cursor: pointer;
@@ -206,23 +208,33 @@
 
 .hero-actions .hero-primary-btn:hover {
   background: #653b4b;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(44, 22, 30, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(42, 18, 26, 0.28);
   color: #fff;
+}
+
+.hero-actions .hero-primary-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.hero-actions .hero-primary-btn:hover svg {
+  transform: translateX(3px);
 }
 
 .hero-actions .hero-text-link {
   font-size: 12px;
   font-weight: 600;
-  color: var(--ink, #2a1b21);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.2s ease;
+  color: #583e46;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(88, 62, 70, 0.3);
+  padding-bottom: 2px;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .hero-actions .hero-text-link:hover {
   color: var(--burnt, #a14558);
+  border-bottom-color: var(--burnt, #a14558);
 }
 
 /* --------------------------------------------------------------------------
@@ -374,16 +386,16 @@
   .hero-editorial-card {
     max-width: 100%;
     width: 100%;
-    padding: 28px 22px;
-    border-radius: 14px;
+    padding: 24px 20px;
+    border-radius: 18px;
     box-shadow: 0 16px 40px rgba(35, 17, 24, 0.28);
   }
   .hero-heading {
-    font-size: 32px;
+    font-size: 26px;
   }
   .hero-description {
-    font-size: 13.5px;
-    margin-bottom: 18px;
+    font-size: 14px;
+    margin-bottom: 16px;
   }
   .hero-actions {
     flex-direction: column;
