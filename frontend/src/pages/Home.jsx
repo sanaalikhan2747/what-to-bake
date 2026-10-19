@@ -365,12 +365,10 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="home-order-band">
-        <Link className="home-order-link" to="/order/local-pickup" data-testid="home-plan-order">
-          <ShoppingBag size={18} aria-hidden="true" />
-          Plan your order <ArrowRight size={18} aria-hidden="true" />
-        </Link>
-      </div>
+      <Link className="home-order-float" to="/order/local-pickup" data-testid="home-plan-order">
+        <ShoppingBag size={18} aria-hidden="true" />
+        Plan your order <ArrowRight size={18} aria-hidden="true" />
+      </Link>
 
       <section className="featured-products" aria-labelledby="featured-products-title">
         <div className="featured-products-heading">

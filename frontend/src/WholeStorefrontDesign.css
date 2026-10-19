@@ -280,9 +280,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero-showcase > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: var(--hero-photo-fit, cover); object-position: var(--hero-photo-position, center); }
 .hero-image.hero-showcase::after { display: block; background: linear-gradient(90deg, rgba(255,250,248,.96), rgba(255,250,248,.82) 30%, rgba(255,250,248,.28) 57%, transparent 78%); }
 .hero-carousel-controls { right: 32px; bottom: 24px; left: auto; transform: none; }
-.home-order-band { display: flex; justify-content: center; padding: 20px 24px; border-bottom: 1px solid var(--store-line); background: #f7e9ed; }
-.home-order-link { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; padding: 12px 30px; border: 1px solid #d9bac4; border-radius: 4px; background: var(--store-ink); color: white; font-weight: 600; text-decoration: none; transition: background .2s; }
-.home-order-link:hover { background: var(--store-berry); }
 
 @media (max-width: 900px) {
   .hero-copy h1 { font-size: 44px; }
