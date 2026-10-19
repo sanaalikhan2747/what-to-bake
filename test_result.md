@@ -154,21 +154,31 @@ frontend:
         agent: "main"
         comment: "Added same-day order note in header and Same-Day Available pill badges on Banana Bread items in cards and modal dialog."
 
+  - task: "Magnolia Bakery-style hero carousel redesign"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/Home.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Redesigned homepage hero carousel inspired by Magnolia Bakery with full-bleed bakery photography, frosted cream editorial cards with Playfair Display typography, circular chevron navigation arrows, pill capsule indicators with active dash, pause-on-hover, touch swiping, and curated slides promoting daily bakes, same-day banana bread, dessert boxes, and custom gifting."
+
 metadata:
   created_by: "main_agent"
-  version: "1.1"
-  test_sequence: 2
+  version: "1.2"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Streamline Order dropdown in navigation"
-    - "Dedicated Same-Day Banana Bread showcase and order form"
-    - "Menu badges and notices for Same-Day Banana Bread exclusivity"
+    - "Magnolia Bakery-style hero carousel redesign"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Updated order menu options in navigation to Advance Orders and Same-Day Orders (Banana Bread only), created dedicated Same-Day Banana Bread ordering page with Add to Cart and WhatsApp booking, and updated Menu page and chat responses."
+    message: "Redesigned website hero carousel to match Magnolia Bakery aesthetic with full-bleed photography, frosted editorial cards, floating circular arrows, capsule pagination pills, pause-on-hover, and touch swipe gestures. Verified with successful frontend build."

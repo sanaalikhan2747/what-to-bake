@@ -7,6 +7,7 @@ import { useCart } from "@/state/CartContext";
 import { findMatches, getProductServes } from "@/state/matchmaker";
 import "./Home.css";
 import "./HomePolish.css";
+import "./MagnoliaCarousel.css";
 
 const occasions = [
   { value: "Birthday", label: "Birthday", detail: "Celebrations" },
@@ -35,48 +36,55 @@ const featuredCategories = [
 const heroSlides = [
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
-    alt: "Artisanal bakes and loaves",
-    eyebrow: "ARTISANAL BAKERY",
+    alt: "Artisanal bakery spread with freshly baked loaves and treats",
+    eyebrow: "ARTISANAL BAKERY · LAHORE",
     heading: "Freshly baked",
     accent: "from scratch.",
-    description: "Small-batch loaves, cakes, and treats handcrafted with premium ingredients.",
-    action: "Explore Menu",
+    description: "Small-batch tea loaves, signature brownies, and decadent cakes handcrafted with pure butter and timeless artisanal recipes.",
+    action: "Explore Full Menu",
     href: "/menu",
-    position: "69% 48%",
+    secondaryAction: "Advance Pre-Order",
+    secondaryHref: "/order/local-pickup",
+    position: "center",
   },
   {
-    src: CATALOGUE_PRODUCTS.find((product) => product.id === "cinnamon-rolls-batch")?.image,
-    alt: "Cinnamon Rolls from the menu",
-    eyebrow: "MADE FOR SHARING",
+    src: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
+    alt: "Freshly baked moist Choco Chip Banana Bread",
+    eyebrow: "DAILY FRESH BAKE · SAME-DAY DISPATCH",
+    heading: "Craving warm banana bread?",
+    accent: "Baked fresh today.",
+    description: "Our signature moist Banana Bread is baked fresh daily in Lahore. Order before daily batch limits close for same-day delivery or pickup.",
+    action: "Order Same-Day Loaf",
+    href: "/order/same-day",
+    secondaryAction: "View Banana Bread",
+    secondaryHref: "/menu#cat-loaf",
+    position: "center 42%",
+  },
+  {
+    src: CATALOGUE_PRODUCTS.find((product) => product.id === "cinnamon-rolls-batch")?.image || "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
+    alt: "Gooey frosted Cinnamon Rolls and dessert boxes",
+    eyebrow: "MADE FOR GATHERING & SHARING",
     heading: "Dessert boxes &",
     accent: "signature bakes.",
-    description: "From morning tea loaves to generous dessert boxes, baked fresh to order.",
-    action: "Browse Desserts",
+    description: "From morning tea party loaves to rich tiramisu tubs and gooey frosted cinnamon rolls, pre-ordered 24 hours in advance.",
+    action: "Browse Dessert Boxes",
     href: "/menu#cat-cheesecake",
-    position: "100% 50%",
-  },
-  {
-    src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_0,w_980,h_675/v1790938869/IMG-20261002-WA0190.jpg",
-    alt: "Double Chocolate Cookie from the menu",
-    eyebrow: "GIFTING & CELEBRATIONS",
-    heading: "Thoughtfully packaged",
-    accent: "for any occasion.",
-    description: "Curated bakery boxes for birthdays, corporate gifts, and celebrations.",
-    action: "Explore Gifting",
-    href: "/order/corporate-gifting",
-    position: "100% 50%",
+    secondaryAction: "Build a Box",
+    secondaryHref: "/build",
+    position: "center",
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_120,w_1700,h_1416/v1791141497/Gemini_Generated_Image_jh3tl4jh3tl4jh3t.jpg",
-    alt: "Flourless Brownies from the menu",
-    eyebrow: "PRE-ORDER SERVICE",
-    heading: "Baked to order,",
-    accent: "ready for your table.",
-    description: "Schedule your fresh order in advance for local pick-up or doorstep delivery.",
-    action: "Schedule Order",
-    href: "/order/local-pickup",
-    position: "100% 50%",
-    fit: "cover",
+    alt: "Thoughtfully packaged bakery gift box with brownies and sweets",
+    eyebrow: "CUSTOM & CELEBRATION GIFTING",
+    heading: "Thoughtfully packaged",
+    accent: "for every occasion.",
+    description: "Curated bakery boxes with satin ribbons and personalized cards for birthdays, anniversaries, corporate gifts, and celebrations.",
+    action: "Build Your Gift Box",
+    href: "/build",
+    secondaryAction: "Corporate Gifting",
+    secondaryHref: "/order/corporate-gifting",
+    position: "center",
   },
 ];
 function slug(x) { return x.toLowerCase().replaceAll(" ", "-").replaceAll("&", "and"); }
@@ -87,6 +95,8 @@ export default function Home() {
   const [boxes, setBoxes] = useState(CATALOGUE_FESTIVE_BOXES);
   const [featuredCategory, setFeaturedCategory] = useState("loaf");
   const [heroSlide, setHeroSlide] = useState(0);
+  const [isHeroPaused, setIsHeroPaused] = useState(false);
+  const touchStartXRef = useRef(null);
   const featuredRailRef = useRef(null);
   const [matchCategory, setMatchCategory] = useState("all");
   const [occasion, setOccasion] = useState("");
@@ -147,11 +157,39 @@ export default function Home() {
   }, [location]);
 
   useEffect(() => {
+    if (isHeroPaused) return;
     const timer = window.setInterval(() => {
       setHeroSlide((current) => (current + 1) % heroSlides.length);
-    }, 6000);
+    }, 5500);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [isHeroPaused]);
+
+  const prevHeroSlide = () => {
+    setHeroSlide((current) => (current + heroSlides.length - 1) % heroSlides.length);
+  };
+
+  const nextHeroSlide = () => {
+    setHeroSlide((current) => (current + 1) % heroSlides.length);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      touchStartXRef.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null || !e.changedTouches || !e.changedTouches[0]) return;
+    const diff = touchStartXRef.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        setHeroSlide((current) => (current + 1) % heroSlides.length);
+      } else {
+        setHeroSlide((current) => (current + heroSlides.length - 1) % heroSlides.length);
+      }
+    }
+    touchStartXRef.current = null;
+  };
 
   const runMatch = async () => {
     setLoading(true); setMatchError(""); setSavedNote("");
@@ -301,67 +339,108 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">{heroSlides[heroSlide].eyebrow}</p>
-          <h1><span>{heroSlides[heroSlide].heading}</span><em>{heroSlides[heroSlide].accent}</em></h1>
-          <p className="hero-text">{heroSlides[heroSlide].description}</p>
-          <div className="hero-actions">
-            <Link to={heroSlides[heroSlide].href} className="button primary" data-testid="hero-find-bake">
-              {heroSlides[heroSlide].action} <ArrowRight size={17} />
-            </Link>
-            <Link to="/build" className="button text-button" data-testid="hero-build-box">
-              <WandSparkles size={17} /> Build a box
-            </Link>
-          </div>
+      <section
+        className="hero magnoliabakery-carousel"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Bakery showcase carousel"
+        onMouseEnter={() => setIsHeroPaused(true)}
+        onMouseLeave={() => setIsHeroPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="hero-carousel-track">
+          {heroSlides.map((slide, index) => {
+            const isActive = heroSlide === index;
+            return (
+              <div
+                key={slide.src || index}
+                className={`hero-carousel-slide ${isActive ? "active" : ""}`}
+                aria-hidden={!isActive}
+              >
+                {/* Full-bleed Bakery Backdrop with Magnolia warm vignette */}
+                <div className="hero-slide-media">
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                    className="hero-slide-img"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    data-testid={isActive ? "hero-dessert-image" : undefined}
+                    style={{ objectPosition: slide.position || "center" }}
+                  />
+                  <div className="hero-slide-scrim" />
+                </div>
+
+                {/* Magnolia-Style Frosted Editorial Content Card */}
+                <div className="hero-content-bounds">
+                  <div className="hero-editorial-card">
+                    <p className="hero-kicker">
+                      <Sparkles size={12} className="hero-kicker-sparkle" />
+                      <span>{slide.eyebrow}</span>
+                    </p>
+                    <h1 className="hero-heading">
+                      <span>{slide.heading}</span>
+                      <em>{slide.accent}</em>
+                    </h1>
+                    <p className="hero-description">{slide.description}</p>
+                    <div className="hero-actions">
+                      <Link
+                        to={slide.href}
+                        className="button primary hero-primary-btn"
+                        data-testid={isActive ? "hero-find-bake" : undefined}
+                      >
+                        {slide.action} <ArrowRight size={17} />
+                      </Link>
+                      <Link
+                        to={slide.secondaryHref || "/build"}
+                        className="button hero-secondary-btn"
+                        data-testid={isActive ? "hero-build-box" : undefined}
+                      >
+                        <WandSparkles size={16} /> {slide.secondaryAction || "Build a box"}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div
-          className="hero-image hero-showcase"
-          role="region"
-          aria-label="Bakery photo carousel"
-          style={{
-            "--hero-photo-background": `url("${heroSlides[heroSlide].src}")`,
-            "--hero-photo-position": heroSlides[heroSlide].position,
-            "--hero-photo-fit": heroSlides[heroSlide].fit || "cover",
-          }}
+
+        {/* Magnolia Floating Circular Navigation Arrows */}
+        <button
+          type="button"
+          className="hero-arrow-btn hero-arrow-prev"
+          aria-label="Previous slide"
+          onClick={prevHeroSlide}
         >
-          <img
-            key={heroSlides[heroSlide].src}
-            src={heroSlides[heroSlide].src}
-            alt={heroSlides[heroSlide].alt}
-            data-testid="hero-dessert-image"
-            loading="eager"
-          />
-          <div className="hero-carousel-controls">
-            <div className="hero-slide-dots" role="group" aria-label="Choose bakery photo">
-              {heroSlides.map((photo, index) => (
-                <button
-                  key={photo.src}
-                  type="button"
-                  className={heroSlide === index ? "hero-slide-dot active" : "hero-slide-dot"}
-                  aria-label={`Show photo ${index + 1}: ${photo.alt}`}
-                  aria-pressed={heroSlide === index}
-                  onClick={() => setHeroSlide(index)}
-                />
-              ))}
-            </div>
-            <button
-              type="button"
-              className="hero-slide-arrow"
-              aria-label="Previous bakery photo"
-              onClick={() => setHeroSlide((heroSlide + heroSlides.length - 1) % heroSlides.length)}
-            >
-              <ChevronLeft size={19} />
-            </button>
-            <button
-              type="button"
-              className="hero-slide-arrow"
-              aria-label="Next bakery photo"
-              onClick={() => setHeroSlide((heroSlide + 1) % heroSlides.length)}
-            >
-              <ChevronRight size={19} />
-            </button>
+          <ChevronLeft size={22} />
+        </button>
+        <button
+          type="button"
+          className="hero-arrow-btn hero-arrow-next"
+          aria-label="Next slide"
+          onClick={nextHeroSlide}
+        >
+          <ChevronRight size={22} />
+        </button>
+
+        {/* Magnolia Bottom Indicator Capsule */}
+        <div className="hero-controls-capsule" role="group" aria-label="Slide indicators">
+          <div className="hero-indicator-pills">
+            {heroSlides.map((slide, index) => (
+              <button
+                key={slide.src || index}
+                type="button"
+                className={`hero-indicator-pill ${heroSlide === index ? "active" : ""}`}
+                aria-label={`Go to slide ${index + 1}: ${slide.heading} ${slide.accent}`}
+                aria-pressed={heroSlide === index}
+                onClick={() => setHeroSlide(index)}
+              />
+            ))}
           </div>
+          <span className="hero-counter-label" aria-hidden="true">
+            {String(heroSlide + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}
+          </span>
         </div>
       </section>
 

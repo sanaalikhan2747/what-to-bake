@@ -1,0 +1,448 @@
+/* ==========================================================================
+   MAGNOLIA BAKERY-STYLE HERO CAROUSEL
+   Treats & Temptation by SK — Artisanal Bakery
+   ========================================================================== */
+
+.hero.magnoliabakery-carousel {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(560px, 78vh, 680px);
+  min-height: 560px;
+  max-height: 720px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #23141b;
+  user-select: none;
+}
+
+.hero-carousel-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Slide Panes (Smooth Crossfade & Layering)
+   -------------------------------------------------------------------------- */
+.hero-carousel-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-carousel-slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+/* --------------------------------------------------------------------------
+   Backdrop Photography (Full-bleed with subtle Ken Burns zoom on active)
+   -------------------------------------------------------------------------- */
+.hero-slide-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hero-slide-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.0);
+  transition: transform 7s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+.hero-carousel-slide.active .hero-slide-img {
+  transform: scale(1.045);
+}
+
+/* Warm subtle gradient scrim preserving mouthwatering bakery tones */
+.hero-slide-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(34, 18, 25, 0.76) 0%,
+    rgba(34, 18, 25, 0.55) 36%,
+    rgba(34, 18, 25, 0.22) 65%,
+    rgba(34, 18, 25, 0.05) 86%,
+    transparent 100%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Editorial Content Bounds & Frosted Bakery Card
+   -------------------------------------------------------------------------- */
+.hero-content-bounds {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 5.5%;
+  display: flex;
+  align-items: center;
+}
+
+/* Magnolia Bakery-style Frosted Parchment Card */
+.hero-editorial-card {
+  position: relative;
+  max-width: 580px;
+  padding: 44px 48px;
+  background: rgba(255, 252, 250, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(230, 206, 201, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(35, 17, 24, 0.22), 0 4px 16px rgba(35, 17, 24, 0.08);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease-out 0.15s, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s;
+}
+
+.hero-carousel-slide.active .hero-editorial-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Kicker / Eyebrow Pill */
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 16px 0;
+  padding: 5px 14px;
+  background: rgba(184, 93, 105, 0.1);
+  border: 1px solid rgba(184, 93, 105, 0.25);
+  border-radius: 999px;
+  color: var(--burnt, #a14558);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-kicker-sparkle {
+  color: #d9a642;
+  flex-shrink: 0;
+}
+
+/* Display Serif Headline */
+.hero-heading {
+  margin: 0 0 16px 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(34px, 3.8vw, 48px);
+  font-weight: 500;
+  line-height: 1.06;
+  color: var(--ink, #2a1b21);
+  letter-spacing: -0.015em;
+}
+
+.hero-heading span {
+  display: block;
+  font-weight: 600;
+}
+
+.hero-heading em {
+  display: block;
+  margin-top: 4px;
+  color: var(--burnt, #a14558);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Narrative / Description */
+.hero-description {
+  margin: 0 0 24px 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: #553e46;
+  max-width: 480px;
+}
+
+/* Action Buttons */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hero-actions .hero-primary-btn {
+  min-height: 48px;
+  padding: 13px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink, #2a1b21);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(44, 22, 30, 0.2);
+  transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hero-actions .hero-primary-btn:hover {
+  background: #653b4b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(44, 22, 30, 0.28);
+  color: #fff;
+}
+
+.hero-actions .hero-secondary-btn {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 1.5px solid rgba(61, 32, 40, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--ink, #2a1b21);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hero-actions .hero-secondary-btn:hover {
+  background: #ffffff;
+  border-color: var(--burnt, #a14558);
+  color: var(--burnt, #a14558);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 22, 30, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Magnolia Circular Floating Chevron Navigation Arrows
+   -------------------------------------------------------------------------- */
+.hero-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(61, 32, 40, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink, #2a1b21);
+  box-shadow: 0 8px 24px rgba(35, 17, 24, 0.18);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-arrow-btn:hover {
+  background: #ffffff;
+  color: var(--burnt, #a14558);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 12px 30px rgba(35, 17, 24, 0.26);
+}
+
+.hero-arrow-btn:focus-visible {
+  outline: 2px solid var(--burnt, #a14558);
+  outline-offset: 3px;
+}
+
+.hero-arrow-prev {
+  left: 28px;
+}
+
+.hero-arrow-next {
+  right: 28px;
+}
+
+/* --------------------------------------------------------------------------
+   Magnolia Bottom Capsule Controls (Pill Indicators + Counter)
+   -------------------------------------------------------------------------- */
+.hero-controls-capsule {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(220, 195, 190, 0.8);
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(35, 17, 24, 0.16);
+}
+
+.hero-indicator-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-indicator-pill {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: rgba(61, 32, 40, 0.28);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-indicator-pill:hover {
+  background: rgba(61, 32, 40, 0.6);
+  transform: scale(1.2);
+}
+
+.hero-indicator-pill.active {
+  width: 28px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--burnt, #a14558);
+  transform: none;
+}
+
+.hero-counter-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink, #2a1b21);
+  border-left: 1px solid rgba(61, 32, 40, 0.16);
+  padding-left: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Layout & Scaling
+   -------------------------------------------------------------------------- */
+@media (max-width: 1050px) {
+  .hero.magnoliabakery-carousel {
+    height: clamp(520px, 72vh, 620px);
+    min-height: 520px;
+  }
+  .hero-editorial-card {
+    max-width: 520px;
+    padding: 34px 38px;
+  }
+  .hero-heading {
+    font-size: 38px;
+  }
+  .hero-arrow-prev {
+    left: 18px;
+  }
+  .hero-arrow-next {
+    right: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero.magnoliabakery-carousel {
+    height: auto;
+    min-height: 560px;
+    padding: 24px 0 68px;
+  }
+  .hero-slide-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(34, 18, 25, 0.4) 0%,
+      rgba(34, 18, 25, 0.68) 50%,
+      rgba(34, 18, 25, 0.88) 100%
+    );
+  }
+  .hero-content-bounds {
+    padding: 20px 16px 44px;
+    justify-content: center;
+  }
+  .hero-editorial-card {
+    max-width: 100%;
+    width: 100%;
+    padding: 28px 22px;
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(35, 17, 24, 0.28);
+  }
+  .hero-heading {
+    font-size: 32px;
+  }
+  .hero-description {
+    font-size: 13.5px;
+    margin-bottom: 18px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .hero-actions .hero-primary-btn,
+  .hero-actions .hero-secondary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-arrow-btn {
+    width: 40px;
+    height: 40px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+  }
+  .hero-arrow-btn:hover {
+    transform: scale(1.06);
+  }
+  .hero-arrow-prev {
+    left: 14px;
+  }
+  .hero-arrow-next {
+    right: 14px;
+  }
+  .hero-controls-capsule {
+    bottom: 20px;
+    padding: 6px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero.magnoliabakery-carousel {
+    min-height: 540px;
+  }
+  .hero-editorial-card {
+    padding: 22px 18px;
+  }
+  .hero-heading {
+    font-size: 27px;
+  }
+  .hero-description {
+    font-size: 13px;
+  }
+  .hero-kicker {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+}
