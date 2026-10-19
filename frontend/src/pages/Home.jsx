@@ -36,54 +36,46 @@ const featuredCategories = [
 const heroSlides = [
   {
     src: "https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg",
-    alt: "Artisanal bakery spread with freshly baked loaves and treats",
-    eyebrow: "ARTISANAL BAKERY · LAHORE",
+    alt: "Freshly baked artisanal loaves and bakes",
+    eyebrow: "BAKED DAILY",
     heading: "Freshly baked",
     accent: "from scratch.",
-    description: "Small-batch tea loaves, signature brownies, and decadent cakes handcrafted with pure butter and timeless artisanal recipes.",
-    action: "Explore Full Menu",
+    description: "Small-batch tea loaves, cakes, and treats handcrafted every morning.",
+    action: "Explore Menu",
     href: "/menu",
-    secondaryAction: "Advance Pre-Order",
-    secondaryHref: "/order/local-pickup",
     position: "center",
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-    alt: "Freshly baked moist Choco Chip Banana Bread",
-    eyebrow: "DAILY FRESH BAKE · SAME-DAY DISPATCH",
-    heading: "Craving warm banana bread?",
-    accent: "Baked fresh today.",
-    description: "Our signature moist Banana Bread is baked fresh daily in Lahore. Order before daily batch limits close for same-day delivery or pickup.",
-    action: "Order Same-Day Loaf",
+    alt: "Warm Choco Chip Banana Bread",
+    eyebrow: "SAME-DAY ORDER",
+    heading: "Warm Banana Bread,",
+    accent: "baked fresh today.",
+    description: "Freshly baked daily in Lahore for same-day delivery or pickup.",
+    action: "Order Same-Day",
     href: "/order/same-day",
-    secondaryAction: "View Banana Bread",
-    secondaryHref: "/menu#cat-loaf",
     position: "center 42%",
   },
   {
     src: CATALOGUE_PRODUCTS.find((product) => product.id === "cinnamon-rolls-batch")?.image || "https://res.cloudinary.com/dffsqfwok/image/upload/v1790778866/WhatsApp_Image_2026-09-30_at_14.22.37.jpeg_2K_20260930193407_k7nfcn.jpg",
-    alt: "Gooey frosted Cinnamon Rolls and dessert boxes",
-    eyebrow: "MADE FOR GATHERING & SHARING",
-    heading: "Dessert boxes &",
-    accent: "signature bakes.",
-    description: "From morning tea party loaves to rich tiramisu tubs and gooey frosted cinnamon rolls, pre-ordered 24 hours in advance.",
-    action: "Browse Dessert Boxes",
+    alt: "Cinnamon rolls and dessert boxes",
+    eyebrow: "DESSERT BOXES",
+    heading: "Dessert Boxes &",
+    accent: "signature rolls.",
+    description: "Generous sharing boxes and frosted rolls, baked to order.",
+    action: "Browse Desserts",
     href: "/menu#cat-cheesecake",
-    secondaryAction: "Build a Box",
-    secondaryHref: "/build",
     position: "center",
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/c_crop,x_0,y_120,w_1700,h_1416/v1791141497/Gemini_Generated_Image_jh3tl4jh3tl4jh3t.jpg",
-    alt: "Thoughtfully packaged bakery gift box with brownies and sweets",
-    eyebrow: "CUSTOM & CELEBRATION GIFTING",
-    heading: "Thoughtfully packaged",
-    accent: "for every occasion.",
-    description: "Curated bakery boxes with satin ribbons and personalized cards for birthdays, anniversaries, corporate gifts, and celebrations.",
-    action: "Build Your Gift Box",
+    alt: "Curated bakery gift box",
+    eyebrow: "GIFT BOXES",
+    heading: "Curated Gift Boxes",
+    accent: "made to share.",
+    description: "Ribbon-tied bakery boxes customized for birthdays and celebrations.",
+    action: "Build a Box",
     href: "/build",
-    secondaryAction: "Corporate Gifting",
-    secondaryHref: "/order/corporate-gifting",
     position: "center",
   },
 ];
@@ -389,15 +381,17 @@ export default function Home() {
                         className="button primary hero-primary-btn"
                         data-testid={isActive ? "hero-find-bake" : undefined}
                       >
-                        {slide.action} <ArrowRight size={17} />
+                        {slide.action} <ArrowRight size={16} />
                       </Link>
-                      <Link
-                        to={slide.secondaryHref || "/build"}
-                        className="button hero-secondary-btn"
-                        data-testid={isActive ? "hero-build-box" : undefined}
-                      >
-                        <WandSparkles size={16} /> {slide.secondaryAction || "Build a box"}
-                      </Link>
+                      {slide.href !== "/build" && (
+                        <Link
+                          to="/build"
+                          className="hero-text-link"
+                          data-testid={isActive ? "hero-build-box" : undefined}
+                        >
+                          Build a box
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

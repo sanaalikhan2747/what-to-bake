@@ -105,16 +105,16 @@
 /* Magnolia Bakery-style Frosted Parchment Card */
 .hero-editorial-card {
   position: relative;
-  max-width: 580px;
-  padding: 44px 48px;
+  max-width: 440px;
+  padding: 28px 32px;
   background: rgba(255, 252, 250, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(230, 206, 201, 0.85);
-  border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(35, 17, 24, 0.22), 0 4px 16px rgba(35, 17, 24, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(35, 17, 24, 0.18), 0 4px 16px rgba(35, 17, 24, 0.06);
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(14px);
   transition: opacity 0.5s ease-out 0.15s, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s;
 }
 
@@ -127,16 +127,16 @@
 .hero-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  margin: 0 0 16px 0;
-  padding: 5px 14px;
+  gap: 6px;
+  margin: 0 0 10px 0;
+  padding: 4px 11px;
   background: rgba(184, 93, 105, 0.1);
-  border: 1px solid rgba(184, 93, 105, 0.25);
+  border: 1px solid rgba(184, 93, 105, 0.22);
   border-radius: 999px;
   color: var(--burnt, #a14558);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
@@ -147,11 +147,11 @@
 
 /* Display Serif Headline */
 .hero-heading {
-  margin: 0 0 16px 0;
+  margin: 0 0 10px 0;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(34px, 3.8vw, 48px);
+  font-size: clamp(26px, 2.9vw, 36px);
   font-weight: 500;
-  line-height: 1.06;
+  line-height: 1.1;
   color: var(--ink, #2a1b21);
   letter-spacing: -0.015em;
 }
@@ -163,7 +163,7 @@
 
 .hero-heading em {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--burnt, #a14558);
   font-style: italic;
   font-weight: 500;
@@ -171,34 +171,34 @@
 
 /* Narrative / Description */
 .hero-description {
-  margin: 0 0 24px 0;
-  font-size: 14.5px;
-  line-height: 1.62;
-  color: #553e46;
-  max-width: 480px;
+  margin: 0 0 18px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #583e46;
+  max-width: 360px;
 }
 
 /* Action Buttons */
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .hero-actions .hero-primary-btn {
-  min-height: 48px;
-  padding: 13px 26px;
+  min-height: 44px;
+  padding: 11px 22px;
   border: 0;
   border-radius: 999px;
   background: var(--ink, #2a1b21);
   color: #fff;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 6px 18px rgba(44, 22, 30, 0.2);
+  box-shadow: 0 4px 14px rgba(44, 22, 30, 0.18);
   transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   cursor: pointer;
@@ -206,34 +206,23 @@
 
 .hero-actions .hero-primary-btn:hover {
   background: #653b4b;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(44, 22, 30, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(44, 22, 30, 0.24);
   color: #fff;
 }
 
-.hero-actions .hero-secondary-btn {
-  min-height: 48px;
-  padding: 12px 22px;
-  border: 1.5px solid rgba(61, 32, 40, 0.35);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.65);
-  color: var(--ink, #2a1b21);
-  font-size: 13.5px;
+.hero-actions .hero-text-link {
+  font-size: 12px;
   font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
-  text-decoration: none;
+  color: var(--ink, #2a1b21);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
   cursor: pointer;
 }
 
-.hero-actions .hero-secondary-btn:hover {
-  background: #ffffff;
-  border-color: var(--burnt, #a14558);
+.hero-actions .hero-text-link:hover {
   color: var(--burnt, #a14558);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(44, 22, 30, 0.12);
 }
 
 /* --------------------------------------------------------------------------
@@ -398,13 +387,16 @@
   }
   .hero-actions {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 10px;
   }
-  .hero-actions .hero-primary-btn,
-  .hero-actions .hero-secondary-btn {
+  .hero-actions .hero-primary-btn {
     width: 100%;
     justify-content: center;
+  }
+  .hero-actions .hero-text-link {
+    font-size: 11.5px;
+    padding: 4px 0;
   }
   .hero-arrow-btn {
     width: 40px;
