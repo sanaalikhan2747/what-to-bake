@@ -1,0 +1,261 @@
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  align-items: stretch;
+  width: 100%;
+  height: clamp(540px, 68svh, 720px);
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f6ebed;
+}
+
+.hero-copy {
+  position: relative;
+  inset: auto;
+  z-index: 2;
+  display: flex;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: clamp(34px, 5.4vw, 78px) clamp(28px, 5.8vw, 86px);
+  background: #f6ebed;
+}
+
+.hero-copy .eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--store-berry);
+}
+
+.hero-copy h1 {
+  max-width: 600px;
+  margin: 0;
+  color: var(--store-ink);
+  font-size: clamp(46px, 4.4vw, 66px);
+  line-height: 1.02;
+}
+
+.hero-copy h1 span,
+.hero-copy h1 em {
+  display: block;
+}
+
+.hero-copy h1 em {
+  margin-top: 3px;
+  color: var(--store-berry);
+}
+
+.hero-copy .hero-text {
+  max-width: 440px;
+  margin: 18px 0 0;
+  color: var(--store-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.hero-actions .button.primary {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 2px;
+  background: var(--store-ink);
+  color: white;
+}
+
+.hero-actions .button.primary:hover {
+  background: var(--store-berry);
+}
+
+.hero-actions .text-button {
+  min-height: 42px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #d9bac4;
+  border-radius: 0;
+  color: var(--store-ink);
+}
+
+.hero-image.hero-showcase {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #eee1dd;
+}
+
+.hero-image.hero-showcase::before,
+.hero-image.hero-showcase::after {
+  display: none;
+}
+
+.hero-showcase > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--hero-photo-fit, cover);
+  object-position: var(--hero-photo-position, center);
+  border-radius: 0;
+  background: transparent;
+  animation: hero-photo-arrive .35s ease both;
+}
+
+.hero-carousel-controls {
+  right: clamp(14px, 2vw, 28px);
+  bottom: clamp(14px, 2vw, 24px);
+  left: auto;
+  z-index: 4;
+  transform: none;
+}
+
+.hero-slide-arrow {
+  border-color: rgba(61, 32, 40, .16);
+  border-radius: 50%;
+  background: rgba(255, 250, 248, .94);
+  color: var(--store-ink);
+  backdrop-filter: blur(8px);
+}
+
+.hero-slide-dots {
+  border-color: rgba(61, 32, 40, .12);
+  border-radius: 999px;
+  background: rgba(255, 250, 248, .94);
+}
+
+.hero-slide-dot {
+  background: rgba(61, 32, 40, .3);
+}
+
+.hero-slide-dot.active {
+  background: var(--store-berry);
+}
+
+@media (max-width: 900px) and (min-width: 761px) {
+  .hero {
+    grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+    height: clamp(520px, 64svh, 650px);
+  }
+
+  .hero-copy {
+    padding-inline: clamp(26px, 4vw, 48px);
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(42px, 5vw, 54px);
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 310px;
+    height: auto;
+    min-height: 0;
+  }
+
+  .hero-copy {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 32px clamp(22px, 6vw, 40px) 28px;
+  }
+
+  .hero-copy .eyebrow {
+    margin-bottom: 12px;
+    font-size: 9px;
+  }
+
+  .hero-copy h1 {
+    max-width: 560px;
+    font-size: clamp(40px, 8vw, 54px);
+  }
+
+  .hero-copy .hero-text {
+    max-width: 520px;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .hero-actions {
+    gap: 14px;
+    margin-top: 17px;
+  }
+
+  .hero-actions .button.primary {
+    min-height: 44px;
+    padding: 10px 15px;
+  }
+
+  .hero-image.hero-showcase {
+    grid-column: 1;
+    grid-row: 2;
+    height: 310px;
+    min-height: 310px;
+  }
+
+  .hero-carousel-controls {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero {
+    grid-template-rows: auto 270px;
+  }
+
+  .hero-copy {
+    padding: 28px 20px 24px;
+  }
+
+  .hero-copy h1 {
+    font-size: 40px;
+  }
+
+  .hero-copy .hero-text {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .hero-image.hero-showcase {
+    height: 270px;
+    min-height: 270px;
+  }
+
+  .hero-carousel-controls {
+    right: 9px;
+    bottom: 9px;
+    gap: 5px;
+  }
+
+  .hero-slide-arrow {
+    width: 34px;
+    height: 34px;
+  }
+
+  .hero-slide-dots {
+    gap: 6px;
+    padding: 7px 8px;
+  }
+}

@@ -18,6 +18,7 @@ import "@/PageAlignment.css";
 import "@/StorefrontExperience.css";
 import "@/pages/HomeExperience.css";
 import "@/pages/HomeLayoutFix.css";
+import "@/WholeStorefrontDesign.css";
 
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
