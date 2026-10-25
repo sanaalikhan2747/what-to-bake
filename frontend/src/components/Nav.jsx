@@ -190,7 +190,7 @@ export default function Nav({ onOpenChat }) {
           { label: "Build a custom box", href: "/build" },
           { label: "Browse the full menu", href: "/menu" },
         ]} />
-        <NavDropdown id="gifting" label="Gifting" heading="READY-MADE GIFT BOXES" items={giftingItems} loading={catalogueLoading} feature={feature} />
+        <NavDropdown id="gifting" label="Gifting" heading="CUSTOMIZED GIFT BOXES" pageHref="/#festive" pageLinkLabel="View all gift boxes" items={giftingItems} loading={catalogueLoading} feature={feature} />
         <NavDropdown id="match" label="Find your perfect match" heading="FIND YOUR BAKE" feature={feature} items={[
           { label: "Open the bake matchmaker", href: "/#match" },
           { label: "Browse every bake", href: "/menu" },

@@ -46,7 +46,7 @@ PRODUCTS = [
      {"id": "apple-cinnamon-loaf", "name": "Apple Cinnamon Loaf", "category": "loaf", "price": 950,
       "serves": "6–8", "serves_min": 6, "serves_max": 8, "unit": "loaf",
       "moods": ["Warm & comforting"], "occasions": ["Tea party", "Family gathering", "Anniversary", "Just craving something"],
-      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867603/IMG-20250824-WA0183.jpg",
+      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1792842257/Screenshot_20261012_231833_Chrome.jpg",
       "story": "Warm spice and cinnamon folded into a tender, golden crumb."},
      {"id": "chocolate-chip-banana", "name": "Choco Chip Banana Bread", "category": "loaf", "price": 1200,
       "serves": "6–8", "serves_min": 6, "serves_max": 8, "unit": "loaf",

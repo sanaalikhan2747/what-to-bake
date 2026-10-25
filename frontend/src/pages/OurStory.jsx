@@ -39,6 +39,69 @@ export default function OurStory() {
           Instagram <Instagram size={17} />
         </a>
       </header>
+
+      <section className="founder-story-section" id="founder-story" aria-labelledby="founder-story-title" data-testid="founder-story">
+        <div className="founder-story-grid">
+          <div className="founder-story-main">
+            <div className="founder-story-header">
+              <p className="eyebrow">OUR JOURNEY</p>
+              <h2 id="founder-story-title">A Passion That Grew Into Something Sweet</h2>
+              <p className="founder-story-lead">
+                My love for baking started long before Treats&amp;Temptations by SK ever existed.
+              </p>
+            </div>
+
+            <div className="founder-story-prose">
+              <p>
+                As a child, I was fascinated by baking. I had wonderful baking books, endless curiosity, and a habit of experimenting with recipes. Not every experiment was a success — some turned out beautifully, some didn't quite go as planned, and a few ended in a little kitchen disaster! There were plenty of messes, a few ruined creations, and countless lessons along the way. But every success and every failure made me want to try again.
+              </p>
+              <p>
+                As I grew older, baking slowly became more than just a childhood hobby. I started baking for my neighbours and friends, sometimes almost every day. Their appreciation, their love for what I made, and their constant encouragement gave me the confidence to take my passion a little further.
+              </p>
+              <p>
+                And so, my journey began right where I was — within my own small community, sharing homemade treats with the people around me. What started with experimenting in my kitchen gradually grew into something I wanted to share with more people.
+              </p>
+              <p>
+                Today, every loaf, cake, and dessert I make carries a little piece of that journey: the curiosity of a young girl, the lessons learned through trial and error, and the happiness of seeing people enjoy something made by hand.
+              </p>
+            </div>
+
+            <blockquote className="founder-story-quote">
+              <p>
+                <strong>Treats&amp;Temptations by SK is more than just baking. It's a childhood dream that grew with time, a passion nurtured by the people who believed in me, and a love for creating homemade treats that bring people together.</strong>
+              </p>
+            </blockquote>
+
+            <div className="founder-story-footer">
+              <p className="founder-story-closing">
+                And this is only the beginning of my story. I'm so happy you're here to be a part of it.
+              </p>
+              <span className="founder-signature">— Sana Khan</span>
+            </div>
+          </div>
+
+          <aside className="founder-story-visual" aria-hidden="true">
+            <div className="founder-story-photo-wrap">
+              <img
+                src="https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg"
+                alt="Freshly baked artisanal treats from Treats&Temptations by SK"
+                loading="lazy"
+              />
+              <div className="founder-story-badge">
+                <small>HANDCRAFTED FROM THE HEART</small>
+                <b>Treats &amp; Temptation by SK</b>
+                <span>Small-batch bakes · Askari X, Lahore</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <div className="our-story-bakes-header">
+        <p className="eyebrow">OUR SPECIALITIES</p>
+        <h2>Stories Behind Our Bakes</h2>
+        <p>Every bake is handcrafted with pure butter and a story of its own.</p>
+      </div>
       <section className="our-story-bakes" aria-label="Stories behind our loaves">
         {storyBakes.map((bake, index) => (
           <article className="our-story-bake" key={bake.id} data-testid={`our-story-${bake.id}`}>

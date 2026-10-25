@@ -696,28 +696,41 @@ export default function Home() {
         </section>
       )}
 
-      <section className="festive-section" id="festive">
-        <div className="festive-heading">
-          <p className="eyebrow">GIFTING</p>
-          <h2>Curated Gift Boxes</h2>
-          <p>Artisanal gift boxes for celebrations and thoughtful gifting.</p>
+      <section className="festive-section" id="festive" aria-labelledby="festive-section-title">
+        <div className="festive-heading-row">
+          <div className="festive-heading">
+            <p className="eyebrow">CELEBRATION GIFTING</p>
+            <h2 id="festive-section-title">Customized Gift Boxes</h2>
+            <p>Thoughtfully curated gift boxes available for every celebration — ready to customize with your choice of bakes and ribbon.</p>
+          </div>
+          <Link to="/build" className="festive-custom-link" data-testid="gifting-custom-box-link">
+            Build Your Own Box <ArrowRight size={15} />
+          </Link>
         </div>
         <div className="festive-grid">
           {boxes.map((box) => (
             <article className="festive-card" key={box.id} data-testid={`festive-${box.id}`}>
-              <div className="festive-image">
-                <img src={box.image} alt={box.name} />
-              </div>
+              <Link to={`/festive/${box.id}`} className="festive-image" aria-label={`Customize ${box.name}`}>
+                <img src={box.image} alt={box.name} loading="lazy" />
+                <span className="festive-badge">Available to Customize</span>
+              </Link>
               <div className="festive-body">
-                <h3>{box.name}</h3>
-                <p className="festive-tagline">{box.tagline}</p>
-                <ul className="festive-items">
-                  {box.items.map(({ product, qty }) => (<li key={product.id}>{qty}× {product.name}</li>))}
-                </ul>
+                <div className="festive-body-top">
+                  <h3>{box.name}</h3>
+                  <p className="festive-tagline">{box.tagline}</p>
+                </div>
                 <div className="festive-footer">
-                  <b>from Rs. {box.total.toLocaleString()}</b>
+                  <div className="festive-price-block">
+                    <span className="festive-price-label">Starting from</span>
+                    <b className="festive-price">Rs. {box.total.toLocaleString()}</b>
+                  </div>
                   <div className="festive-actions">
-                    <Link className="button primary small" to={`/festive/${box.id}`} data-testid={`festive-customize-${box.id}`}>
+                    <Link
+                      className="button primary small festive-customize-btn"
+                      to={`/festive/${box.id}`}
+                      data-testid={`festive-customize-${box.id}`}
+                      aria-label={`Customize ${box.name}`}
+                    >
                       Customize <ArrowRight size={14} />
                     </Link>
                   </div>
