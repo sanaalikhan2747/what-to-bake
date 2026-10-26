@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowUpRight, Coffee, Compass, House, Instagram, MapPin, Minus, Navigation, Plus, ShoppingBasket } from "lucide-react";
 import { waLink } from "@/state/api";
+import journeyImage from "@/assets/our-journey.jpg";
 import "./OurStory.css";
 
 const storyBakes = [
@@ -80,19 +81,19 @@ export default function OurStory() {
             </div>
           </div>
 
-          <aside className="founder-story-visual" aria-hidden="true">
-            <div className="founder-story-photo-wrap">
-              <img
-                src="https://res.cloudinary.com/dffsqfwok/image/upload/v1790758951/Commercial_bakery_products_on_ta__2K_20260930140220_ggjrdi.jpg"
-                alt="Freshly baked artisanal treats from Treats&Temptations by SK"
-                loading="lazy"
-              />
-              <div className="founder-story-badge">
-                <small>HANDCRAFTED FROM THE HEART</small>
-                <b>Treats &amp; Temptation by SK</b>
-                <span>Small-batch bakes · Askari X, Lahore</span>
+          <aside className="founder-story-visual">
+            <figure className="founder-story-figure">
+              <div className="founder-story-photo-wrap">
+                <img
+                  src={journeyImage}
+                  alt="Where it all began — pop-up stalls and early days of Treats & Temptation by Sana Khan"
+                  loading="lazy"
+                />
               </div>
-            </div>
+              <figcaption className="founder-story-caption">
+                <span>Where It All Began</span> · Community stalls, pop-ups, and the early days of Treats &amp; Temptation
+              </figcaption>
+            </figure>
           </aside>
         </div>
       </section>
