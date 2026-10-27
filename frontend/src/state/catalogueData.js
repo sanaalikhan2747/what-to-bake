@@ -11,7 +11,7 @@ export const CATALOGUE_PRODUCTS = [
     unit: "loaf",
     moods: ["Warm & comforting"],
     occasions: ["Tea party", "Family gathering", "Anniversary", "Just craving something"],
-    image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867603/IMG-20250824-WA0183.jpg",
+    image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1792842257/Screenshot_20261012_231833_Chrome.jpg",
     story: "Warm spice and cinnamon folded into a tender, golden crumb.",
   },
   {
