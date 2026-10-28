@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Mic, MicOff, MessageCircle, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import { api, waLink } from "@/state/api";
+import { getLocalPippaReply } from "@/state/bakerBrain";
 import MagicBaker from "@/components/MagicBaker";
 import "./ChatDrawer.css";
 
@@ -100,153 +101,100 @@ export default function ChatDrawer({ open, onClose }) {
     });
   };
 
-  const startBrowserListening = async () => {
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Recognition) {
-      setError("Voice input isn't supported by this browser. Type your question instead.");
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {}
+      recognitionRef.current = null;
+    }
+    stopRecording(true);
+    setListening(false);
+    setTranscribing(false);
+  };
+
+  const startListening = () => {
+    if (listening || loading) {
+      stopListening();
       return;
     }
+
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      setError("Voice input is supported in Chrome, Edge, and Safari. On mobile keyboards, you can tap the microphone icon on your keyboard to speak into this message field!");
+      setVoiceProblem(true);
+      return;
+    }
+
+    stopListening();
     setError("");
     setVoiceProblem(false);
     voiceSubmissionRef.current = false;
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
-    let processLocally = false;
-    if (typeof Recognition.available === "function" && typeof Recognition.install === "function") {
-      try {
-        const availability = await Recognition.available({ langs: ["en-US"], processLocally: true });
-        if (availability === "available") {
-          processLocally = true;
-        } else if (availability === "downloadable" || availability === "downloading") {
-          setError("Preparing Pippa’s offline voice pack…");
-          const installed = await Recognition.install({ langs: ["en-US"] });
-          setError("");
-          processLocally = installed;
-        }
-      } catch {
-        processLocally = false;
-        setError("");
-      }
-    }
-
-    const recognition = new Recognition();
-    recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    if ("processLocally" in recognition) recognition.processLocally = processLocally;
-    recognition.onstart = () => setListening(true);
-    recognition.onresult = (event) => {
-      if (voiceSubmissionRef.current) return;
-      const finalResult = Array.from(event.results || []).find((result) => result.isFinal) || event.results?.[0];
-      const transcript = finalResult?.[0]?.transcript?.trim();
-      if (transcript) {
-        voiceSubmissionRef.current = true;
-        recognition.stop();
-        setMessage(transcript.slice(0, 1000));
-        inputRef.current?.focus();
-      }
-    };
-    recognition.onerror = (event) => {
-      setListening(false);
-      if (event.error === "aborted") return;
-      const messages = {
-        "not-allowed": "Microphone access is blocked. Allow it for this page in your browser settings, then try again.",
-        "service-not-allowed": "This browser or embedded editor blocks its speech service. Try opening the site in Chrome, or use macOS Dictation in the message field.",
-        "no-speech": "I didn't hear speech. Tap the mic, wait for the listening state, then speak clearly; you can also use macOS Dictation in the message field.",
-        "audio-capture": "No microphone was found. Connect or enable a microphone, or type your question.",
-        network: "The browser speech service couldn't connect, and offline English speech isn't available here. Try Chrome, or enable Dictation in System Settings → Keyboard, then dictate into this message field. Pippa's text chat is still available.",
-        "language-not-supported": "Voice recognition doesn't support English on this browser. Type your question instead.",
-      };
-      setVoiceProblem(true);
-      setError(messages[event.error] || `Voice input stopped (${event.error || "unknown reason"}). Try again or type your question.`);
-    };
-    recognition.onend = () => setListening(false);
-    recognitionRef.current = recognition;
     try {
+      const recognition = new Recognition();
+      recognition.lang = "en-US";
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        if (voiceSubmissionRef.current) return;
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript) {
+          setMessage(transcript.slice(0, 1000));
+        }
+
+        const isFinal = event.results[event.results.length - 1]?.isFinal;
+        if (isFinal && transcript.trim()) {
+          voiceSubmissionRef.current = true;
+          try {
+            recognition.stop();
+          } catch {}
+          recognitionRef.current = null;
+          setListening(false);
+          send(transcript.trim());
+        }
+      };
+
+      recognition.onerror = (event) => {
+        setListening(false);
+        recognitionRef.current = null;
+        if (event.error === "aborted") return;
+        if (event.error === "no-speech") {
+          setError("I didn't hear speech. Tap the microphone and speak clearly.");
+          setVoiceProblem(true);
+          return;
+        }
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          setError("Microphone access is blocked. Allow microphone permission in your browser address bar, then try again.");
+          setVoiceProblem(true);
+          return;
+        }
+        setError(`Voice input paused (${event.error || "network"}). You can type your question or tap the mic to try again.`);
+        setVoiceProblem(true);
+      };
+
+      recognition.onend = () => {
+        setListening(false);
+        recognitionRef.current = null;
+      };
+
+      recognitionRef.current = recognition;
       recognition.start();
     } catch {
       setListening(false);
-      setError("The microphone is busy. Try again in a moment.");
-    }
-  };
-
-  const startListening = async () => {
-    if (voiceStartingRef.current || recordingRef.current || transcribing || loading) return;
-    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-      return startBrowserListening();
-    }
-    voiceStartingRef.current = true;
-    setError("");
-    setVoiceProblem(false);
-    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-      if (!openRef.current) {
-        stream.getTracks().forEach((track) => track.stop());
-        return;
-      }
-      const mimeType = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus"].find((type) => window.MediaRecorder.isTypeSupported(type));
-      const recorder = new window.MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      const recording = { recorder, stream, chunks: [], cancelled: false, timer: undefined };
-      recordingRef.current = recording;
-      recorder.ondataavailable = (event) => {
-        if (event.data.size) recording.chunks.push(event.data);
-      };
-      recorder.onerror = () => {
-        stopRecording(true);
-        setListening(false);
-        setVoiceProblem(true);
-        setError("The microphone recording failed. Please try again.");
-      };
-      recorder.onstop = async () => {
-        window.clearTimeout(recording.timer);
-        recording.stream.getTracks().forEach((track) => track.stop());
-        if (recordingRef.current === recording) recordingRef.current = null;
-        if (recording.cancelled || !openRef.current) return;
-        setListening(false);
-        setTranscribing(true);
-        const controller = new AbortController();
-        voiceRequestRef.current = controller;
-        try {
-          const audio = new Blob(recording.chunks, { type: recorder.mimeType || mimeType || "audio/webm" });
-          const response = await api.post("/speech/transcribe", audio, {
-            headers: { "Content-Type": audio.type },
-            signal: controller.signal,
-            timeout: 180000,
-          });
-          const transcript = response.data.text?.trim();
-          if (controller.signal.aborted || !openRef.current) return;
-          if (!transcript) throw new Error("No speech was detected. Please try again.");
-          setTranscribing(false);
-          setMessage(transcript.slice(0, 1000));
-          inputRef.current?.focus();
-        } catch (failure) {
-          if (!controller.signal.aborted && openRef.current) {
-            setVoiceProblem(true);
-            setError(failure.response?.data?.detail || "Pippa couldn't transcribe the recording. Check the kitchen server connection and try again.");
-          }
-        } finally {
-          if (voiceRequestRef.current === controller) {
-            voiceRequestRef.current = null;
-            setTranscribing(false);
-          }
-        }
-      };
-      recorder.start();
-      setListening(true);
-      recording.timer = window.setTimeout(() => stopRecording(), 15000);
-    } catch (failure) {
-      stream?.getTracks().forEach((track) => track.stop());
-      recordingRef.current = null;
-      setListening(false);
+      recognitionRef.current = null;
+      setError("The microphone could not be started. Tap the mic to try again or type your question.");
       setVoiceProblem(true);
-      const permissionBlocked = failure.name === "NotAllowedError" || failure.name === "SecurityError";
-      setError(permissionBlocked
-        ? "Microphone access is blocked. Allow microphone access for this page, then try again."
-        : "No microphone is available. Connect a microphone and try again.");
-    } finally {
-      voiceStartingRef.current = false;
     }
   };
 
@@ -258,15 +206,28 @@ export default function ChatDrawer({ open, onClose }) {
     setChat((c) => [...c, { role: "user", text }]);
     setError("");
     setLoading(true);
+
     try {
-      const r = await api.post("/chat", { message: text, session_id: sessionId.current, history });
-      setChat((c) => [...c, { role: "assistant", text: r.data.reply }]);
-      setMode(r.data.mode || "help");
-      if (voiceReplies) speak(r.data.reply);
+      const r = await api.post("/chat", { message: text, session_id: sessionId.current, history }, { timeout: 6000 });
+      if (r?.data?.reply) {
+        setChat((c) => [...c, { role: "assistant", text: r.data.reply }]);
+        setMode(r.data.mode || "help");
+        if (voiceReplies) speak(r.data.reply);
+        return;
+      }
     } catch {
-      setError("Pippa couldn't reach the kitchen just now. Please try again.");
+      // Backend unavailable or error; use our local kitchen brain fallback seamlessly
     } finally {
       setLoading(false);
+    }
+
+    try {
+      const localReply = getLocalPippaReply(text, history);
+      setChat((c) => [...c, { role: "assistant", text: localReply }]);
+      setMode("help");
+      if (voiceReplies) speak(localReply);
+    } catch {
+      setError("Pippa is having a momentary hiccup. Message Sana directly on WhatsApp: +92 322 411 2832.");
     }
   };
 
@@ -302,7 +263,7 @@ export default function ChatDrawer({ open, onClose }) {
         <div ref={messagesEnd} />
       </div>
       {error && <div className="chat-error" role="alert" data-testid="chat-error">{error}</div>}
-      {(listening || transcribing) && <div className="chat-voice-status" role="status" data-testid="chat-voice-status">{transcribing ? "Transcribing your question..." : "Listening... tap the microphone to finish."}</div>}
+      {(listening || transcribing) && <div className="chat-voice-status" role="status" data-testid="chat-voice-status">{transcribing ? "Processing your speech..." : "Listening... Speak your question ✨"}</div>}
       {error && voiceProblem && (
         <div className="chat-voice-recovery">
           <button type="button" onClick={startListening}>Try microphone again</button>
@@ -319,7 +280,7 @@ export default function ChatDrawer({ open, onClose }) {
           placeholder="Ask Pippa anything…"
           data-testid="baker-chat-input"
         />
-        <button type="button" className={`chat-mic-button${listening ? " listening" : ""}`} onClick={listening ? () => { stopRecording(); recognitionRef.current?.stop(); } : startListening} disabled={loading || transcribing} aria-label={listening ? "Stop listening" : "Ask Pippa by voice"} title={listening ? "Stop listening" : "Ask Pippa by voice"} data-testid="chat-voice-input">
+        <button type="button" className={`chat-mic-button${listening ? " listening" : ""}`} onClick={listening ? stopListening : startListening} disabled={loading || transcribing} aria-label={listening ? "Stop listening" : "Ask Pippa by voice"} title={listening ? "Stop listening" : "Ask Pippa by voice"} data-testid="chat-voice-input">
           {listening ? <MicOff size={17} /> : <Mic size={17} />}
         </button>
         <button type="submit" disabled={!message.trim() || loading} aria-label="Send message" title="Send message" data-testid="send-baker-chat"><ArrowUp size={18} /></button>
