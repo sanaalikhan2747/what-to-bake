@@ -367,86 +367,161 @@
 
 @media (max-width: 768px) {
   .hero.magnoliabakery-carousel {
-    height: auto;
+    height: clamp(560px, 86vh, 660px);
     min-height: 560px;
-    padding: 24px 0 68px;
+    max-height: 700px;
+    padding: 0;
   }
+  .hero-carousel-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-slide-img {
+    object-position: center 30% !important;
+  }
+  /* Warm subtle mobile scrim: completely clear at top so photography shines, softly darkening at bottom for legible text */
   .hero-slide-scrim {
     background: linear-gradient(
       180deg,
-      rgba(34, 18, 25, 0.4) 0%,
-      rgba(34, 18, 25, 0.68) 50%,
-      rgba(34, 18, 25, 0.88) 100%
+      rgba(34, 18, 25, 0.04) 0%,
+      rgba(34, 18, 25, 0.08) 32%,
+      rgba(34, 18, 25, 0.42) 65%,
+      rgba(34, 18, 25, 0.86) 100%
     );
   }
+  /* Dock card at the bottom to leave top 55% unobstructed for the bakery picture */
   .hero-content-bounds {
-    padding: 20px 16px 44px;
-    justify-content: center;
+    padding: 16px 16px 76px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    pointer-events: none;
   }
   .hero-editorial-card {
-    max-width: 100%;
+    pointer-events: auto;
+    max-width: 480px;
     width: 100%;
-    padding: 24px 20px;
+    padding: 18px 20px;
     border-radius: 18px;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 254, 252, 0.94) 0%,
+      rgba(254, 248, 246, 0.90) 100%
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 16px 40px rgba(35, 17, 24, 0.28);
   }
+  .hero-kicker {
+    margin-bottom: 6px;
+    padding: 3px 9px;
+    font-size: 9px;
+  }
   .hero-heading {
-    font-size: 26px;
+    font-size: 23px;
+    line-height: 1.12;
+    margin-bottom: 6px;
+  }
+  .hero-heading em {
+    margin-top: 2px;
   }
   .hero-description {
-    font-size: 14px;
-    margin-bottom: 16px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    line-height: 1.35;
   }
   .hero-actions {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
   }
   .hero-actions .hero-primary-btn {
-    width: 100%;
+    flex: 1;
+    min-height: 40px;
+    padding: 9px 16px;
+    font-size: 12.5px;
     justify-content: center;
   }
   .hero-actions .hero-text-link {
     font-size: 11.5px;
-    padding: 4px 0;
+    padding: 6px 8px;
+    white-space: nowrap;
   }
   .hero-arrow-btn {
     width: 40px;
     height: 40px;
     top: auto;
-    bottom: 20px;
+    bottom: 18px;
     transform: none;
   }
   .hero-arrow-btn:hover {
     transform: scale(1.06);
   }
   .hero-arrow-prev {
-    left: 14px;
+    left: 12px;
   }
   .hero-arrow-next {
-    right: 14px;
+    right: 12px;
   }
   .hero-controls-capsule {
-    bottom: 20px;
+    bottom: 18px;
     padding: 6px 14px;
   }
 }
 
 @media (max-width: 480px) {
   .hero.magnoliabakery-carousel {
+    height: clamp(540px, 86vh, 610px);
     min-height: 540px;
   }
   .hero-editorial-card {
-    padding: 22px 18px;
+    padding: 15px 16px;
+    border-radius: 16px;
   }
   .hero-heading {
-    font-size: 27px;
+    font-size: 20px;
   }
   .hero-description {
-    font-size: 13px;
+    font-size: 12px;
+    margin-bottom: 12px;
   }
   .hero-kicker {
-    font-size: 10px;
+    font-size: 8.5px;
     letter-spacing: 0.1em;
+  }
+  .hero-actions .hero-primary-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .hero-actions .hero-text-link {
+    font-size: 11px;
+    padding: 5px;
+  }
+  .hero-arrow-btn {
+    width: 36px;
+    height: 36px;
+    bottom: 16px;
+  }
+  .hero-arrow-prev {
+    left: 8px;
+  }
+  .hero-arrow-next {
+    right: 8px;
+  }
+  .hero-controls-capsule {
+    bottom: 16px;
+    padding: 5px 12px;
+    gap: 8px;
+  }
+  .hero-indicator-pill {
+    width: 7px;
+    height: 7px;
+  }
+  .hero-indicator-pill.active {
+    width: 22px;
+    height: 7px;
   }
 }
