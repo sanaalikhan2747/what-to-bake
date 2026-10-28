@@ -98,7 +98,7 @@ PRODUCTS = [
       "unit": "1 lb", "serves": "6–8", "serves_min": 6, "serves_max": 8,
       "variants": ["Strawberry Topping", "Lemon Topping"],
       "moods": ["Fresh & citrusy", "Something different"], "occasions": ["Anniversary", "Birthday", "Gift"],
-      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1790867632/IMG-20250913-WA0191.jpg",
+      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793177336/Screenshot_20261027_225057_Gallery.jpg",
       "story": "Silky slow-baked cheesecake on a buttery biscuit crust with fruit topping."},
      {"id": "pineapple-cheesecake", "name": "Pineapple Dessert Box", "category": "cheesecake", "price": 1800,
       "unit": "1 lb", "serves": "6–8", "serves_min": 6, "serves_max": 8,
