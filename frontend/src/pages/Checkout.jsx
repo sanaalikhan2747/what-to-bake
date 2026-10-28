@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Building2, Check, Copy, ShieldCheck } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
+import { PAYMENT_CONFIG } from "@/state/paymentConfig";
 
 const PACK_LABELS = {
   "clear-box": "Clear Plastic Box with Pink Ribbon",
@@ -28,7 +29,16 @@ export default function Checkout() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [copiedIban, setCopiedIban] = useState(false);
   const navigate = useNavigate();
+
+  const copyIban = async () => {
+    try {
+      await navigator.clipboard.writeText(PAYMENT_CONFIG.iban);
+      setCopiedIban(true);
+      setTimeout(() => setCopiedIban(false), 2000);
+    } catch {}
+  };
 
   useEffect(() => {
     api.get("/packaging").then((r) => {
@@ -134,11 +144,58 @@ export default function Checkout() {
             </div>
           </div>
 
+          <div className="checkout-payment-section" data-testid="checkout-payment-method">
+            <h2 className="section-h">Payment Method</h2>
+            <div className="payment-method-card">
+              <div className="payment-method-top">
+                <div className="payment-method-title">
+                  <Building2 size={18} className="payment-method-icon" />
+                  <div>
+                    <strong>Advance Bank Transfer</strong>
+                    <small>Direct transfer to confirm order</small>
+                  </div>
+                </div>
+                <span className="payment-badge">Advance Required</span>
+              </div>
+              <p className="payment-policy-text">
+                {PAYMENT_CONFIG.policy}.
+              </p>
+              <div className="bank-details-box">
+                <div className="bank-detail-row">
+                  <span className="bank-label">Bank</span>
+                  <span className="bank-val">{PAYMENT_CONFIG.bankName}</span>
+                </div>
+                <div className="bank-detail-row">
+                  <span className="bank-label">Account Title</span>
+                  <span className="bank-val">{PAYMENT_CONFIG.accountTitle}</span>
+                </div>
+                <div className="bank-detail-row iban-row">
+                  <div>
+                    <span className="bank-label">IBAN</span>
+                    <code className="bank-iban" data-testid="checkout-bank-iban">{PAYMENT_CONFIG.iban}</code>
+                  </div>
+                  <button
+                    type="button"
+                    className="button-copy-iban"
+                    onClick={copyIban}
+                    data-testid="checkout-copy-iban"
+                  >
+                    {copiedIban ? <Check size={13} /> : <Copy size={13} />}
+                    <span>{copiedIban ? "Copied" : "Copy IBAN"}</span>
+                  </button>
+                </div>
+              </div>
+              <p className="payment-instructions">
+                {PAYMENT_CONFIG.actionNote}
+              </p>
+            </div>
+          </div>
+
           {serverError && <p className="inline-error" data-testid="checkout-error">{serverError}</p>}
           <button className="button primary wide" onClick={place} disabled={submitting} data-testid="place-order-button">
             {submitting ? "Placing your order…" : <>Place order <ArrowRight size={17} /></>}
           </button>
-          <p className="pay-hint"><ShieldCheck size={14} /> Payment via bank transfer — SK will confirm your order & share account details on WhatsApp.</p>
+          <p className="pay-hint"><ShieldCheck size={14} /> Orders are confirmed once advance payment is received. Transfer screenshot can be shared on WhatsApp after placing the order.</p>
         </div>
 
         <aside className="checkout-summary">

@@ -430,7 +430,7 @@ async def ask_baker(prompt: str, session_id: str, system_extra: str = "", full_c
         "Speak like a friend, not a menu. Keep replies under 90 words. All prices are in Rs. "
         "The catalogue does not contain verified ingredient or allergen lists. Never guess ingredients or claim a product is safe for an allergy; recommend confirming directly with the baker. "
         "Do not claim access to private orders. Order tracking is handled separately by the secure order lookup. "
-        "Verified website details: WhatsApp +92 322 411 2832; payment is arranged by Sana by bank transfer after confirmation; online card payment is unavailable; pickup address and opening hours are not published, so Sana confirms pickup availability, location and time directly. "
+        "Verified website details: WhatsApp +92 322 411 2832; all bakes are freshly prepared on order and orders are confirmed once advance payment is received; payment is by advance bank transfer to Allied bank (Account Title: Farzana seemin, IBAN: PK53ABPA0010070700810022); customers share a transfer screenshot on WhatsApp to confirm their slot; online card payment and cash on deposit are unavailable; pickup address and opening hours are not published, so Sana confirms pickup availability, location and time directly. "
         "The website has a full menu, a build-your-own box with per-piece pricing and Rs. 150 pink-ribbon packaging, five festive gift boxes, a checkout form, and order pages. Never invent delivery zones, same-day availability, an email, a physical address, business hours, discounts, or stock status."
     )
     if system_extra:
@@ -570,11 +570,18 @@ def _catalogue_chat_reply(message: str, history=None):
             detail = "The pick-up address isn't published; Sana confirms the location for each order."
         return f"{detail} WhatsApp Sana at +92 322 411 2832: https://wa.me/923224112832."
 
-    if any(word in lowered for word in ("card", "credit card", "debit card", "online payment", "pay online", "payment", "how do i pay", "bank transfer")):
-        return "After you place an order, Sana confirms it on WhatsApp and shares bank-transfer details. Online card payment isn't currently available."
+    if any(word in lowered for word in ("card", "credit card", "debit card", "online payment", "pay online", "payment", "how do i pay", "bank transfer", "account details", "bank", "iban")):
+        return (
+            "All our bakes are freshly prepared on order. Orders are confirmed once advance payment is received.\n\n"
+            "Please transfer the total to confirm your slot:\n"
+            "• Bank: Allied bank\n"
+            "• Account Title: Farzana seemin\n"
+            "• IBAN: PK53ABPA0010070700810022\n\n"
+            "Kindly share a quick screenshot of the transfer on WhatsApp (+92 322 411 2832) once done! ✨ (Online card payment is currently unavailable)."
+        )
 
     if "cash" in lowered:
-        return "Cash payment options aren't published. Sana confirms how to pay when she confirms your order on WhatsApp: https://wa.me/923224112832."
+        return "We do not offer cash on deposit or cash on delivery. All our bakes are freshly prepared on order, and orders are confirmed once advance bank transfer to Allied bank (Farzana seemin) is received: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("delivery fee", "delivery fees", "delivery charge", "shipping cost", "delivery cost", "how much for delivery", "how much is delivery", "how much does delivery cost")):
         return "Delivery charges depend on your area and aren't listed as a fixed price here. Send Sana your location and order details for a quote: https://wa.me/923224112832."
@@ -682,7 +689,7 @@ def _catalogue_chat_reply(message: str, history=None):
         return "For an existing order, send its code (like TT123456) and the last four digits of the checkout phone to check the status privately. For a new order, add bakes to your bag and continue to checkout; Sana confirms it on WhatsApp."
 
     if any(word in lowered for word in ("website", "how do i", "how can i", "where can i", "how to", "checkout", "place an order", "place order")):
-        return "Browse all bakes in Menu, mix treats in Build a box, or customize one of the ready-made gifts under Gifting. Add your choices to the bag and continue to checkout; Sana confirms orders and shares bank-transfer details on WhatsApp."
+        return "Browse all bakes in Menu, mix treats in Build a box, or customize one of the ready-made gifts under Gifting. Add your choices to the bag and continue to checkout; orders are confirmed once advance bank transfer to Allied bank (Farzana seemin) is received and receipt is shared on WhatsApp."
 
     if any(word in lowered for word in ("hello", "hi", "hey", "good morning", "good afternoon", "good evening")) and len(lowered.split()) <= 5:
         return "Hi! I’m Pippa. Tell me what you’re celebrating, your budget, or what you’re craving and I’ll find a few lovely options."

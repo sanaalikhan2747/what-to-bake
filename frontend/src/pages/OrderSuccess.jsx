@@ -1,17 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CheckCircle2, Copy, MessageCircle } from "lucide-react";
+import { Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { api, waLink } from "@/state/api";
+import { PAYMENT_CONFIG } from "@/state/paymentConfig";
 
 export default function OrderSuccess() {
   const { orderNumber } = useParams();
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [ibanCopied, setIbanCopied] = useState(false);
 
   useEffect(() => {
     api.get(`/orders/${orderNumber}`).then((r) => setOrder(r.data)).catch(() => setError("We couldn't find that order."));
   }, [orderNumber]);
+
+  const copyIban = async () => {
+    try {
+      await navigator.clipboard.writeText(PAYMENT_CONFIG.iban);
+      setIbanCopied(true);
+      setTimeout(() => setIbanCopied(false), 2000);
+    } catch {}
+  };
 
   const waMessage = order && (() => {
     const lines = order.items.map((i) => `• ${i.qty}× ${i.name}${i.custom_box ? " (single)" : ""} — Rs. ${i.line_total.toLocaleString()}`).join("\n");
@@ -27,7 +37,17 @@ export default function OrderSuccess() {
     if (order.packaging) parts.push("", `Packaging: ${order.packaging.name} (Rs. ${order.packaging.price})`);
     if (order.personalized_message) parts.push(`Note on box: "${order.personalized_message}"`);
     if (order.customer.notes) parts.push(`Notes: ${order.customer.notes}`);
-    parts.push("", `Total: Rs. ${order.total.toLocaleString()}`, "", `Please confirm & share bank details for payment. Thank you!`);
+    parts.push(
+      "",
+      `Total: Rs. ${order.total.toLocaleString()}`,
+      "",
+      `Please transfer the total to confirm your slot:`,
+      `• Bank: ${PAYMENT_CONFIG.bankName}`,
+      `• Account Title: ${PAYMENT_CONFIG.accountTitle}`,
+      `• IBAN: ${PAYMENT_CONFIG.iban}`,
+      "",
+      `Kindly share a quick screenshot of the transfer once done! ✨`
+    );
     return parts.join("\n");
   })();
 
@@ -54,10 +74,52 @@ export default function OrderSuccess() {
     <div className="success-page">
       <div className="success-badge"><CheckCircle2 size={26} /></div>
       <p className="eyebrow">ORDER RECEIVED</p>
-      <h1>Thank you, {order.customer.name.split(" ")[0]}.<br /><em>Your box is on the way.</em></h1>
+      <h1>Thank you, {order.customer.name.split(" ")[0]}.<br /><em>Your box is almost confirmed.</em></h1>
       <p className="success-lead">
-        Your order number is <b data-testid="order-number">{order.order_number}</b>. To finalise, tap "Send to SK on WhatsApp" — SK will confirm and share bank transfer details.
+        Your order number is <b data-testid="order-number">{order.order_number}</b>. All our bakes are freshly prepared on order. Orders are confirmed once advance payment is received.
       </p>
+
+      {/* Prominent Payment Details Card */}
+      <section className="order-payment-box" data-testid="order-payment-card">
+        <div className="order-payment-banner">
+          <p className="order-payment-thanks">{PAYMENT_CONFIG.thankYou}</p>
+          <div className="order-payment-total">
+            <span>Total to transfer:</span>
+            <strong>Rs. {order.total.toLocaleString()}</strong>
+          </div>
+          <p className="order-payment-prompt">{PAYMENT_CONFIG.prompt}</p>
+        </div>
+
+        <div className="bank-details-box">
+          <div className="bank-detail-row">
+            <span className="bank-label">Bank</span>
+            <span className="bank-val">{PAYMENT_CONFIG.bankName}</span>
+          </div>
+          <div className="bank-detail-row">
+            <span className="bank-label">Account Title</span>
+            <span className="bank-val">{PAYMENT_CONFIG.accountTitle}</span>
+          </div>
+          <div className="bank-detail-row iban-row">
+            <div>
+              <span className="bank-label">IBAN</span>
+              <code className="bank-iban" data-testid="success-bank-iban">{PAYMENT_CONFIG.iban}</code>
+            </div>
+            <button
+              type="button"
+              className="button-copy-iban"
+              onClick={copyIban}
+              data-testid="success-copy-iban"
+            >
+              {ibanCopied ? <Check size={14} /> : <Copy size={14} />}
+              <span>{ibanCopied ? "Copied" : "Copy IBAN"}</span>
+            </button>
+          </div>
+        </div>
+
+        <p className="payment-screenshot-prompt">
+          {PAYMENT_CONFIG.actionNote}
+        </p>
+      </section>
 
       <div className="success-actions">
         <a
@@ -67,7 +129,7 @@ export default function OrderSuccess() {
           rel="noreferrer"
           data-testid="order-whatsapp"
         >
-          Send to SK on WhatsApp <MessageCircle size={17} />
+          Send to SK on WhatsApp &amp; Share Receipt <MessageCircle size={17} />
         </a>
         <button className="button ghost" onClick={copyOrder} data-testid="order-copy">
           {copied ? "Copied!" : <>Copy order details <Copy size={14} /></>}
