@@ -230,7 +230,7 @@ FESTIVE_BOXES = [
         "image": "https://res.cloudinary.com/dffsqfwok/image/upload/v1790782194/Eid_dessert_box_product_shoot_2K_20260930202830_gn5gmr.jpg?pid=1513201099705"},
     {"id": "baby-born-box", "name": "Baby Born Box", "tagline": "Gentle, bright and full of good wishes.",
      "items": [{"product_id": "lemon-loaf", "qty": 1}, {"product_id": "cinnamon-rolls-batch", "qty": 1}],
-        "image": "https://res.cloudinary.com/dffsqfwok/image/upload/v1790782197/Designing_baby_dessert_gift_box_2K_20260930202937_vsh6nh.jpg?pid=1700045530510"},
+        "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793189723/Screenshot_20261027_225338_Gallery.jpg"},
 ]
 
 
