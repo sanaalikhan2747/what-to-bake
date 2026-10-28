@@ -755,6 +755,82 @@ async def get_festive_box(box_id: str):
     raise HTTPException(status_code=404, detail="Festive box not found")
 
 
+def _build_variety_box(req: MatchRequest):
+    budget = req.budget or 1500
+    if budget <= 1500:
+        return None
+
+    diet = (req.dietary or "No preference").lower().strip()
+    def is_compatible(p):
+        if "sugar" in diet or "less sweet" in diet:
+            return p.get("healthy") or p["id"] in ("sugar-free-dates", "coconut-loaf", "apple-cinnamon-loaf", "oat-flour-banana-bread", "oat-flour-choco-chip-cookie")
+        if "gluten" in diet:
+            return p.get("healthy") or "oat" in p["id"] or p["id"] == "flourless-brownies-batch"
+        return True
+
+    pool = [p for p in PRODUCTS if is_compatible(p)]
+    if not pool:
+        return None
+
+    scored = [(p, _score(p, req)) for p in pool if _score(p, req) > -1e8]
+    scored.sort(key=lambda x: x[1], reverse=True)
+    if not scored:
+        return None
+
+    centerpiece = next((p for p, s in scored if p["category"] in ("loaf", "cheesecake") and p["price"] <= budget * 0.75), None)
+    if not centerpiece:
+        centerpiece = next((p for p, s in scored if p["price"] < budget), scored[0][0])
+
+    selected_items = [{"product": centerpiece, "qty": 1, "line_total": centerpiece["price"]}]
+    current_total = centerpiece["price"]
+    cats = {centerpiece["category"]}
+    ids = {centerpiece["id"]}
+
+    desired_cats = [c for c in ("batch", "cookie", "loaf", "cheesecake") if c not in cats]
+    for c in desired_cats:
+        remaining = budget - current_total
+        if remaining < 300:
+            break
+        cand = next((p for p, s in scored if p["category"] == c and p["id"] not in ids and p["price"] <= remaining), None)
+        if cand:
+            selected_items.append({"product": cand, "qty": 1, "line_total": cand["price"]})
+            current_total += cand["price"]
+            cats.add(cand["category"])
+            ids.add(cand["id"])
+
+    remaining = budget - current_total
+    if remaining >= 300 and len(selected_items) < 4:
+        cand = next((p for p, s in scored if p["id"] not in ids and p["price"] <= remaining), None)
+        if cand:
+            selected_items.append({"product": cand, "qty": 1, "line_total": cand["price"]})
+            current_total += cand["price"]
+            cats.add(cand["category"])
+            ids.add(cand["id"])
+
+    if len(selected_items) < 2:
+        return None
+
+    min_s = sum((p.get("serves_min") or (p.get("batch_size") or 1)) for it in selected_items for p in [it["product"]])
+    max_s = sum((p.get("serves_max") or (p.get("batch_size") or 1)) for it in selected_items for p in [it["product"]])
+
+    names = " + ".join(it["product"]["name"] for it in selected_items)
+    occasion_label = req.occasion or "Celebration"
+    explanation = f"Curated variety box for your {occasion_label.lower()}: a celebratory combination of {names}. Handcrafted to serve {min_s}–{max_s} guests within your Rs. {budget:,} budget."
+
+    return {
+        "is_variety_box": True,
+        "name": f"{occasion_label} Variety Box",
+        "tagline": f"Curated assortment of {len(selected_items)} handcrafted bakes for {req.people or min_s} guests",
+        "items": selected_items,
+        "total": current_total,
+        "serves": f"{min_s}–{max_s} guests",
+        "serves_min": min_s,
+        "serves_max": max_s,
+        "explanation": explanation,
+        "centerpiece": centerpiece,
+    }
+
+
 @api_router.post("/match")
 async def match_dessert(request: MatchRequest):
     options = _pick_options(request, limit=4)
@@ -788,7 +864,9 @@ async def match_dessert(request: MatchRequest):
     other_names = [p["name"] for p in PRODUCTS if p["id"] != best["id"]]
     if best["name"].lower() not in explanation.lower() or any(n.lower() in explanation.lower() for n in other_names):
         explanation = f"{best['name']} is an ideal match for your {request.occasion.lower()} — freshly baked to serve {serves_val} within your budget."
-    return {"product": best, "explanation": explanation, "options": options}
+
+    variety_box = _build_variety_box(request) if (request.budget or 0) > 1500 else None
+    return {"product": best, "explanation": explanation, "options": options, "variety_box": variety_box}
 
 
 @api_router.post("/match/save")

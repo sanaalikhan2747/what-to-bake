@@ -136,9 +136,123 @@ export function findMatches(products, criteria, limit = 4) {
   const serves = getProductServes(best);
   const explanation = `${best.name} is an ideal match for your ${criteria.occasion ? criteria.occasion.toLowerCase() : "celebration"} — freshly baked to serve ${serves.text} within your budget.`;
 
+  const numericBudget = Number(criteria.budget) || 1500;
+  const varietyBox = numericBudget > 1500 ? buildVarietyBox(products, criteria) : null;
+
   return {
     product: best,
-    explanation,
+    explanation: varietyBox ? varietyBox.explanation : explanation,
     options: selected,
+    varietyBox,
+  };
+}
+
+export function buildVarietyBox(products, criteria) {
+  const numericBudget = Number(criteria.budget) || 1500;
+  if (numericBudget <= 1500 || !Array.isArray(products) || products.length === 0) {
+    return null;
+  }
+
+  const diet = String(criteria.dietary || "No preference").toLowerCase().trim();
+  const isDietaryCompatible = (p) => {
+    if (diet === "sugar-free") return Boolean(p.healthy || p.id === "sugar-free-dates");
+    if (diet.includes("less sweet") || diet.includes("sugar")) {
+      return Boolean(p.healthy || ["coconut-loaf", "apple-cinnamon-loaf", "oat-flour-banana-bread", "oat-flour-choco-chip-cookie", "sugar-free-dates"].includes(p.id));
+    }
+    if (diet.includes("gluten")) return Boolean(p.healthy || p.id.includes("oat") || p.id === "flourless-brownies-batch");
+    return true;
+  };
+
+  const pool = products.filter(isDietaryCompatible);
+  if (!pool.length) return null;
+
+  const scored = pool
+    .map((product) => ({ product, score: scoreProduct(product, criteria) }))
+    .filter((entry) => entry.score > -1e8)
+    .sort((a, b) => b.score - a.score);
+
+  if (!scored.length) return null;
+
+  // Step 1: Pick a centerpiece bake that leaves budget for complementary variety
+  let centerpieceEntry = scored.find(
+    (e) => ["loaf", "cheesecake"].includes(e.product.category) && e.product.price <= numericBudget * 0.75
+  );
+  if (!centerpieceEntry) {
+    centerpieceEntry = scored.find((e) => e.product.price < numericBudget) || scored[0];
+  }
+
+  const centerpiece = centerpieceEntry.product;
+  const selectedItems = [{ product: centerpiece, qty: 1, line_total: centerpiece.price }];
+  let currentTotal = centerpiece.price;
+  const categoriesInBox = new Set([centerpiece.category]);
+  const productIdsInBox = new Set([centerpiece.id]);
+
+  // Step 2: Pick complementary treats from other categories (batch, cookie, etc.)
+  const categoryOrder = ["batch", "cookie", "loaf", "cheesecake"].filter((c) => !categoriesInBox.has(c));
+
+  for (const cat of categoryOrder) {
+    const remaining = numericBudget - currentTotal;
+    if (remaining < 300) break;
+
+    const candEntry = scored.find(
+      (e) =>
+        e.product.category === cat &&
+        !productIdsInBox.has(e.product.id) &&
+        e.product.price <= remaining
+    );
+
+    if (candEntry) {
+      selectedItems.push({ product: candEntry.product, qty: 1, line_total: candEntry.product.price });
+      currentTotal += candEntry.product.price;
+      categoriesInBox.add(candEntry.product.category);
+      productIdsInBox.add(candEntry.product.id);
+    }
+  }
+
+  // Step 3: If budget still remains (>= 300) and box has < 4 items, add another treat
+  const remainingAfterCats = numericBudget - currentTotal;
+  if (remainingAfterCats >= 300 && selectedItems.length < 4) {
+    const extraEntry = scored.find(
+      (e) =>
+        !productIdsInBox.has(e.product.id) &&
+        e.product.price <= remainingAfterCats
+    );
+    if (extraEntry) {
+      selectedItems.push({ product: extraEntry.product, qty: 1, line_total: extraEntry.product.price });
+      currentTotal += extraEntry.product.price;
+      categoriesInBox.add(extraEntry.product.category);
+      productIdsInBox.add(extraEntry.product.id);
+    }
+  }
+
+  // Return variety box only if at least 2 distinct products are included
+  if (selectedItems.length < 2) {
+    return null;
+  }
+
+  let minServes = 0;
+  let maxServes = 0;
+  selectedItems.forEach((it) => {
+    const s = getProductServes(it.product);
+    minServes += (s.min || 1) * it.qty;
+    maxServes += (s.max || 1) * it.qty;
+  });
+
+  const occasionLabel = criteria.occasion || "Celebration";
+  const namesList = selectedItems.map((it) => it.product.name).join(" + ");
+  const explanation = `Curated variety box for your ${occasionLabel.toLowerCase()}: a celebratory combination of ${namesList}. Handcrafted to serve ${minServes}–${maxServes} guests within your Rs. ${numericBudget.toLocaleString()} budget.`;
+
+  return {
+    isVarietyBox: true,
+    name: `${occasionLabel} Variety Box`,
+    tagline: `Curated assortment of ${selectedItems.length} handcrafted bakes for ${criteria.people || minServes} guests`,
+    items: selectedItems,
+    total: currentTotal,
+    serves: `${minServes}–${maxServes} guests`,
+    servesMin: minServes,
+    servesMax: maxServes,
+    explanation,
+    categories: Array.from(categoriesInBox),
+    centerpiece,
   };
 }
