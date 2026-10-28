@@ -635,22 +635,42 @@ def _catalogue_chat_reply(message: str, history=None):
     }
     category = next((key for key, terms in category_terms.items() if any(term in query for term in terms)), None)
     occasion_map = {
-        "Birthday": ("birthday",), "Anniversary": ("anniversary",), "Tea party": ("tea",),
-        "Family gathering": ("family", "gathering"), "Graduation": ("graduation",), "Eid": ("eid",),
-        "Baby born": ("new baby", "baby", "new arrival"), "Gift": ("gift", "present"),
+        "Birthday": ("birthday", "bday"), "Anniversary": ("anniversary",), "Tea party": ("tea", "high tea", "afternoon"),
+        "Family gathering": ("family", "gathering", "dinner", "dawat"), "Graduation": ("graduation", "convocation"), "Eid": ("eid",),
+        "Baby born": ("new baby", "baby", "new arrival", "shower"), "Gift": ("gift", "present", "surprise"),
     }
     occasion = next((name for name, words in occasion_map.items() if any(word in query for word in words)), None)
+    mood = "Chocolate lover" if any(w in query for w in ("chocolate", "choc", "fudge", "brownie")) else "Fresh & citrusy" if any(w in query for w in ("lemon", "mango", "citrus", "fruit")) else "Coffee lover" if any(w in query for w in ("coffee", "walnut", "brittle")) else "Warm & comforting"
+
+    # Variety box matching for mix / assortment requests or larger budgets
+    wants_variety = any(w in lowered for w in ("variety", "mix", "assortment", "combination", "platter", "sampler", "spread", "different bakes"))
+    if wants_variety or (budget and budget >= 2000 and not any(w in lowered for w in ("only", "single", "just one"))):
+        var_req = MatchRequest(occasion=occasion or "Celebration", mood=mood, people=people or 6, budget=budget or 2500)
+        vbox = _build_variety_box(var_req)
+        if vbox and len(vbox.get("items", [])) >= 2:
+            lines = "\n".join(f"• {it['product']['name']} (Rs. {it['line_total']:,}) — {it['product']['unit']}" for it in vbox["items"])
+            return f"✨ Curated variety assortment for your {occasion.lower() if occasion else 'celebration'} ({vbox['serves']}):\n\n{lines}\n\nTotal: Rs. {vbox['total']:,} (within Rs. {budget or 2500:,}). You can customize these in Build a box or order directly!"
+
+    # Occasion-specific customer variety
+    if occasion == "Birthday":
+      return "🎂 For a birthday celebration, here is our top variety:\n• Centerpieces: New York Cheesecake (Rs. 2,200, serves 6–8) or Salted Caramel Brownie Trifle Box (Rs. 2,500)\n• Gift Box: Birthday Box (Rs. 3,800: Banana Bread + 4 Double Choc Cookies + Box of 4 Brownies, ribbon-tied)\n• Sharing Cups: Chocolate Trifle Cup (Rs. 400) or Malt Cake Cup (Rs. 400)\nWould you like rich chocolate or creamy cheesecake?"
+
+    if occasion == "Tea party":
+      return "🫖 For high tea or afternoon tea, we recommend this spread:\n• Coffee Bread with Walnut Crumble (Rs. 1,200) — toasty, aromatic, slices beautifully\n• Moist Lemon Loaf (Rs. 1,200) — bright citrus glaze\n• Cinnamon Rolls (Pack of 4, Rs. 1,600) — warm and pillowy with cream cheese icing\n• Chocolate Chip Cookies (Rs. 300 each)\nOr choose our Anniversary Box (Rs. 2,400) which pairs Coffee Bread with 4 Cookies!"
+
+    if occasion == "Eid":
+      return "🌙 For Eid celebrations, here is our festive variety:\n• Signature Eid Box (Rs. 3,800): 1 × Coconut Loaf, 4 × Double Choc Cookies, and 1 × Box of 4 Papparoti Buns!\n• Dessert Trifle Boxes: Fruit Trifle Box (Rs. 1,800) or Banoffee Pie Trifle Box (Rs. 2,100)\n• Loaves: Coconut Loaf (Rs. 1,200) or Apple Cinnamon Loaf (Rs. 950)"
+
+    if any(w in lowered for w in ("chocolate", "choc", "fudge")) and not category:
+      return "🍫 For chocolate lovers, we have a decadent variety:\n• Fudgy: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n• Dessert Box: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n• Warm Loaves: Double Chocolate Loaf (Rs. 1,800) or Choco Chip Banana Bread (Rs. 1,200)\n• Cookie: Double Chocolate Cookie (Rs. 350 each)"
+
     recommendation = any(word in query for word in ("recommend", "suggest", "what should", "which one", "best for", "perfect for", "match me", "surprise"))
-    if recommendation and category in (None, "loaf"):
-        mood = "Coffee lover" if "coffee" in query else "Chocolate lover" if "chocolate" in query else "Warm & comforting"
+    if recommendation:
         req = MatchRequest(occasion=occasion or "Just craving something", mood=mood, people=people or 6, budget=budget or 100000)
-        candidates = [item for item in PRODUCTS if item["category"] == "loaf" and within_budget(item["price"])]
-        if occasion:
-            candidates = [item for item in candidates if occasion in item["occasions"]] or candidates
-        if not candidates:
-            return f"The loaves start at Rs. {min(item['price'] for item in PRODUCTS if item['category'] == 'loaf'):,}. I can look for cookies or smaller treats within Rs. {budget:,}."
-        best = max(candidates, key=lambda item: _score(item, req))
-        return f"For {occasion.lower() if occasion else 'a little treat'}, I’d suggest {best['name']} (Rs. {best['price']:,}, serves {best['serves']}). {best['story']}"
+        candidates = [item for item in PRODUCTS if (not category or item["category"] == category) and within_budget(item["price"])]
+        if candidates:
+            best = max(candidates, key=lambda item: _score(item, req))
+            return f"For {occasion.lower() if occasion else 'a wonderful treat'}, I’d suggest {best['name']} (Rs. {best['price']:,}, serves {best['serves']}). {best['story']}"
 
     product_query = normalize(f"{message} {' '.join(user_history)}")
     product = next((item for item in PRODUCTS if normalize(item["name"]) in product_query), None)

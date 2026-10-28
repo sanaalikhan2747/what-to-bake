@@ -1,5 +1,6 @@
 import { CATALOGUE_PRODUCTS, CATALOGUE_FESTIVE_BOXES, CATALOGUE_PACKAGING } from "./catalogueData.js";
 import { PAYMENT_CONFIG } from "./paymentConfig.js";
+import { buildVarietyBox, scoreProduct, getProductServes } from "./matchmaker.js";
 
 function normalize(text) {
   return String(text || "")
@@ -10,7 +11,6 @@ function normalize(text) {
 
 function parseBudget(text) {
   const clean = String(text || "").toLowerCase();
-  // Match patterns like "under 1000", "under rs 1,000", "rs. 1500", "budget 2000", "less than 1000"
   const amountRegex = /(?:under|below|less than|within|budget|up to|upto|max|maximum|around|rs\.?)\s*(?:rs\.?\s*)?(\d{1,3}(?:[, ]\d{3})+|\d+)/i;
   const match = clean.match(amountRegex);
   if (match && match[1]) {
@@ -21,55 +21,105 @@ function parseBudget(text) {
   if (standaloneRs && standaloneRs[1]) {
     return parseInt(standaloneRs[1], 10);
   }
-  // Word numbers: "thousand", "one thousand"
   if (clean.includes("thousand") || clean.includes("1k") || clean.includes("1 k")) return 1000;
   if (clean.includes("two thousand") || clean.includes("2k")) return 2000;
-  if (clean.includes("fifteen hundred") || clean.includes("1500")) return 1500;
+  if (clean.includes("twenty five hundred") || clean.includes("2500") || clean.includes("2.5k")) return 2500;
+  if (clean.includes("three thousand") || clean.includes("3k")) return 3000;
+  if (clean.includes("four thousand") || clean.includes("4k")) return 4000;
+  if (clean.includes("fifteen hundred") || clean.includes("1500") || clean.includes("1.5k")) return 1500;
+  return null;
+}
+
+function parseGuestCount(text) {
+  const clean = String(text || "").toLowerCase();
+  const match = clean.match(/\b(?:for|serves?|people|guests?|persons)\s*(\d{1,2})\b|\b(\d{1,2})\s*(?:people|guests?|persons)\b/);
+  if (match) {
+    const num = parseInt(match[1] || match[2], 10);
+    if (!isNaN(num) && num > 0) return num;
+  }
+  if (clean.includes("couple") || clean.includes("two of us")) return 2;
+  if (clean.includes("family") || clean.includes("gathering")) return 6;
+  if (clean.includes("party") || clean.includes("dinner") || clean.includes("dawat")) return 8;
+  return 6;
+}
+
+function extractOccasion(text) {
+  const t = text.toLowerCase();
+  if (t.includes("birthday") || t.includes("bday")) return "Birthday";
+  if (t.includes("anniversary")) return "Anniversary";
+  if (t.includes("tea") || t.includes("high tea") || t.includes("afternoon tea")) return "Tea party";
+  if (t.includes("eid")) return "Eid";
+  if (t.includes("graduation") || t.includes("convocation") || t.includes("milestone")) return "Graduation";
+  if (t.includes("baby") || t.includes("shower") || t.includes("newborn") || t.includes("birth")) return "Baby born";
+  if (t.includes("gift") || t.includes("present") || t.includes("surprise")) return "Gift";
+  if (t.includes("dinner") || t.includes("family") || t.includes("dawat") || t.includes("gathering")) return "Family gathering";
+  return null;
+}
+
+function extractFlavorMood(text) {
+  const t = text.toLowerCase();
+  if (t.includes("choc") || t.includes("fudge") || t.includes("brownie") || t.includes("malt") || t.includes("nutella") || t.includes("cocoa")) {
+    return "Chocolate lover";
+  }
+  if (t.includes("lemon") || t.includes("mango") || t.includes("pineapple") || t.includes("citrus") || t.includes("fruit") || t.includes("zest") || t.includes("berry")) {
+    return "Fresh & citrusy";
+  }
+  if (t.includes("cinnamon") || t.includes("apple") || t.includes("spice") || t.includes("banana") || t.includes("warm") || t.includes("comfort")) {
+    return "Warm & comforting";
+  }
+  if (t.includes("coffee") || t.includes("walnut") || t.includes("brittle") || t.includes("caramel") || t.includes("toffee") || t.includes("banoffee")) {
+    return "Coffee lover";
+  }
+  if (t.includes("sugar free") || t.includes("sugar-free") || t.includes("diet") || t.includes("healthy") || t.includes("dates") || t.includes("flourless") || t.includes("gluten") || t.includes("oat")) {
+    return "Something different";
+  }
   return null;
 }
 
 /**
- * Resilient, client-side Pippa response generator.
- * Provides immediate, delightful, grounded bakery answers even when the backend is unreachable.
+ * Resilient, highly personalized Bakery Brain for Pippa.
+ * Dynamically tailors replies and variety combinations based on the customer's
+ * occasion, flavor cravings, guest count, and budget.
  */
 export function getLocalPippaReply(message, history = []) {
-  const lowered = normalize(message);
-  const userHistory = (history || [])
-    .filter((turn) => turn && turn.role === "user" && turn.text)
-    .slice(-4)
-    .map((turn) => normalize(turn.text));
-  const fullContext = normalize(`${message} ${userHistory.join(" ")}`);
-  const budget = parseBudget(fullContext);
-  const isExclusive = /\b(under|below|less than)\b/.test(lowered);
-  const withinBudget = (price) => {
-    if (budget === null) return true;
-    return isExclusive ? price < budget : price <= budget;
-  };
+  const currentText = String(message || "");
+  const lowered = normalize(currentText);
+
+  // Parse budget from current message first; only check history if user is asking a follow-up
+  let budget = parseBudget(currentText);
+  const isFollowUp = /cheaper|more|variety|else|other|within|budget|another|option/.test(lowered);
+  if (budget === null && isFollowUp && history.length > 0) {
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === "user") {
+        const prevBudget = parseBudget(history[i].text);
+        if (prevBudget !== null) {
+          budget = prevBudget;
+          break;
+        }
+      }
+    }
+  }
+
+  const people = parseGuestCount(currentText);
+  const occasion = extractOccasion(currentText);
+  const flavorMood = extractFlavorMood(currentText);
 
   // 1. Allergens and dietary safety
   if (
-    /allerg|ingredient|peanut|nut\s*free|nut-free|nuts|gluten|dairy|milk|lactose|sesame|soy|eggless|eggs|vegan|halal|contain/.test(
+    /allerg|ingredient|peanut|nut\s*free|nut-free|nuts|dairy|milk|lactose|sesame|soy|eggless|eggs|vegan|halal|contain/.test(
       lowered
     )
   ) {
-    return "I don't have verified ingredient or allergen sheets in my recipe notebook, so I won't guess about allergy safety. Please confirm directly with Sana on WhatsApp (+92 322 411 2832: https://wa.me/923224112832) before ordering. I can still help compare bakes and prices!";
+    return "I don't have verified allergen or ingredient sheets in my kitchen notes, so I won't guess about allergy safety. Please confirm directly with Sana on WhatsApp (+92 322 411 2832: https://wa.me/923224112832) before placing an allergy-sensitive order. I can still help you compare prices, flavors, and treats!";
   }
 
-  // 2. Location, opening hours, contact
-  if (
-    /where are you located|location|address|pickup address|store address|opening hours|business hours|open hours|what time do you open|email/.test(
-      lowered
-    )
-  ) {
-    return "Treats & Temptation by SK is a boutique home-based studio in Askari X, Lahore. All bakes are made fresh to order. Pick-up is arranged in Askari X, and doorstep delivery is available across Lahore. Sana confirms exact pick-up times and arrangements directly on WhatsApp (+92 322 411 2832: https://wa.me/923224112832).";
+  // 2. Location & pick-up
+  if (/where are you located|location|address|pickup address|store address|opening hours|business hours|open hours|what time do you open|email/.test(lowered)) {
+    return "Treats & Temptation by SK is an artisanal studio based in Askari X, Lahore. All our bakes are prepared fresh on pre-order. We offer pick-up in Askari X and doorstep delivery across Lahore. Sana confirms exact pick-up times and arrangements directly on WhatsApp (+92 322 411 2832: https://wa.me/923224112832).";
   }
 
   // 3. Payment methods (Allied Bank advance transfer)
-  if (
-    /card|credit card|debit card|online payment|pay online|payment|how do i pay|bank transfer|account details|bank|iban|allied/.test(
-      lowered
-    )
-  ) {
+  if (/card|credit card|debit card|online payment|pay online|payment|how do i pay|bank transfer|account details|bank|iban|allied/.test(lowered)) {
     return (
       `All our bakes are freshly prepared on order. Orders are confirmed once advance payment is received ✨\n\n` +
       `Please transfer the total to confirm your slot:\n` +
@@ -80,20 +130,14 @@ export function getLocalPippaReply(message, history = []) {
     );
   }
 
-  // 4. Cash on delivery / deposit
+  // 4. Cash on deposit / delivery
   if (lowered.includes("cash")) {
-    return (
-      "We do not offer cash on deposit or cash on delivery. All our bakes are prepared fresh on order, and slots are confirmed once advance bank transfer to Allied Bank (Farzana seemin) is received. WhatsApp Sana: https://wa.me/923224112832."
-    );
+    return "We do not offer cash on deposit or cash on delivery. All our bakes are prepared fresh to order, and slots are confirmed once advance bank transfer to Allied Bank (Farzana seemin) is received. Message Sana on WhatsApp for assistance: https://wa.me/923224112832.";
   }
 
-  // 5. Delivery costs / timing
-  if (
-    /delivery fee|delivery charge|delivery cost|shipping cost|how much for delivery|how much is delivery/.test(
-      lowered
-    )
-  ) {
-    return "Delivery charges depend on your delivery location in Lahore and the courier service (e.g. Careem / Bykea delivery). Share your area with Sana on WhatsApp (+92 322 411 2832) for an exact quote: https://wa.me/923224112832.";
+  // 5. Delivery costs / delivery inquiry
+  if (/delivery fee|delivery charge|delivery cost|shipping cost|how much for delivery|how much is delivery/.test(lowered)) {
+    return "Delivery charges depend on your delivery location in Lahore and rider service rates (Careem / Bykea delivery). Share your area with Sana on WhatsApp (+92 322 411 2832) for an exact quote: https://wa.me/923224112832.";
   }
 
   // 6. Same-day orders
@@ -101,17 +145,8 @@ export function getLocalPippaReply(message, history = []) {
     return "For same-day orders, only freshly baked Banana Bread (Classic Choco Chip & Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm today's availability: https://wa.me/923224112832.";
   }
 
-  // 7. Delivery & Pickup general
-  if (/delivery|deliver|pick up|pickup|pick-up|collect|shipping/.test(lowered)) {
-    return "We offer doorstep delivery across Lahore and self pick-up from Askari X, Lahore. Sana confirms the exact time and arrangements directly on WhatsApp: https://wa.me/923224112832.";
-  }
-
-  // 8. Custom Box / Build a box / Packaging costs
-  if (
-    /custom box|build a box|box builder|pick and mix|pick mix|packaging|ribbon|box price|box cost|how much is a custom box/.test(
-      lowered
-    )
-  ) {
+  // 7. Custom Box / Build a Box specifics
+  if (/custom box|build a box|box builder|pick and mix|pick mix|packaging|ribbon|box price|box cost|how much is a custom box/.test(lowered)) {
     const customItems = CATALOGUE_PRODUCTS.filter((p) => p.custom_box_unit != null);
     const itemPrices = customItems
       .map((p) => `${p.name}: Rs. ${p.custom_box_unit.toLocaleString()} each`)
@@ -120,53 +155,196 @@ export function getLocalPippaReply(message, history = []) {
       (p) => `${p.name} (Rs. ${p.price.toLocaleString()})`
     ).join(", ");
     return (
-      `In our Build a Box feature, you can pick and mix individual freshly baked treats!\n\n` +
+      `In our Build a Box feature, you can create a custom assortment with individual treats!\n\n` +
       `• Per-piece treats: ${itemPrices}.\n` +
-      `• Packaging choices: ${boxPackaging}, hand-tied with a luxury pink ribbon.\n\n` +
-      `Your total depends on how many treats you select plus the packaging (Rs. 150). You can also add a handwritten note at checkout!`
+      `• Packaging choices: ${boxPackaging}, tied with a signature pink satin ribbon.\n\n` +
+      `Your total is simply the sum of the treats you pick plus the packaging (Rs. 150). You can also add a handwritten note at checkout!`
     );
   }
 
-  // 9. Ready-made Gift Boxes / Festive Boxes
-  if (
-    /gift box|gift boxes|gifting|festive box|festive boxes|eid box|anniversary box|birthday box|graduation box|baby born box|tell me about gift boxes/.test(
-      lowered
-    )
-  ) {
+  // 8. Ready-made Gift Boxes / Festive Boxes
+  if (/gift box|gift boxes|gifting|festive box|festive boxes|tell me about gift boxes/.test(lowered)) {
     let boxes = CATALOGUE_FESTIVE_BOXES;
     if (budget !== null) {
-      boxes = boxes.filter((b) => withinBudget(b.total));
+      boxes = boxes.filter((b) => b.total <= budget);
       if (boxes.length === 0) {
         const lowest = Math.min(...CATALOGUE_FESTIVE_BOXES.map((b) => b.total));
-        return `Our curated gift boxes start at Rs. ${lowest.toLocaleString()}; there aren't ready-made boxes under Rs. ${budget.toLocaleString()}. However, you can mix individual treats in 'Build a box' to fit your exact budget!`;
+        return `Our curated gift boxes start at Rs. ${lowest.toLocaleString()} (the Anniversary Box). Under Rs. ${budget.toLocaleString()}, you can build your own custom gift box in 'Build a Box' with individual brownies, cinnamon rolls, or cookies!`;
       }
     }
-    const boxDescriptions = boxes
+    const boxList = boxes
       .map(
         (b) =>
-          `• ${b.name} (Rs. ${b.total.toLocaleString()}): ` +
+          `🎁 ${b.name} (Rs. ${b.total.toLocaleString()}): ` +
           b.items.map((line) => `${line.qty} × ${line.product?.name || line.product_id}`).join(", ")
       )
       .join("\n");
     const intro = budget !== null
-      ? `Here are our gift boxes within Rs. ${budget.toLocaleString()}:\n\n`
-      : `Our curated gift boxes come tied with a luxury ribbon and are made for celebrations:\n\n`;
-    return (
-      `${intro}${boxDescriptions}\n\n` +
-      `You can customize any of these under Gifting or build a custom treat box from scratch!`
-    );
+      ? `Here are curated gift boxes within Rs. ${budget.toLocaleString()}:\n\n`
+      : `Our curated gift boxes are hand-tied with a luxury ribbon and perfect for celebrations:\n\n`;
+    return `${intro}${boxList}\n\nAll gift boxes come with gift tags. You can order them under 'Gifting' or customize treats in 'Build a box'!`;
   }
 
-  // 10. Specific item match (e.g. "how much is apple cinnamon loaf", "cheesecake", "brownies")
-  const matchedProduct = CATALOGUE_PRODUCTS.find((p) =>
-    lowered.includes(normalize(p.name))
-  );
+  // 9. Variety / Mix / Assortment request OR Budget > 1500 with variety request
+  const wantsVariety = /variety|mix|assortment|combination|platter|sampler|spread|few different|several|both/.test(lowered);
+  if (wantsVariety || (budget && budget >= 2000 && !/only|single|just one/.test(lowered))) {
+    const effectiveBudget = budget || 3000;
+    const criteria = {
+      budget: effectiveBudget,
+      occasion: occasion || "Celebration",
+      mood: flavorMood || "Chocolate lover",
+      people: people,
+      dietary: "No preference",
+      category: "all",
+    };
+    const varietyBox = buildVarietyBox(CATALOGUE_PRODUCTS, criteria);
+    if (varietyBox && varietyBox.items && varietyBox.items.length >= 2) {
+      const itemsList = varietyBox.items
+        .map((it) => `• ${it.product.name} (Rs. ${it.line_total.toLocaleString()}) — ${it.product.category === "loaf" ? "Whole Loaf" : it.product.unit || "Treat"}`)
+        .join("\n");
+      return (
+        `✨ Here is a curated variety combination tailored for your ${occasion ? occasion.toLowerCase() : "celebration"} (serves ${varietyBox.serves}):\n\n` +
+        `${itemsList}\n\n` +
+        `💰 Total: Rs. ${varietyBox.total.toLocaleString()} (within your Rs. ${effectiveBudget.toLocaleString()} budget)\n\n` +
+        `This combination gives your guests a lovely balance of textures and flavors. You can add these directly to your bag, or mix and match in 'Build a box'!`
+      );
+    }
+  }
+
+  // 10. Occasion-specific customer requirements
+  if (occasion) {
+    if (occasion === "Birthday") {
+      return (
+        `🎂 For a wonderful birthday celebration (${people} guests), here is our top variety:\n\n` +
+        `1. 🍰 Centerpiece Showstoppers:\n` +
+        `   • New York Cheesecake (Rs. 2,200 — velvety, rich, classic graham crust, serves 6–8)\n` +
+        `   • Salted Caramel Brownie Trifle Box (Rs. 2,500 — layers of fudgy brownie, caramel & cream)\n\n` +
+        `2. 🎁 Curated Gifting:\n` +
+        `   • Birthday Box (Rs. 3,800: 1 × Choco Chip Banana Bread + 4 × Double Chocolate Cookies + 1 × Box of 4 Brownies, ribbon-tied)\n\n` +
+        `3. 🧁 Mini Treats for Sharing:\n` +
+        `   • Malt Cake Cup (Rs. 400) or Chocolate Trifle Cup (Rs. 400)\n\n` +
+        `Would you like something rich in chocolate, or a creamy cheesecake?`
+      );
+    }
+
+    if (occasion === "Tea party") {
+      return (
+        `🫖 For an afternoon tea or high tea gathering (${people} guests), we recommend this elegant spread:\n\n` +
+        `• Coffee Bread with Walnut Crumble (Rs. 1,200) — toasty, aromatic, slices like a dream\n` +
+        `• Moist Lemon Loaf (Rs. 1,200) — bright citrus glaze that pairs wonderfully with hot tea\n` +
+        `• Warm Cinnamon Rolls (Pack of 4, Rs. 1,600) — pillowy soft with cream cheese icing\n` +
+        `• Crisp Chocolate Chip Cookies (Rs. 300 each / Pack of 4 Rs. 1,200)\n\n` +
+        `Or choose our ready-made Anniversary Box (Rs. 2,400) which combines Coffee Bread with 4 Cookies!`
+      );
+    }
+
+    if (occasion === "Anniversary") {
+      return (
+        `🥂 For a sweet anniversary celebration:\n\n` +
+        `• Signature Anniversary Box (Rs. 2,400): 1 × Coffee Bread with Walnut Crumble + 4 × Chocolate Chip Cookies, tied with satin ribbon.\n` +
+        `• Romantic Dessert Boxes: Banoffee Pie Trifle Box (Rs. 2,100) or New York Cheesecake (Rs. 2,200).\n` +
+        `• Decadent Loaf: Double Chocolate Loaf (Rs. 1,800) or Choco Chip Banana Bread (Rs. 1,200).\n\n` +
+        `You can also add a custom anniversary note at checkout!`
+      );
+    }
+
+    if (occasion === "Eid" || occasion === "Family gathering") {
+      return (
+        `🌙 For Eid and family gatherings (${people} guests), here is a festive variety for sharing:\n\n` +
+        `• Curated Eid Box (Rs. 3,800): 1 × Coconut Loaf + 4 × Double Chocolate Cookies + 1 × Box of 4 Papparoti Buns!\n` +
+        `• Large Dessert Trifle Boxes (serves 6–8):\n` +
+        `  - Fruit Trifle Box (Rs. 1,800) — light and refreshing with seasonal fruits\n` +
+        `  - Banoffee Pie Trifle Box (Rs. 2,100) — fresh bananas and dulce de leche\n` +
+        `• Loaf Favorites: Coconut Loaf (Rs. 1,200) or Apple Cinnamon Loaf (Rs. 950)\n\n` +
+        `What flavor profile does your family love most?`
+      );
+    }
+
+    if (occasion === "Baby born") {
+      return (
+        `🍼 For welcoming a new baby or celebrating a baby shower:\n\n` +
+        `• Curated Baby Born Box (Rs. 2,800): 1 × Lemon Loaf + 1 × Cinnamon Rolls (Pack of 4), tied in ribbon.\n` +
+        `• Gentle Treats: Mango Trifle Cup (Rs. 350) and Fruit Trifle Box (Rs. 1,800).\n` +
+        `• Build a Box: Pick mini loaves, cookies, and pastel ribbons in our Box Builder!`
+      );
+    }
+
+    if (occasion === "Graduation") {
+      return (
+        `🎓 For a milestone graduation celebration:\n\n` +
+        `• Signature Graduation Box (Rs. 2,800): 1 × Coffee Bread with Walnut Crumble + 1 × Cinnamon Rolls (Pack of 4).\n` +
+        `• Party Centerpieces: New York Cheesecake (Rs. 2,200) or Salted Caramel Brownie Trifle Box (Rs. 2,500).\n` +
+        `• Bite-Sized Treats: Brownies (Box of 4, Rs. 1,200) and Double Chocolate Cookies (Rs. 350).`
+      );
+    }
+  }
+
+  // 11. Flavor cravings and mood matching
+  if (flavorMood) {
+    if (flavorMood === "Chocolate lover") {
+      return (
+        `🍫 For chocolate cravings, here is our decadent chocolate lineup:\n\n` +
+        `• Fudgy & Rich: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n` +
+        `• Chilled Showstopper: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n` +
+        `• Warm Oven Loaves: Double Chocolate Loaf (Rs. 1,800) or Choco Chip Banana Bread (Rs. 1,200)\n` +
+        `• Bite-sized: Double Chocolate Cookie (Rs. 350) or Chocolate Trifle Cup (Rs. 400)\n\n` +
+        `Are you craving warm baked slices or a cold creamy dessert box?`
+      );
+    }
+
+    if (flavorMood === "Fresh & citrusy") {
+      return (
+        `🍋 For something fresh, fruity, and citrusy:\n\n` +
+        `• Zesty & Glazed: Moist Lemon Loaf (Rs. 1,200 — real lemon zest & citrus glaze)\n` +
+        `• Tropical Desserts: Pineapple Dessert Box (Rs. 1,800) or Fruit Trifle Box (Rs. 1,800)\n` +
+        `• Chilled Cups: Mango Trifle Cup (Rs. 350) — layered sponge, mango puree, and light cream\n` +
+        `• Spiced Fruit: Apple Cinnamon Loaf (Rs. 950)\n\n` +
+        `These are light, refreshing, and never overwhelmingly heavy!`
+      );
+    }
+
+    if (flavorMood === "Warm & comforting") {
+      return (
+        `☕ For warm, comforting bakery aromas:\n\n` +
+        `• Cinnamon Rolls (Pack of 4, Rs. 1,600) — buttery swirl with cream cheese glaze\n` +
+        `• Choco Chip Banana Bread (Rs. 1,200) — loaded with ripe bananas and melting chips\n` +
+        `• Apple Cinnamon Loaf (Rs. 950) — spiced apple chunks and warm cinnamon\n` +
+        `• Papparoti Buns (Box of 4, Rs. 1,200) — crispy coffee crust with buttery center\n\n` +
+        `Pop any of these in the oven or microwave for 15 seconds for that fresh-out-of-the-oven bliss!`
+      );
+    }
+
+    if (flavorMood === "Coffee lover") {
+      return (
+        `☕ For coffee lovers:\n\n` +
+        `• Coffee Bread with Walnut Crumble (Rs. 1,200) — rich coffee swirl topped with toasty walnuts\n` +
+        `• Coffee Cake with Nutty Brittle (Rs. 1,200) — moist coffee sponge with crunchy caramelized brittle\n` +
+        `• Papparoti Buns (Box of 4, Rs. 1,200) — famous aromatic coffee caramel topping\n` +
+        `• Banoffee Pie Trifle Box (Rs. 2,100) — pairs heavenly with a warm cup of espresso\n\n` +
+        `Which one would pair best with your coffee?`
+      );
+    }
+
+    if (flavorMood === "Something different") {
+      return (
+        `✨ For guilt-free, wholesome, or dietary-friendly options:\n\n` +
+        `• Sugar-Free Dates Loaf (Rs. 1,800) — 100% naturally sweetened with premium dates, zero refined sugar\n` +
+        `• Flourless Brownies (Box of 4, Rs. 1,200) — naturally gluten-free and deeply fudgy\n` +
+        `• Oat Flour Choco Chip Banana Bread (Rs. 1,200) — wholesome oat flour recipe\n` +
+        `• Oat Flour Chocolate Chip Cookie (Rs. 400 each)\n\n` +
+        `Healthy indulgence crafted with pure quality ingredients!`
+      );
+    }
+  }
+
+  // 12. Specific product match
+  const matchedProduct = CATALOGUE_PRODUCTS.find((p) => lowered.includes(normalize(p.name)));
   if (matchedProduct) {
     const isCustomQuery = /custom|single|piece|each/.test(lowered);
     const unitPrice = isCustomQuery && matchedProduct.custom_box_unit != null
       ? matchedProduct.custom_box_unit
       : matchedProduct.price;
-    let detail = `${matchedProduct.name} is Rs. ${unitPrice.toLocaleString()} per ${matchedProduct.unit}`;
+    let detail = `🍰 **${matchedProduct.name}** is Rs. ${unitPrice.toLocaleString()} per ${matchedProduct.unit}`;
     if (isCustomQuery && matchedProduct.custom_box_unit != null) {
       detail += " in a custom box";
     }
@@ -175,66 +353,104 @@ export function getLocalPippaReply(message, history = []) {
       detail += ` Serves ${matchedProduct.serves}.`;
     }
     if (matchedProduct.story) {
-      detail += ` ${matchedProduct.story}`;
+      detail += `\n${matchedProduct.story}`;
     }
     return detail;
   }
 
-  // 11. Budget queries ("Bakes under Rs 1,000", "Under 1500", "Menu options", "What can I get for 1000")
-  if (
-    budget !== null ||
-    /menu|price|prices|cost|available|what do you have|products|bakes|under 1000|options/.test(lowered)
-  ) {
-    const categories = [
-      { id: "loaf", label: "Loaves" },
-      { id: "cheesecake", label: "Dessert Boxes" },
-      { id: "batch", label: "Bakes & Cups" },
-      { id: "cookie", label: "Cookies" },
-    ];
-    const lines = [];
-    for (const cat of categories) {
-      const items = CATALOGUE_PRODUCTS.filter(
-        (p) => p.category === cat.id && withinBudget(p.price)
-      );
-      if (items.length > 0) {
-        lines.push(
-          `• ${cat.label}: ` +
-            items.map((it) => `${it.name} (Rs. ${it.price.toLocaleString()})`).join(", ")
-        );
-      }
-    }
-    if (lines.length === 0) {
+  // 13. Category queries
+  if (/cheesecake|dessert box|dessert boxes|trifle box/.test(lowered)) {
+    const desserts = CATALOGUE_PRODUCTS.filter((p) => p.category === "cheesecake");
+    const list = desserts.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()} — serves ${p.serves})`).join("\n");
+    return (
+      `🍰 Here are our signature cold-set Dessert Boxes & Cheesecakes (generous 6–8 servings each):\n\n` +
+      `${list}\n\n` +
+      `Each dessert box is layered to perfection and served chilled. Which flavor catches your eye?`
+    );
+  }
+
+  if (/loaf|loaves|bread/.test(lowered)) {
+    const loaves = CATALOGUE_PRODUCTS.filter((p) => p.category === "loaf");
+    const list = loaves.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()} — serves ${p.serves})`).join("\n");
+    return (
+      `🍞 Here is our freshly baked artisanal Loaf collection (all serve 6–8):\n\n` +
+      `${list}\n\n` +
+      `All loaves are baked with pure butter and real fruit/cocoa. Would you like a warm slice recommendation?`
+    );
+  }
+
+  if (/cookie|cookies/.test(lowered)) {
+    const cookies = CATALOGUE_PRODUCTS.filter((p) => p.category === "cookie");
+    const list = cookies.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()})`).join("\n");
+    return (
+      `🍪 Here are our handcrafted Cookies:\n\n` +
+      `${list}\n\n` +
+      `You can order individual cookies, a pack of 4, or mix them into a custom box!`
+    );
+  }
+
+  if (/cup|cups|trifle cup|batch|batches|brownie|rolls/.test(lowered)) {
+    const batches = CATALOGUE_PRODUCTS.filter((p) => p.category === "batch");
+    const list = batches.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()} — ${p.unit})`).join("\n");
+    return (
+      `🧁 Here are our individual bakes, cups & sharing batches:\n\n` +
+      `${list}\n\n` +
+      `Great for party platters, tea tables, or single cravings!`
+    );
+  }
+
+  // 14. Budget queries (Under 1000, 1500, etc.)
+  if (budget !== null || /under 1000|cheap|affordable|budget/.test(lowered)) {
+    const targetBudget = budget || 1000;
+    const items = CATALOGUE_PRODUCTS.filter((p) => p.price <= targetBudget);
+    if (items.length === 0) {
       const minPrice = Math.min(...CATALOGUE_PRODUCTS.map((p) => p.price));
-      return `I couldn't find any menu items under Rs. ${budget?.toLocaleString() || "that amount"}. Our lowest-priced bakes start at Rs. ${minPrice.toLocaleString()} (e.g., Chocolate Chip Cookies and Trifle Cups). You can also mix treats in Build a Box!`;
+      return `Our lowest-priced bakes start at Rs. ${minPrice.toLocaleString()} (e.g. Chocolate Chip Cookie Rs. 300, Trifle Cups Rs. 350–400). In 'Build a box', you can also assemble single treats to match your budget!`;
     }
-    const intro = budget !== null
-      ? `Here are delicious options under Rs. ${budget.toLocaleString()}:\n\n`
-      : `Here are our artisanal bakery favorites:\n\n`;
-    return `${intro}${lines.join("\n")}\n\nTap 'Menu' at the top to see photos and order!`;
+
+    const loaves = items.filter((p) => p.category === "loaf");
+    const cups = items.filter((p) => p.category === "batch");
+    const cookies = items.filter((p) => p.category === "cookie");
+    const desserts = items.filter((p) => p.category === "cheesecake");
+
+    const lines = [];
+    if (loaves.length) lines.push(`🍞 **Loaves**: ` + loaves.map((it) => `${it.name} (Rs. ${it.price.toLocaleString()})`).join(", "));
+    if (desserts.length) lines.push(`🍰 **Desserts**: ` + desserts.map((it) => `${it.name} (Rs. ${it.price.toLocaleString()})`).join(", "));
+    if (cups.length) lines.push(`🧁 **Bakes & Cups**: ` + cups.map((it) => `${it.name} (Rs. ${it.price.toLocaleString()})`).join(", "));
+    if (cookies.length) lines.push(`🍪 **Cookies**: ` + cookies.map((it) => `${it.name} (Rs. ${it.price.toLocaleString()})`).join(", "));
+
+    return (
+      `💰 Here are delicious options within Rs. ${targetBudget.toLocaleString()}:\n\n` +
+      `${lines.join("\n\n")}\n\n` +
+      `Tip: You can also combine treats (e.g. a Loaf + Cookie, or 2 Trifle Cups) for great variety!`
+    );
   }
 
-  // 12. Recommendation questions
-  if (/recommend|suggest|what should i|best bake|craving|favorite|popular/.test(lowered)) {
-    if (/chocolate/.test(lowered)) {
-      return "For chocolate lovers, I highly recommend our Choco Chip Banana Bread (Rs. 1,600) or our Double Chocolate Cookies (Rs. 350 each). Rich, fudgy, and loaded with melted chocolate chips!";
-    }
-    if (/tea|afternoon/.test(lowered)) {
-      return "For tea time, you'll love the Coffee Bread with Walnut Crumble (Rs. 1,600) or our moist Lemon Loaf (Rs. 1,200). They pair beautifully with hot tea or coffee!";
-    }
-    return "Our most loved signature bakes are the warm Choco Chip Banana Bread (Rs. 1,600), freshly glazed Cinnamon Rolls (Pack of 4, Rs. 1,600), and New York Cheesecake (Rs. 3,500). What flavors do you usually crave?";
+  // 15. Recommendation / Best seller general
+  if (/recommend|suggest|what should i|best bake|favorite|popular|famous|top/.test(lowered)) {
+    return (
+      `✨ Our most celebrated customer favorites across the menu:\n\n` +
+      `1. 🍞 **Warm Banana Bread** (Rs. 1,200) — same-day oven fresh in Lahore, pure butter with molten chocolate chips.\n` +
+      `2. 🍰 **New York Cheesecake** (Rs. 2,200) — velvety smooth on a buttery graham crust, serves 6–8.\n` +
+      `3. 🧁 **Cinnamon Rolls** (Pack of 4, Rs. 1,600) — pillowy soft with vanilla cream cheese icing.\n` +
+      `4. 🍮 **Salted Caramel Brownie Trifle Box** (Rs. 2,500) — layered fudge brownies, caramel, and cream.\n\n` +
+      `Tell me if you prefer something chocolatey, fruity, or toasty for tea time!`
+    );
   }
 
-  // 13. Order tracking
-  const orderCodeMatch = lowered.match(/\btt\d{6}\b/i);
-  if (orderCodeMatch || /track|my order|where is my order|status of order/.test(lowered)) {
-    return "To look up an order, enter your order code (like TT123456) along with the last four digits of your phone number. You can also message Sana directly on WhatsApp with your code: https://wa.me/923224112832.";
-  }
-
-  // 14. Greeting / Hello
+  // 16. Greetings
   if (/^(hi|hello|hey|salam|assalam|good morning|good afternoon|good evening)\b/.test(lowered)) {
-    return "Hi! I’m Pippa, your pocket baker ✨ Tell me what you're craving, your budget, or an occasion you're celebrating, and I’ll help you find the sweetest bake!";
+    return "Hi there! I’m Pippa, your pocket baker at Treats & Temptation by SK ✨ Tell me what you're celebrating, your budget, or flavors you're craving, and I'll curate the sweetest variety for you!";
   }
 
-  // Default fallback
-  return "I'm Pippa, your pocket baker! I can help you check menu prices, find bakes under a budget, guide you through Build a Box and Gift Boxes, explain bank transfer payment, or assist with order questions. What can I bake up for you?";
+  // 17. Default helpful guide
+  return (
+    `I'm Pippa, your pocket baker! I can help you find the perfect bake or curate a variety spread.\n\n` +
+    `Try asking me:\n` +
+    `• *"What should I get for a birthday with 8 guests?"*\n` +
+    `• *"Suggest a variety of bakes within Rs. 2,500"*\n` +
+    `• *"I want something chocolate for tea time"*\n` +
+    `• *"Tell me about gift boxes" or "How much is a custom box?"*\n\n` +
+    `What are you in the mood for today?`
+  );
 }
