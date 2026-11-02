@@ -95,7 +95,7 @@ PRODUCTS = [
      "serves": "5–6", "serves_min": 5, "serves_max": 6, "unit": "loaf", "healthy": True,
       "note": "Wholesome oat flour & dark chocolate",
       "moods": ["Warm & comforting", "Chocolate lover"], "occasions": ["Tea party", "Gift", "Just craving something"],
-      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
+      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793614897/Gemini_Generated_Image_9pm7ni9pm7ni9pm7.jpg",
       "story": "Wholesome oat flour, ripe bananas, and rich chocolate chips."},
 
      # Cheesecake & dessert boxes
