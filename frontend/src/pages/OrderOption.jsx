@@ -32,17 +32,17 @@ const ORDER_PAGES = {
     eyebrow: "DAILY FRESH BAKE · LAHORE",
     title: <em>Same-Day Orders</em>,
     intro: "Craving a fresh bake today? Our signature Banana Bread is baked fresh daily and available for same-day delivery or pick-up in Lahore. All other menu items require 24 hours advance order.",
-    note: "Same-day ordering is exclusively available for Banana Bread (Classic Choco Chip & Oat Flour), subject to daily batch availability. All other bakes require 24 hours advance notice.",
+    note: "Same-day ordering is exclusively available for Banana Bread (Choco Chip & Walnuts and Oat Flour), subject to daily batch availability. All other bakes require 24 hours advance notice.",
     prompt: "Hello Sana! I would like to place a same-day order for fresh Banana Bread.",
     primary: "Order Banana Bread",
     primaryTo: "#same-day-bakes",
     secondary: "Order on WhatsApp",
     label: "SAME-DAY ORDERS · BANANA BREAD EXCLUSIVE",
     image: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-    imageAlt: "Freshly baked Choco Chip Banana Bread",
+    imageAlt: "Freshly baked Choco Chip and Walnuts Banana Bread",
     imageCaption: "Baked fresh daily · Available today",
     steps: [
-      { title: "Select Banana Bread", detail: "Choose our classic Choco Chip Banana Bread or wholesome Oat Flour variant." },
+      { title: "Select Banana Bread", detail: "Choose our Choco Chip and Walnuts Banana Bread or wholesome Oat Flour variant." },
       { title: "Fulfilment Details", detail: "Pick up in Askari X or provide your delivery address in Lahore." },
       { title: "Fast Dispatch", detail: "Instant confirmation on WhatsApp with same-day dispatch from our oven." },
     ],
@@ -124,7 +124,7 @@ export default function OrderOption({ orderType }) {
   });
   const [sameDayRequest, setSameDayRequest] = useState({
     fulfilment: "pickup",
-    selectedLoaf: "Choco Chip Banana Bread (Rs. 1,200)",
+    selectedLoaf: "Choco Chip & Walnuts Banana Bread (Rs. 1,350)",
     quantity: 1,
     fullName: "",
     phone: "",
@@ -367,9 +367,9 @@ export default function OrderOption({ orderType }) {
               <label className="advance-order-field">
                 <span>Choose Banana Bread</span>
                 <select name="selectedLoaf" value={sameDayRequest.selectedLoaf} onChange={updateSameDayRequest} data-testid="same-day-loaf-select">
-                  <option value="Choco Chip Banana Bread (Rs. 1,200)">Choco Chip Banana Bread (Rs. 1,200)</option>
+                  <option value="Choco Chip & Walnuts Banana Bread (Rs. 1,350)">Choco Chip & Walnuts Banana Bread (Rs. 1,350)</option>
                   <option value="Oat Flour Choco Chip Banana Bread (Rs. 1,200)">Oat Flour Choco Chip Banana Bread (Rs. 1,200)</option>
-                  <option value="Both Loaves (1x Classic + 1x Oat Flour - Rs. 2,400)">Both Loaves (1x Classic + 1x Oat Flour - Rs. 2,400)</option>
+                  <option value="Both Loaves (1x Choco Chip & Walnuts + 1x Oat Flour - Rs. 2,550)">Both Loaves (1x Choco Chip & Walnuts + 1x Oat Flour - Rs. 2,550)</option>
                 </select>
               </label>
               <label className="advance-order-field">

@@ -54,12 +54,11 @@ PRODUCTS = [
       "moods": ["Warm & comforting"], "occasions": ["Tea party", "Family gathering", "Anniversary", "Just craving something"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1792842257/Screenshot_20261012_231833_Chrome.jpg",
       "story": "Warm spice and cinnamon folded into a tender, golden crumb."},
-     {"id": "chocolate-chip-banana", "name": "Choco Chip Banana Bread", "category": "loaf", "price": 1200,
+     {"id": "chocolate-chip-banana", "name": "Choco Chip and Walnuts Banana Bread", "category": "loaf", "price": 1350,
       "serves": "5–6", "serves_min": 5, "serves_max": 6, "unit": "loaf",
-      "addons": [{"name": "Walnuts", "price": 100}],
       "moods": ["Warm & comforting", "Chocolate lover"], "occasions": ["Tea party", "Family gathering", "Just craving something", "Birthday"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-      "story": "Classic banana bread loaded with melted semi-sweet chocolate chips."},
+      "story": "Classic banana bread loaded with melted semi-sweet chocolate chips and crunchy walnuts."},
      {"id": "lemon-loaf", "name": "Lemon Loaf", "category": "loaf", "price": 1200,
       "serves": "5–6", "serves_min": 5, "serves_max": 6, "unit": "loaf",
       "moods": ["Fresh & citrusy"], "occasions": ["Tea party", "Gift", "Baby born", "Just craving something"],
@@ -598,7 +597,7 @@ def _catalogue_chat_reply(message: str, history=None):
         return "Delivery charges depend on your area and aren't listed as a fixed price here. Send Sana your location and order details for a quote: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("same day", "today")):
-        return "For same-day orders, only freshly baked Banana Bread (Classic Choco Chip & Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm: https://wa.me/923224112832."
+        return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("delivery", "deliver", "pick up", "pickup", "pick-up", "collect", "shipping")):
         return "Pick-up is available in Askari X and doorstep delivery across Lahore. Send Sana your location and preferred time; she confirms availability and arrangements directly: https://wa.me/923224112832."
@@ -667,7 +666,7 @@ def _catalogue_chat_reply(message: str, history=None):
       return "🌙 For Eid celebrations, here is our festive variety:\n• Signature Eid Box (Rs. 3,800): 1 × Coconut Loaf, 4 × Double Choc Cookies, and 1 × Box of 4 Papparoti Buns!\n• Dessert Trifle Boxes: Fruit Trifle Box (Rs. 1,800) or Banoffee Pie Trifle Box (Rs. 2,100)\n• Loaves: Coconut Loaf (Rs. 1,200) or Apple Cinnamon Loaf (Rs. 950)"
 
     if any(w in lowered for w in ("chocolate", "choc", "fudge")) and not category:
-      return "🍫 For chocolate lovers, we have a decadent variety:\n• Fudgy: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n• Dessert Box: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n• Warm Loaves: Double Chocolate Loaf (Rs. 1,800) or Choco Chip Banana Bread (Rs. 1,200)\n• Cookie: Double Chocolate Cookie (Rs. 350 each)"
+      return "🍫 For chocolate lovers, we have a decadent variety:\n• Fudgy: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n• Dessert Box: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n• Warm Loaves: Double Chocolate Loaf (Rs. 1,800) or Choco Chip and Walnuts Banana Bread (Rs. 1,350)\n• Cookie: Double Chocolate Cookie (Rs. 350 each)"
 
     recommendation = any(word in query for word in ("recommend", "suggest", "what should", "which one", "best for", "perfect for", "match me", "surprise"))
     if recommendation:

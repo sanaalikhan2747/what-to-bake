@@ -13,9 +13,9 @@ const storyBakes = [
   },
   {
     id: "chocolate-chip-banana",
-    name: "Chocolate Chip Banana Bread",
+    name: "Choco Chip & Walnuts Banana Bread",
     image: "https://images.unsplash.com/photo-1621994214182-f467e6999dc9?auto=format&fit=crop&w=900&q=85",
-    story: "The loaf you slice on a slow Sunday, with chocolate melting into every crumb.",
+    story: "The loaf you slice on a slow Sunday, with melted chocolate and toasted walnuts in every crumb.",
   },
   {
     id: "apple-cinnamon-loaf",

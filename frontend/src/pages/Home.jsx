@@ -47,7 +47,7 @@ const heroSlides = [
   },
   {
     src: "https://res.cloudinary.com/n9pu62pg/image/upload/v1790870752/image_6ac914dd.jpg",
-    alt: "Warm Choco Chip Banana Bread",
+    alt: "Warm Choco Chip and Walnuts Banana Bread",
     eyebrow: "SAME-DAY IN LAHORE",
     heading: "Warm Banana Bread,",
     accent: "fresh from the oven.",
