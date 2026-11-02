@@ -142,7 +142,7 @@ export function getLocalPippaReply(message, history = []) {
 
   // 6. Same-day orders
   if (/same day|today|urgent|in 2 hours|right now/.test(lowered)) {
-    return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm today's availability: https://wa.me/923224112832.";
+    return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Nutty Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm today's availability: https://wa.me/923224112832.";
   }
 
   // 7. Custom Box / Build a Box specifics
@@ -330,7 +330,7 @@ export function getLocalPippaReply(message, history = []) {
         `✨ For guilt-free, wholesome, or dietary-friendly options:\n\n` +
         `• Sugar-Free Dates Loaf (Rs. 1,800) — 100% naturally sweetened with premium dates, zero refined sugar\n` +
         `• Flourless Brownies (Box of 4, Rs. 1,200) — naturally gluten-free and deeply fudgy\n` +
-        `• Oat Flour Choco Chip Banana Bread (Rs. 1,200) — wholesome oat flour recipe\n` +
+        `• Nutty Oat Flour Banana Bread (Rs. 1,350) — wholesome oat flour recipe with crunchy nuts & chocolate chips\n` +
         `• Oat Flour Chocolate Chip Cookie (Rs. 400 each)\n\n` +
         `Healthy indulgence crafted with pure quality ingredients!`
       );

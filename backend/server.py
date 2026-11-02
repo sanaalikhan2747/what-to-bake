@@ -91,12 +91,12 @@ PRODUCTS = [
       "moods": ["Warm & comforting", "Something different"], "occasions": ["Gift", "Family gathering", "Just craving something"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1790869786/image_8402ea07.jpg",
       "story": "Naturally sweetened with Arabian dates and crunchy walnuts."},
-    {"id": "oat-flour-banana-bread", "name": "Oat Flour Choco Chip Banana Bread", "category": "loaf", "price": 1200,
+    {"id": "oat-flour-banana-bread", "name": "Nutty Oat Flour Banana Bread", "category": "loaf", "price": 1350,
      "serves": "5–6", "serves_min": 5, "serves_max": 6, "unit": "loaf", "healthy": True,
-      "note": "Wholesome oat flour & dark chocolate",
+      "note": "Wholesome oat flour, crunchy nuts & dark chocolate",
       "moods": ["Warm & comforting", "Chocolate lover"], "occasions": ["Tea party", "Gift", "Just craving something"],
-      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793614897/Gemini_Generated_Image_9pm7ni9pm7ni9pm7.jpg",
-      "story": "Wholesome oat flour, ripe bananas, and rich chocolate chips."},
+      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793612966/ChatGPT_Image_Oct_2_2026_11_09_38_PM.png",
+      "story": "Wholesome oat flour, ripe bananas, crunchy toasted nuts, and rich chocolate chips."},
 
      # Cheesecake & dessert boxes
      {"id": "nyc-cheesecake", "name": "New York Cheesecake", "category": "cheesecake", "price": 2200,
@@ -597,7 +597,7 @@ def _catalogue_chat_reply(message: str, history=None):
         return "Delivery charges depend on your area and aren't listed as a fixed price here. Send Sana your location and order details for a quote: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("same day", "today")):
-        return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm: https://wa.me/923224112832."
+        return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Nutty Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm: https://wa.me/923224112832."
 
     if any(word in lowered for word in ("delivery", "deliver", "pick up", "pickup", "pick-up", "collect", "shipping")):
         return "Pick-up is available in Askari X and doorstep delivery across Lahore. Send Sana your location and preferred time; she confirms availability and arrangements directly: https://wa.me/923224112832."
