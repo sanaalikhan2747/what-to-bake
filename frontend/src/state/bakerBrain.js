@@ -373,7 +373,7 @@ export function getLocalPippaReply(message, history = []) {
     const loaves = CATALOGUE_PRODUCTS.filter((p) => p.category === "loaf");
     const list = loaves.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()} — serves ${p.serves})`).join("\n");
     return (
-      `🍞 Here is our freshly baked artisanal Loaf collection (all serve 6–8):\n\n` +
+      `🍞 Here is our freshly baked artisanal Loaf collection (all serve 5–6):\n\n` +
       `${list}\n\n` +
       `All loaves are baked with pure butter and real fruit/cocoa. Would you like a warm slice recommendation?`
     );
