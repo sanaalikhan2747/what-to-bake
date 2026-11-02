@@ -142,7 +142,7 @@ export function getLocalPippaReply(message, history = []) {
 
   // 6. Same-day orders
   if (/same day|today|urgent|in 2 hours|right now/.test(lowered)) {
-    return "For same-day orders, only freshly baked Banana Bread (Choco Chip & Walnuts and Nutty Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm today's availability: https://wa.me/923224112832.";
+    return "For same-day orders, only freshly baked Banana Bread (Classic Choco Chip, Choco Chip & Walnuts, Nutty Oat Flour) is available today (subject to daily oven batches). All other menu items require 24 hours advance pre-order. Message Sana on WhatsApp to confirm today's availability: https://wa.me/923224112832.";
   }
 
   // 7. Custom Box / Build a Box specifics
@@ -286,7 +286,7 @@ export function getLocalPippaReply(message, history = []) {
         `🍫 For chocolate cravings, here is our decadent chocolate lineup:\n\n` +
         `• Fudgy & Rich: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n` +
         `• Chilled Showstopper: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n` +
-        `• Warm Oven Loaves: Double Chocolate Loaf (Rs. 1,800) or Choco Chip and Walnuts Banana Bread (Rs. 1,350)\n` +
+        `• Warm Oven Loaves: Choco Chip Banana Bread (Rs. 1,200 — premium choco chips), Choco Chip and Walnuts Banana Bread (Rs. 1,350), or Double Chocolate Loaf (Rs. 1,800)\n` +
         `• Bite-sized: Double Chocolate Cookie (Rs. 350) or Chocolate Trifle Cup (Rs. 400)\n\n` +
         `Are you craving warm baked slices or a cold creamy dessert box?`
       );
@@ -307,7 +307,8 @@ export function getLocalPippaReply(message, history = []) {
       return (
         `☕ For warm, comforting bakery aromas:\n\n` +
         `• Cinnamon Rolls (Pack of 4, Rs. 1,600) — buttery swirl with cream cheese glaze\n` +
-        `• Choco Chip and Walnuts Banana Bread (Rs. 1,350) — loaded with ripe bananas, melting chips and crunchy walnuts\n` +
+        `• Choco Chip Banana Bread (Rs. 1,200) — loaded with ripe bananas and premium quality choco chips\n` +
+        `• Choco Chip and Walnuts Banana Bread (Rs. 1,350) — bananas, melting chips and crunchy walnuts\n` +
         `• Apple Cinnamon Loaf (Rs. 950) — spiced apple chunks and warm cinnamon\n` +
         `• Papparoti Buns (Box of 4, Rs. 1,200) — crispy coffee crust with buttery center\n\n` +
         `Pop any of these in the oven or microwave for 15 seconds for that fresh-out-of-the-oven bliss!`
@@ -430,7 +431,7 @@ export function getLocalPippaReply(message, history = []) {
   if (/recommend|suggest|what should i|best bake|favorite|popular|famous|top/.test(lowered)) {
     return (
       `✨ Our most celebrated customer favorites across the menu:\n\n` +
-      `1. 🍞 **Warm Banana Bread** (Rs. 1,350) — same-day oven fresh in Lahore, pure butter with molten chocolate chips and walnuts.\n` +
+      `1. 🍞 **Warm Banana Bread** (From Rs. 1,200) — same-day oven fresh in Lahore with premium quality choco chips or crunchy walnuts.\n` +
       `2. 🍰 **New York Cheesecake** (Rs. 2,200) — velvety smooth on a buttery graham crust, serves 5–6.\n` +
       `3. 🧁 **Cinnamon Rolls** (Pack of 4, Rs. 1,600) — pillowy soft with vanilla cream cheese icing.\n` +
       `4. 🍮 **Salted Caramel Brownie Trifle Box** (Rs. 2,500) — layered fudge brownies, caramel, and cream.\n\n` +
