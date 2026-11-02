@@ -4,6 +4,7 @@ import { ArrowRight, Building2, Check, Copy, ShieldCheck } from "lucide-react";
 import { api } from "@/state/api";
 import { useCart } from "@/state/CartContext";
 import { PAYMENT_CONFIG } from "@/state/paymentConfig";
+import PaymentScreenshotUploader from "@/components/PaymentScreenshotUploader";
 
 const PACK_LABELS = {
   "clear-box": "Clear Plastic Box with Pink Ribbon",
@@ -30,6 +31,7 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
   const [copiedIban, setCopiedIban] = useState(false);
+  const [screenshot, setScreenshot] = useState(null);
   const navigate = useNavigate();
 
   const copyIban = async () => {
@@ -72,6 +74,7 @@ export default function Checkout() {
         items: items.map((i) => ({ product_id: i.id, qty: i.qty, custom_box: !!i.custom_box })),
         packaging_id: packagingId || null,
         personalized_message: message || null,
+        payment_screenshot: screenshot?.dataUrl || null,
         customer: {
           name: form.name.trim(),
           phone: form.phone.trim(),
@@ -83,7 +86,7 @@ export default function Checkout() {
       };
       const r = await api.post("/orders", payload);
       clearCart();
-      navigate(`/order/${r.data.order_number}`);
+      navigate(`/order/${r.data.order_number}`, { state: { screenshot } });
     } catch (err) {
       setServerError(err?.response?.data?.detail || "Something went wrong placing your order. Please try again.");
     } finally {
@@ -188,6 +191,17 @@ export default function Checkout() {
               <p className="payment-instructions">
                 {PAYMENT_CONFIG.actionNote}
               </p>
+
+              <div className="checkout-screenshot-section">
+                <PaymentScreenshotUploader
+                  screenshot={screenshot}
+                  onScreenshotChange={setScreenshot}
+                  title="Payment Screenshot / Transfer Receipt"
+                  subtitle="Transferred to Farzana seemin via your banking app? Attach screenshot here to share it directly to WhatsApp with your order!"
+                  compact={true}
+                  testIdPrefix="checkout-screenshot"
+                />
+              </div>
             </div>
           </div>
 

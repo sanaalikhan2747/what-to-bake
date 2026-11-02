@@ -303,6 +303,11 @@ class CreateOrderRequest(BaseModel):
     packaging_id: Optional[str] = None
     personalized_message: Optional[str] = Field(default=None, max_length=140)
     customer: Customer
+    payment_screenshot: Optional[str] = None
+
+
+class AttachScreenshotRequest(BaseModel):
+    payment_screenshot: str = Field(min_length=1)
 
 
 # ---------- Matchmaker (loaves only — the emotional layer) ----------
@@ -965,6 +970,9 @@ async def baker_chat(request: ChatRequest):
     return {"session_id": session_id, "reply": reply, "ok": True, "mode": mode}
 
 
+MEMORY_ORDERS = {}
+
+
 def _new_order_number():
     return "TT" + "".join(random.choices("0123456789", k=6))
 
@@ -1014,6 +1022,7 @@ async def create_order(payload: CreateOrderRequest):
         "packaging": ({"id": pack["id"], "name": pack["name"], "price": pack["price"], "ribbon": pack["ribbon"], "style": pack.get("style"), "image": pack.get("image")} if pack else None),
         "personalized_message": payload.personalized_message or "",
         "customer": payload.customer.model_dump(),
+        "payment_screenshot": payload.payment_screenshot or None,
         "subtotal": subtotal,
         "packaging_total": packaging_total,
         "total": total,
@@ -1021,17 +1030,50 @@ async def create_order(payload: CreateOrderRequest):
         "status": "pending_confirmation",
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    await db.orders.insert_one(order_doc)
-    order_doc.pop("_id", None)
+    MEMORY_ORDERS[order_number] = dict(order_doc)
+    if db is not None:
+        try:
+            await db.orders.insert_one(order_doc)
+            order_doc.pop("_id", None)
+        except Exception as e:
+            logger.warning("MongoDB orders insert error: %s", e)
     return order_doc
 
 
 @api_router.get("/orders/{order_number}")
 async def get_order(order_number: str):
-    doc = await db.orders.find_one({"order_number": order_number}, {"_id": 0})
+    doc = None
+    if db is not None:
+        try:
+            doc = await db.orders.find_one({"order_number": order_number}, {"_id": 0})
+        except Exception as e:
+            logger.warning("MongoDB orders find error: %s", e)
+    if not doc:
+        doc = MEMORY_ORDERS.get(order_number)
     if not doc:
         raise HTTPException(status_code=404, detail="Order not found")
     return doc
+
+
+@api_router.post("/orders/{order_number}/screenshot")
+async def attach_order_screenshot(order_number: str, payload: AttachScreenshotRequest):
+    if not payload.payment_screenshot:
+        raise HTTPException(status_code=400, detail="Screenshot is required")
+    if order_number in MEMORY_ORDERS:
+        MEMORY_ORDERS[order_number]["payment_screenshot"] = payload.payment_screenshot
+    matched = False
+    if db is not None:
+        try:
+            res = await db.orders.update_one(
+                {"order_number": order_number},
+                {"$set": {"payment_screenshot": payload.payment_screenshot}}
+            )
+            matched = res.matched_count > 0
+        except Exception as e:
+            logger.warning("MongoDB orders screenshot update error: %s", e)
+    if not matched and order_number not in MEMORY_ORDERS:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {"ok": True, "order_number": order_number}
 
 
 app.include_router(api_router)
