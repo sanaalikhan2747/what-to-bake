@@ -80,7 +80,7 @@ PRODUCTS = [
       "moods": ["Chocolate lover"], "occasions": ["Birthday", "Gift", "Just craving something"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791141262/Gemini_Generated_Image_asmttfasmttfasmt.jpg",
       "story": "Rich cocoa crumb studded with molten chocolate chunks throughout."},
-    {"id": "mini-loaves-pack", "name": "Mini Loaves (Pack of 4)", "category": "loaf", "price": 2000,
+    {"id": "mini-loaves-pack", "name": "Mini Loaves (Pack of 4)", "category": "loaf", "price": 2400,
      "serves": "4 mini loaves", "serves_min": 4, "serves_max": 8,
      "unit": "pack of 4", "batch_size": 4, "variants": ["Lemon", "Coconut", "Coffee Walnut", "Double Chocolate"],
       "moods": ["Something different", "Gift"], "occasions": ["Gift", "Tea party", "Family gathering"],

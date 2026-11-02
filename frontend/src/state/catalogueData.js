@@ -89,7 +89,7 @@ export const CATALOGUE_PRODUCTS = [
     id: "mini-loaves-pack",
     name: "Mini Loaves (Pack of 4)",
     category: "loaf",
-    price: 2000,
+    price: 2400,
     serves: "4 mini loaves",
     serves_min: 4,
     serves_max: 8,
