@@ -6,12 +6,13 @@
 .hero.magnoliabakery-carousel {
   position: relative;
   display: block;
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   height: clamp(560px, 78vh, 680px);
   min-height: 560px;
   max-height: 720px;
-  margin: 0;
-  padding: 0;
+  margin: 0 auto !important;
+  padding: 0 !important;
   overflow: hidden;
   isolation: isolate;
   background: #23141b;
@@ -345,6 +346,30 @@
 /* --------------------------------------------------------------------------
    Responsive Layout & Scaling
    -------------------------------------------------------------------------- */
+@media (min-width: 1200px) {
+  .hero.magnoliabakery-carousel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .hero-content-bounds {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+  .hero-controls-capsule {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .hero-arrow-prev {
+    left: clamp(28px, calc((100vw - 1360px) / 2 + 12px), 52px);
+  }
+  .hero-arrow-next {
+    right: clamp(28px, calc((100vw - 1360px) / 2 + 12px), 52px);
+  }
+}
+
 @media (max-width: 1050px) {
   .hero.magnoliabakery-carousel {
     height: clamp(520px, 72vh, 620px);
