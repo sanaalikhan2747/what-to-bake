@@ -285,7 +285,7 @@ export function getLocalPippaReply(message, history = []) {
       return (
         `🍫 For chocolate cravings, here is our decadent chocolate lineup:\n\n` +
         `• Fudgy & Rich: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n` +
-        `• Chilled Showstopper: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n` +
+        `• Chilled Showstopper: Salted Caramel Brownie Trifle Box (Rs. 2,500), Malt Cake Box (Rs. 1,800), or Chocolate Chip Cookie Delight (Rs. 1,800)\n` +
         `• Warm Oven Loaves: Choco Chip Banana Bread (Rs. 1,200 — premium choco chips), Choco Chip and Walnuts Banana Bread (Rs. 1,350), or Double Chocolate Loaf (Rs. 1,800)\n` +
         `• Bite-sized: Double Chocolate Cookie (Rs. 350) or Chocolate Trifle Cup (Rs. 400)\n\n` +
         `Are you craving warm baked slices or a cold creamy dessert box?`
@@ -319,7 +319,6 @@ export function getLocalPippaReply(message, history = []) {
       return (
         `☕ For coffee lovers:\n\n` +
         `• Coffee Bread with Walnut Crumble (Rs. 1,200) — rich coffee swirl topped with toasty walnuts\n` +
-        `• Coffee Cake with Nutty Brittle (Rs. 1,200) — moist coffee sponge with crunchy caramelized brittle\n` +
         `• Papparoti Buns (Box of 4, Rs. 1,200) — famous aromatic coffee caramel topping\n` +
         `• Banoffee Pie Trifle Box (Rs. 2,100) — pairs heavenly with a warm cup of espresso\n\n` +
         `Which one would pair best with your coffee?`

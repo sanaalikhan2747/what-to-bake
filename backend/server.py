@@ -121,11 +121,11 @@ PRODUCTS = [
       "moods": ["Warm & comforting"], "occasions": ["Family gathering", "Anniversary", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621229/Gemini_Generated_Image_5o2yxo5o2yxo5o2y.jpg",
       "story": "Dulce de leche toffee, fresh bananas, and coffee-dusted whipped cream."},
-     {"id": "coffee-cake-nutty", "name": "Coffee Cake with Nutty Brittle", "category": "cheesecake", "price": 1200,
-      "unit": "1 lb", "serves": "5–6", "serves_min": 5, "serves_max": 6,
-      "moods": ["Coffee lover"], "occasions": ["Tea party", "Anniversary", "Graduation"],
-      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621156/Gemini_Generated_Image_xbirs4xbirs4xbir.jpg",
-      "story": "Deep roast coffee crumb frosted with buttercream and crunchy nut brittle."},
+     {"id": "chocolate-chip-cookie-delight", "name": "Chocolate Chip Cookie Delight", "category": "cheesecake", "price": 1800,
+      "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
+      "moods": ["Chocolate lover", "Warm & comforting"], "occasions": ["Birthday", "Tea party", "Family gathering", "Gift", "Just craving something"],
+      "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793628520/Gemini_Generated_Image.jpg",
+      "story": "Layers of freshly baked chocolate chip cookies, velvety vanilla cream, and rich chocolate drizzle."},
      {"id": "fruit-trifle-box", "name": "Fruit Trifle Box", "category": "cheesecake", "price": 1800,
       "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Fresh & citrusy"], "occasions": ["Family gathering", "Tea party", "Gift"],
@@ -672,7 +672,7 @@ def _catalogue_chat_reply(message: str, history=None):
       return "🌙 For Eid celebrations, here is our festive variety:\n• Signature Eid Box (Rs. 3,800): 1 × Coconut Loaf, 4 × Double Choc Cookies, and 1 × Box of 4 Papparoti Buns!\n• Dessert Trifle Boxes: Fruit Trifle Box (Rs. 1,800) or Banoffee Pie Trifle Box (Rs. 2,100)\n• Loaves: Coconut Loaf (Rs. 1,200) or Apple Cinnamon Loaf (Rs. 950)"
 
     if any(w in lowered for w in ("chocolate", "choc", "fudge")) and not category:
-      return "🍫 For chocolate lovers, we have a decadent variety:\n• Fudgy: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n• Dessert Box: Salted Caramel Brownie Trifle Box (Rs. 2,500) or Malt Cake Box (Rs. 1,800)\n• Warm Loaves: Choco Chip Banana Bread (Rs. 1,200, premium choco chips), Choco Chip and Walnuts Banana Bread (Rs. 1,350), or Double Chocolate Loaf (Rs. 1,800)\n• Cookie: Double Chocolate Cookie (Rs. 350 each)"
+      return "🍫 For chocolate lovers, we have a decadent variety:\n• Fudgy: Classic Brownies (Box of 4, Rs. 1,200) or Gluten-Free Flourless Brownies (Rs. 1,200)\n• Dessert Box: Salted Caramel Brownie Trifle Box (Rs. 2,500), Malt Cake Box (Rs. 1,800), or Chocolate Chip Cookie Delight (Rs. 1,800)\n• Warm Loaves: Choco Chip Banana Bread (Rs. 1,200, premium choco chips), Choco Chip and Walnuts Banana Bread (Rs. 1,350), or Double Chocolate Loaf (Rs. 1,800)\n• Cookie: Double Chocolate Cookie (Rs. 350 each)"
 
     recommendation = any(word in query for word in ("recommend", "suggest", "what should", "which one", "best for", "perfect for", "match me", "surprise"))
     if recommendation:
