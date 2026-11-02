@@ -217,7 +217,7 @@ export function getLocalPippaReply(message, history = []) {
       return (
         `🎂 For a wonderful birthday celebration (${people} guests), here is our top variety:\n\n` +
         `1. 🍰 Centerpiece Showstoppers:\n` +
-        `   • New York Cheesecake (Rs. 2,200 — velvety, rich, classic graham crust, serves 6–8)\n` +
+        `   • New York Cheesecake (Rs. 2,200 — velvety, rich, classic graham crust, serves 5–6)\n` +
         `   • Salted Caramel Brownie Trifle Box (Rs. 2,500 — layers of fudgy brownie, caramel & cream)\n\n` +
         `2. 🎁 Curated Gifting:\n` +
         `   • Birthday Box (Rs. 3,800: 1 × Choco Chip Banana Bread + 4 × Double Chocolate Cookies + 1 × Box of 4 Brownies, ribbon-tied)\n\n` +
@@ -252,7 +252,7 @@ export function getLocalPippaReply(message, history = []) {
       return (
         `🌙 For Eid and family gatherings (${people} guests), here is a festive variety for sharing:\n\n` +
         `• Curated Eid Box (Rs. 3,800): 1 × Coconut Loaf + 4 × Double Chocolate Cookies + 1 × Box of 4 Papparoti Buns!\n` +
-        `• Large Dessert Trifle Boxes (serves 6–8):\n` +
+        `• Large Dessert Trifle Boxes (serves 5–6):\n` +
         `  - Fruit Trifle Box (Rs. 1,800) — light and refreshing with seasonal fruits\n` +
         `  - Banoffee Pie Trifle Box (Rs. 2,100) — fresh bananas and dulce de leche\n` +
         `• Loaf Favorites: Coconut Loaf (Rs. 1,200) or Apple Cinnamon Loaf (Rs. 950)\n\n` +
@@ -363,7 +363,7 @@ export function getLocalPippaReply(message, history = []) {
     const desserts = CATALOGUE_PRODUCTS.filter((p) => p.category === "cheesecake");
     const list = desserts.map((p) => `• ${p.name} (Rs. ${p.price.toLocaleString()} — serves ${p.serves})`).join("\n");
     return (
-      `🍰 Here are our signature cold-set Dessert Boxes & Cheesecakes (generous 6–8 servings each):\n\n` +
+      `🍰 Here are our signature cold-set Dessert Boxes & Cheesecakes (generous 5–6 servings each):\n\n` +
       `${list}\n\n` +
       `Each dessert box is layered to perfection and served chilled. Which flavor catches your eye?`
     );
@@ -431,7 +431,7 @@ export function getLocalPippaReply(message, history = []) {
     return (
       `✨ Our most celebrated customer favorites across the menu:\n\n` +
       `1. 🍞 **Warm Banana Bread** (Rs. 1,200) — same-day oven fresh in Lahore, pure butter with molten chocolate chips.\n` +
-      `2. 🍰 **New York Cheesecake** (Rs. 2,200) — velvety smooth on a buttery graham crust, serves 6–8.\n` +
+      `2. 🍰 **New York Cheesecake** (Rs. 2,200) — velvety smooth on a buttery graham crust, serves 5–6.\n` +
       `3. 🧁 **Cinnamon Rolls** (Pack of 4, Rs. 1,600) — pillowy soft with vanilla cream cheese icing.\n` +
       `4. 🍮 **Salted Caramel Brownie Trifle Box** (Rs. 2,500) — layered fudge brownies, caramel, and cream.\n\n` +
       `Tell me if you prefer something chocolatey, fruity, or toasty for tea time!`

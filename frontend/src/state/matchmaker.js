@@ -13,7 +13,7 @@ export function getProductServes(product) {
   if (unit.includes("cup") || unit.includes("piece")) {
     return { min: 1, max: 2, text: product.unit || "Individual" };
   }
-  return { min: 6, max: 8, text: product.serves || "6–8" };
+  return { min: 5, max: 6, text: product.serves || "5–6" };
 }
 
 export function scoreProduct(product, { occasion, mood, people, budget, dietary, category }) {

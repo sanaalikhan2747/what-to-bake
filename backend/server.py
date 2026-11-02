@@ -101,38 +101,38 @@ PRODUCTS = [
 
      # Cheesecake & dessert boxes
      {"id": "nyc-cheesecake", "name": "New York Cheesecake", "category": "cheesecake", "price": 2200,
-      "unit": "1 lb", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 lb", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "variants": ["Strawberry Topping", "Lemon Topping"],
       "moods": ["Fresh & citrusy", "Something different"], "occasions": ["Anniversary", "Birthday", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1793177336/Screenshot_20261027_225057_Gallery.jpg",
       "story": "Silky slow-baked cheesecake on a buttery biscuit crust with fruit topping."},
      {"id": "pineapple-cheesecake", "name": "Pineapple Dessert Box", "category": "cheesecake", "price": 1800,
-      "unit": "1 lb", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 lb", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Fresh & citrusy", "Something different"], "occasions": ["Tea party", "Gift", "Family gathering"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791622441/419066.jpg",
       "story": "Juicy tropical pineapple layered with light, pillowy cream cheese."},
      {"id": "banoffee-pie", "name": "Banoffee Pie Trifle Box", "category": "cheesecake", "price": 2100,
-      "unit": "1 box", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Warm & comforting"], "occasions": ["Family gathering", "Anniversary", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621229/Gemini_Generated_Image_5o2yxo5o2yxo5o2y.jpg",
       "story": "Dulce de leche toffee, fresh bananas, and coffee-dusted whipped cream."},
      {"id": "coffee-cake-nutty", "name": "Coffee Cake with Nutty Brittle", "category": "cheesecake", "price": 1200,
-      "unit": "1 lb", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 lb", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Coffee lover"], "occasions": ["Tea party", "Anniversary", "Graduation"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621156/Gemini_Generated_Image_xbirs4xbirs4xbir.jpg",
       "story": "Deep roast coffee crumb frosted with buttercream and crunchy nut brittle."},
      {"id": "fruit-trifle-box", "name": "Fruit Trifle Box", "category": "cheesecake", "price": 1800,
-      "unit": "1 box", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Fresh & citrusy"], "occasions": ["Family gathering", "Tea party", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621178/Gemini_Generated_Image_6u3an76u3an76u3a.jpg",
       "story": "Golden sponge layered with fresh seasonal fruit and silky custard."},
      {"id": "salted-caramel-brownie-trifle", "name": "Salted Caramel Brownie Trifle Box", "category": "cheesecake", "price": 2500,
-      "unit": "1 box", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Chocolate lover"], "occasions": ["Birthday", "Family gathering", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791624702/Gemini_Generated_Image_5j06gv5j06gv5j06.jpg",
       "story": "Fudgy brownie bites, housemade salted caramel, and chantilly cream."},
      {"id": "malt-cake-box", "name": "Malt Cake Box", "category": "cheesecake", "price": 1800,
-      "unit": "1 box", "serves": "6–8", "serves_min": 6, "serves_max": 8,
+      "unit": "1 box", "serves": "5–6", "serves_min": 5, "serves_max": 6,
       "moods": ["Chocolate lover"], "occasions": ["Birthday", "Family gathering", "Gift"],
       "image": "https://res.cloudinary.com/n9pu62pg/image/upload/v1791621203/Gemini_Generated_Image_92833d92833d9283.jpg",
       "story": "Tender chocolate malt cake frosted with signature malt fudge."},
@@ -332,7 +332,7 @@ def _product_serves_range(product):
     unit = str(product.get("unit", "")).lower()
     if any(k in unit for k in ("cup", "piece", "each")):
         return 1, 2
-    return 6, 8
+    return 5, 6
 
 
 def _score(product, req: MatchRequest):
@@ -658,7 +658,7 @@ def _catalogue_chat_reply(message: str, history=None):
 
     # Occasion-specific customer variety
     if occasion == "Birthday":
-      return "🎂 For a birthday celebration, here is our top variety:\n• Centerpieces: New York Cheesecake (Rs. 2,200, serves 6–8) or Salted Caramel Brownie Trifle Box (Rs. 2,500)\n• Gift Box: Birthday Box (Rs. 3,800: Banana Bread + 4 Double Choc Cookies + Box of 4 Brownies, ribbon-tied)\n• Sharing Cups: Chocolate Trifle Cup (Rs. 400) or Malt Cake Cup (Rs. 400)\nWould you like rich chocolate or creamy cheesecake?"
+      return "🎂 For a birthday celebration, here is our top variety:\n• Centerpieces: New York Cheesecake (Rs. 2,200, serves 5–6) or Salted Caramel Brownie Trifle Box (Rs. 2,500)\n• Gift Box: Birthday Box (Rs. 3,800: Banana Bread + 4 Double Choc Cookies + Box of 4 Brownies, ribbon-tied)\n• Sharing Cups: Chocolate Trifle Cup (Rs. 400) or Malt Cake Cup (Rs. 400)\nWould you like rich chocolate or creamy cheesecake?"
 
     if occasion == "Tea party":
       return "🫖 For high tea or afternoon tea, we recommend this spread:\n• Coffee Bread with Walnut Crumble (Rs. 1,200) — toasty, aromatic, slices beautifully\n• Moist Lemon Loaf (Rs. 1,200) — bright citrus glaze\n• Cinnamon Rolls (Pack of 4, Rs. 1,600) — warm and pillowy with cream cheese icing\n• Chocolate Chip Cookies (Rs. 300 each)\nOr choose our Anniversary Box (Rs. 2,400) which pairs Coffee Bread with 4 Cookies!"
